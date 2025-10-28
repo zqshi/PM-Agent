@@ -6,6 +6,7 @@
     <title>ProductCoCreate AI - 项目详情</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="js/process-flow-service.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -88,7 +89,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 transition-all">
+                    <a href="#" class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 transition-all" onclick="event.preventDefault(); alert('系统设置功能正在开发中，敬请期待！');">
                         <i class="fa fa-cog w-6 text-center"></i>
                         <span class="ml-3 sidebar-text">系统设置</span>
                     </a>
@@ -127,9 +128,6 @@
                         </div>
                     </div>
                 </div>
-                <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-secondary transition-all">
-                    <i class="fa fa-cog mr-2"></i>项目设置
-                </button>
             </div>
         </div>
 
@@ -143,6 +141,8 @@
 
         <!-- Version List -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="versionList">
+            <!-- 动态版本卡片将在这里插入 -->
+
             <!-- Version Card 1 -->
             <div class="version-card bg-white rounded-lg shadow-md p-6" onclick="goToVersion(1)">
                 <div class="flex items-start justify-between mb-4">
@@ -258,6 +258,99 @@
         </div>
     </main>
 
+    <!-- 版本创建模态对话框 -->
+    <div id="versionModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+        <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between">
+                <h3 class="text-xl font-bold text-gray-800">创建新版本</h3>
+                <button onclick="closeVersionModal()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fa fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <div class="p-6">
+                <!-- 版本类型选择 -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-3">版本类型</label>
+                    <div class="grid grid-cols-2 gap-3" id="versionTypeSelector">
+                        <!-- 初始版本 - 仅在没有版本时显示 -->
+                        <div class="version-type-option border-2 rounded-lg p-4 cursor-pointer hover:border-primary transition-all" data-type="initial">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-bold text-gray-800">初始版本</span>
+                                <span class="text-sm text-gray-500 font-mono">v1.0.0</span>
+                            </div>
+                            <p class="text-xs text-gray-600">项目的第一个正式版本</p>
+                        </div>
+
+                        <!-- 修订版本 -->
+                        <div class="version-type-option border-2 rounded-lg p-4 cursor-pointer hover:border-primary transition-all" data-type="patch">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-bold text-gray-800">修订版本 (Patch)</span>
+                                <span class="text-sm text-gray-500 font-mono" id="patchPreview">vX.Y.Z+1</span>
+                            </div>
+                            <p class="text-xs text-gray-600">向后兼容的问题修复</p>
+                        </div>
+
+                        <!-- 次版本 -->
+                        <div class="version-type-option border-2 rounded-lg p-4 cursor-pointer hover:border-primary transition-all" data-type="minor">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-bold text-gray-800">次版本 (Minor)</span>
+                                <span class="text-sm text-gray-500 font-mono" id="minorPreview">vX.Y+1.0</span>
+                            </div>
+                            <p class="text-xs text-gray-600">向后兼容的功能新增</p>
+                        </div>
+
+                        <!-- 主版本 -->
+                        <div class="version-type-option border-2 rounded-lg p-4 cursor-pointer hover:border-primary transition-all" data-type="major">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-bold text-gray-800">主版本 (Major)</span>
+                                <span class="text-sm text-gray-500 font-mono" id="majorPreview">vX+1.0.0</span>
+                            </div>
+                            <p class="text-xs text-gray-600">不兼容的重大变更</p>
+                        </div>
+                    </div>
+                    <input type="hidden" id="selectedVersionType" value="">
+                </div>
+
+                <!-- 版本说明 -->
+                <div class="mb-4 p-3 bg-blue-50 rounded-md">
+                    <p class="text-xs text-blue-800">
+                        <i class="fa fa-info-circle mr-1"></i>
+                        <strong>版本号规则：</strong>采用语义化版本控制（SemVer），格式为 vX.Y.Z
+                    </p>
+                    <ul class="text-xs text-blue-700 mt-2 ml-5 space-y-1">
+                        <li>• 主版本号(X)：不兼容的API变更</li>
+                        <li>• 次版本号(Y)：向后兼容的功能新增</li>
+                        <li>• 修订号(Z)：向后兼容的问题修复</li>
+                    </ul>
+                </div>
+
+                <!-- 版本建设目标 -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        版本建设目标 <span class="text-red-500">*</span>
+                    </label>
+                    <textarea id="versionGoal" rows="3"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                        placeholder="例如：优化用户体验，提升系统性能，增加移动端支持..."></textarea>
+                </div>
+
+                <!-- 按钮区域 -->
+                <div class="flex items-center justify-end space-x-3 pt-4 border-t">
+                    <button onclick="closeVersionModal()"
+                        class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-all">
+                        取消
+                    </button>
+                    <button onclick="confirmCreateVersion()"
+                        class="px-4 py-2 bg-primary text-white rounded-md hover:bg-secondary transition-all">
+                        <i class="fa fa-check mr-2"></i>创建版本
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/process-flow-service.js"></script>
     <script>
         function goToVersion(versionId) {
             // 获取URL参数中的项目ID
@@ -268,20 +361,374 @@
             window.location.href = `version-detail.html?projectId=${projectId}&versionId=${versionId}`;
         }
 
-        // 创建新版本
-        document.getElementById('createVersionBtn').addEventListener('click', function() {
-            // 这里可以打开创建版本的对话框
-            alert('创建新版本功能');
+
+        // 存储当前项目的版本信息
+        let projectVersions = [
+            { version: 'v1.0.0', major: 1, minor: 0, patch: 0 },
+            { version: 'v2.0.0', major: 2, minor: 0, patch: 0 },
+            { version: 'v2.1.0', major: 2, minor: 1, patch: 0 }
+        ];
+
+        // 获取最新版本号
+        function getLatestVersion() {
+            if (projectVersions.length === 0) return null;
+
+            // 按版本号排序，找到最大的版本
+            const sorted = [...projectVersions].sort((a, b) => {
+                if (a.major !== b.major) return b.major - a.major;
+                if (a.minor !== b.minor) return b.minor - a.minor;
+                return b.patch - a.patch;
+            });
+
+            return sorted[0];
+        }
+
+        // 计算新版本号
+        function calculateNewVersion(type) {
+            if (type === 'initial') {
+                return { version: 'v1.0.0', major: 1, minor: 0, patch: 0 };
+            }
+
+            const latest = getLatestVersion();
+            if (!latest) {
+                return { version: 'v1.0.0', major: 1, minor: 0, patch: 0 };
+            }
+
+            let newVersion;
+            switch (type) {
+                case 'patch':
+                    newVersion = {
+                        major: latest.major,
+                        minor: latest.minor,
+                        patch: latest.patch + 1
+                    };
+                    break;
+                case 'minor':
+                    newVersion = {
+                        major: latest.major,
+                        minor: latest.minor + 1,
+                        patch: 0
+                    };
+                    break;
+                case 'major':
+                    newVersion = {
+                        major: latest.major + 1,
+                        minor: 0,
+                        patch: 0
+                    };
+                    break;
+                default:
+                    return latest;
+            }
+
+            newVersion.version = `v${newVersion.major}.${newVersion.minor}.${newVersion.patch}`;
+            return newVersion;
+        }
+
+        // 打开版本创建模态框
+        function openVersionModal() {
+            const modal = document.getElementById('versionModal');
+            modal.classList.remove('hidden');
+
+            // 更新版本预览
+            updateVersionPreviews();
+
+            // 如果项目已有版本，隐藏初始版本选项
+            const hasVersions = projectVersions.length > 0;
+            const initialOption = document.querySelector('[data-type="initial"]');
+
+            if (hasVersions) {
+                initialOption.style.display = 'none';
+                // 默认选择patch
+                selectVersionType('patch');
+            } else {
+                initialOption.style.display = 'block';
+                // 默认选择initial
+                selectVersionType('initial');
+            }
+        }
+
+        // 关闭版本创建模态框
+        function closeVersionModal() {
+            const modal = document.getElementById('versionModal');
+            modal.classList.add('hidden');
+
+            // 清空表单
+            document.getElementById('versionGoal').value = '';
+            document.getElementById('selectedVersionType').value = '';
+
+            // 清除选中状态
+            document.querySelectorAll('.version-type-option').forEach(opt => {
+                opt.classList.remove('border-primary', 'bg-blue-50');
+            });
+        }
+
+        // 更新版本预览
+        function updateVersionPreviews() {
+            const latest = getLatestVersion();
+
+            if (latest) {
+                const patchVersion = calculateNewVersion('patch');
+                const minorVersion = calculateNewVersion('minor');
+                const majorVersion = calculateNewVersion('major');
+
+                document.getElementById('patchPreview').textContent = patchVersion.version;
+                document.getElementById('minorPreview').textContent = minorVersion.version;
+                document.getElementById('majorPreview').textContent = majorVersion.version;
+            }
+        }
+
+        // 选择版本类型
+        function selectVersionType(type) {
+            // 移除所有选中状态
+            document.querySelectorAll('.version-type-option').forEach(opt => {
+                opt.classList.remove('border-primary', 'bg-blue-50');
+            });
+
+            // 添加选中状态
+            const selectedOption = document.querySelector(`[data-type="${type}"]`);
+            if (selectedOption) {
+                selectedOption.classList.add('border-primary', 'bg-blue-50');
+                document.getElementById('selectedVersionType').value = type;
+            }
+        }
+
+        // 版本类型点击事件
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.version-type-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    const type = this.getAttribute('data-type');
+                    selectVersionType(type);
+                });
+            });
         });
+
+        // 确认创建版本
+        function confirmCreateVersion() {
+            const versionType = document.getElementById('selectedVersionType').value;
+            const versionGoal = document.getElementById('versionGoal').value.trim();
+
+            // 验证输入
+            if (!versionType) {
+                alert('请选择版本类型！');
+                return;
+            }
+
+            if (!versionGoal) {
+                alert('请输入版本建设目标！');
+                return;
+            }
+
+            // 计算新版本号
+            const newVersionInfo = calculateNewVersion(versionType);
+
+            // 创建版本
+            createVersion(newVersionInfo, versionGoal);
+
+            // 关闭模态框
+            closeVersionModal();
+        }
+
+        // 创建版本
+        function createVersion(versionInfo, goal) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const projectId = urlParams.get('id') || '1';
+            const versionId = Date.now();
+
+            // 添加到版本列表
+            projectVersions.push(versionInfo);
+
+            // 生成版本mock数据
+            const statuses = [
+                { badge: 'badge-development', text: '开发中' },
+                { badge: 'badge-active', text: '规划中' }
+            ];
+            const randomStatus = statuses[0]; // 新创建的版本默认为"规划中"
+            const processCount = 0; // 初始没有流程
+            const randomDocCount = 0; // 初始没有文档
+            const randomProgress = 0; // 初始进度0%
+
+            const today = new Date();
+            const futureDate = new Date(today);
+            futureDate.setMonth(futureDate.getMonth() + Math.floor(Math.random() * 4) + 2); // 2-6个月后
+
+            // 创建版本卡片HTML
+            const newVersionHTML = `
+                <div class="version-card bg-white rounded-lg shadow-md p-6" onclick="goToVersion(${versionId})">
+                    <div class="flex items-start justify-between mb-4">
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-800">${versionInfo.version}</h3>
+                            <span class="badge ${randomStatus.badge} mt-2 inline-block">${randomStatus.text}</span>
+                        </div>
+                        <i class="fa fa-chevron-right text-gray-400"></i>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-4"><strong>建设目标：</strong>${goal}</p>
+                    <div class="space-y-2 mb-4">
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-gray-500">流程数量</span>
+                            <span class="font-medium text-gray-800">${processCount}个</span>
+                        </div>
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-gray-500">文档数量</span>
+                            <span class="font-medium text-gray-800">${randomDocCount}个</span>
+                        </div>
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-gray-500">完成度</span>
+                            <span class="font-medium text-blue-600">${randomProgress}%</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between text-xs text-gray-500 pt-4 border-t">
+                        <span>创建于: ${today.toISOString().split('T')[0]}</span>
+                        <span>预计: ${futureDate.toISOString().split('T')[0]}</span>
+                    </div>
+                </div>
+            `;
+
+            // 插入到版本列表
+            const versionList = document.getElementById('versionList');
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = newVersionHTML;
+            versionList.insertBefore(tempDiv.firstElementChild, versionList.firstChild);
+
+            // 更新统计数据
+            updateVersionStats(1, processCount, randomDocCount);
+
+            // 显示成功消息
+            showToast('success', `版本 ${versionInfo.version} 创建成功！`);
+        }
+
+        // 创建新版本（点击按钮）
+        document.getElementById('createVersionBtn').addEventListener('click', function() {
+            openVersionModal();
+        });
+
+        // 更新版本统计数据
+        function updateVersionStats(versionChange, processChange, docChange) {
+            const versionElement = document.querySelector('.grid.grid-cols-4 > div:nth-child(1) .text-3xl');
+            const processElement = document.querySelector('.grid.grid-cols-4 > div:nth-child(3) .text-3xl');
+            const docElement = document.querySelector('.grid.grid-cols-4 > div:nth-child(2) .text-3xl');
+
+            if (versionElement) {
+                const current = parseInt(versionElement.textContent);
+                versionElement.textContent = current + versionChange;
+            }
+            if (processElement) {
+                const current = parseInt(processElement.textContent);
+                processElement.textContent = current + processChange;
+            }
+            if (docElement) {
+                const current = parseInt(docElement.textContent);
+                docElement.textContent = current + docChange;
+            }
+        }
+
+        // 显示Toast提示
+        function showToast(type, message) {
+            const colors = {
+                success: 'bg-green-500',
+                error: 'bg-red-500',
+                info: 'bg-blue-500'
+            };
+            const icons = {
+                success: 'fa-check-circle',
+                error: 'fa-times-circle',
+                info: 'fa-info-circle'
+            };
+
+            const toast = document.createElement('div');
+            toast.className = `fixed top-4 right-4 ${colors[type]} text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in`;
+            toast.innerHTML = `<i class="fa ${icons[type]} mr-2"></i>${message}`;
+            toast.style.animation = 'fadeIn 0.3s ease-in-out';
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
 
         // 根据URL参数加载项目数据
         window.addEventListener('DOMContentLoaded', function() {
+            // 确保数据已初始化
+            if (typeof processFlowService !== 'undefined') {
+                processFlowService.initializeMockData();
+            }
+
             const urlParams = new URLSearchParams(window.location.search);
             const projectId = urlParams.get('id');
 
-            // 这里可以根据projectId加载实际数据
             console.log('加载项目ID:', projectId);
+
+            // 如果是project_001，动态加载mock版本和流程数据
+            if (projectId === 'project_001') {
+                loadMockProjectData();
+            }
         });
+
+        // 加载Mock项目数据
+        function loadMockProjectData() {
+            const versionList = document.getElementById('versionList');
+
+            // 获取version数据
+            const versionsData = localStorage.getItem('versions');
+            const flowsData = localStorage.getItem('process_flows');
+
+            if (versionsData && flowsData) {
+                const versions = JSON.parse(versionsData);
+                const flows = JSON.parse(flowsData);
+
+                const version = versions['version_001'];
+                const flow = flows['process_1730076000000'];
+
+                if (version && flow) {
+                    // 创建版本卡片
+                    const versionCard = document.createElement('div');
+                    versionCard.className = 'version-card bg-white rounded-lg shadow-md p-6';
+                    versionCard.onclick = function() {
+                        window.location.href = `version-detail.html?projectId=project_001&versionId=version_001`;
+                    };
+
+                    versionCard.innerHTML = `
+                        <div class="flex items-start justify-between mb-4">
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800">${version.name}</h3>
+                                <span class="badge badge-development mt-2 inline-block">开发中</span>
+                            </div>
+                            <i class="fa fa-chevron-right text-gray-400"></i>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-4">${version.description}</p>
+                        <div class="space-y-2 mb-4">
+                            <div class="flex items-center justify-between text-sm">
+                                <span class="text-gray-500">流程数量</span>
+                                <span class="font-medium text-gray-800">${version.processes.length}个</span>
+                            </div>
+                            <div class="flex items-center justify-between text-sm">
+                                <span class="text-gray-500">文档数量</span>
+                                <span class="font-medium text-gray-800">${flow.documents.length}个</span>
+                            </div>
+                            <div class="flex items-center justify-between text-sm">
+                                <span class="text-gray-500">完成度</span>
+                                <span class="font-medium text-blue-600">${version.progress}%</span>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full" style="width: ${version.progress}%"></div>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between text-xs text-gray-500 pt-4 border-t">
+                            <span>创建于: ${new Date(version.createdAt).toLocaleDateString('zh-CN')}</span>
+                            <span>预计: ${version.estimatedReleaseDate}</span>
+                        </div>
+                    `;
+
+                    // 插入到版本列表最前面
+                    versionList.insertBefore(versionCard, versionList.firstChild);
+
+                    console.log('✅ 已加载Mock版本数据');
+                }
+            }
+        }
     </script>
 </body>
 </html>

@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI协作流程详情</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="js/process-flow-service.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#4f46e5',
+                        success: '#10b981',
+                        warning: '#f59e0b',
+                        danger: '#ef4444'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background-color: #f8fafc;
+        }
+        .sidebar {
+            width: 250px;
+        }
+        .step-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .step-card:hover {
+            background-color: #f9fafb;
+            transform: translateX(5px);
+        }
+        .step-card.active {
+            border-left: 4px solid #2563eb;
+            background-color: #eff6ff;
+        }
+        .step-card.completed {
+            border-left: 4px solid #10b981;
+        }
+        .step-card.skipped {
+            opacity: 0.6;
+        }
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .status-pending {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        .status-in-progress {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+        .status-completed {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        .status-skipped {
+            background-color: #f3f4f6;
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex">
+    <!-- Sidebar -->
+    <aside class="sidebar bg-white shadow-md h-screen fixed left-0 top-0 z-10">
+        <div class="p-4 flex items-center justify-between border-b">
+            <div class="flex items-center">
+                <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/e10cd3e372b34c81bd38e133e4bd5b6f~tplv-a9rns2rl98-image.image?rcl=202510281322428F39A82D876F62A3D046&rk3s=8e244e95&rrcfp=f06b921b&x-expires=1764221004&x-signature=F1qcXPuf02II05L0PsQjVA3rO4o%3D" alt="Logo" class="h-8">
+                <h1 class="ml-2 text-lg font-bold text-gray-800">ProductCoCreate</h1>
+            </div>
+        </div>
+        <nav class="mt-4">
+            <ul>
+                <li>
+                    <a href="dashboard.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 transition-all">
+                        <i class="fa fa-dashboard w-6 text-center"></i>
+                        <span class="ml-3">仪表盘</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="project-management.html" class="bg-blue-50 text-primary border-l-4 border-primary flex items-center px-4 py-3 hover:bg-blue-50 transition-all">
+                        <i class="fa fa-folder-open w-6 text-center"></i>
+                        <span class="ml-3">项目管理</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 transition-all" onclick="event.preventDefault(); alert('系统设置功能正在开发中，敬请期待！');">
+                        <i class="fa fa-cog w-6 text-center"></i>
+                        <span class="ml-3">系统设置</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="ml-64 flex-1 min-h-screen p-6">
+        <!-- Breadcrumb -->
+        <nav class="flex mb-6 text-sm">
+            <a href="project-management.html" class="text-primary hover:text-secondary">项目管理</a>
+            <span class="mx-2 text-gray-400">/</span>
+            <a href="project-detail.html?id=1" class="text-primary hover:text-secondary" id="projectLink">项目</a>
+            <span class="mx-2 text-gray-400">/</span>
+            <a href="version-detail.html" class="text-primary hover:text-secondary" id="versionLink">版本</a>
+            <span class="mx-2 text-gray-400">/</span>
+            <span class="text-gray-600" id="processName">AI协作流程</span>
+        </nav>
+
+        <!-- Process Header -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div class="flex items-start justify-between">
+                <div class="flex-1">
+                    <div class="flex items-center mb-2">
+                        <h1 class="text-3xl font-bold text-gray-800" id="processTitle">加载中...</h1>
+                        <span class="ml-4 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium" id="processStatus">进行中</span>
+                    </div>
+                    <p class="text-gray-600 mb-4" id="processRequirement">正在加载流程信息...</p>
+                    <div class="flex items-center space-x-6 text-sm text-gray-600">
+                        <span><i class="fa fa-calendar mr-2"></i>创建于: <span id="createdAt">--</span></span>
+                        <span><i class="fa fa-clock-o mr-2"></i>当前步骤: <span id="currentStep">--</span></span>
+                        <span><i class="fa fa-user mr-2"></i>负责Agent: <span id="currentAgent">--</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Overview -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold text-gray-800">整体进度</h3>
+                <span class="text-2xl font-bold text-primary" id="progressPercent">0%</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-3 mb-4">
+                <div class="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all duration-500" style="width: 0%" id="progressBar"></div>
+            </div>
+            <div class="grid grid-cols-4 gap-4">
+                <div class="text-center">
+                    <p class="text-2xl font-bold text-gray-800" id="totalSteps">12</p>
+                    <p class="text-sm text-gray-600">总步骤数</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-2xl font-bold text-success" id="completedSteps">0</p>
+                    <p class="text-sm text-gray-600">已完成</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-2xl font-bold text-warning" id="inProgressSteps">1</p>
+                    <p class="text-sm text-gray-600">进行中</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-2xl font-bold text-info" id="documentCount">0</p>
+                    <p class="text-sm text-gray-600">文档数</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 13 Steps Flow -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h3 class="text-xl font-bold text-gray-800 mb-6">流程步骤 (13步)</h3>
+            <div class="space-y-3" id="stepsContainer">
+                <!-- Steps will be dynamically generated here -->
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let currentProcessFlow = null;
+
+        // 页面加载时获取流程数据
+        window.addEventListener('DOMContentLoaded', function() {
+            // 确保数据已初始化
+            if (typeof processFlowService !== 'undefined') {
+                processFlowService.initializeMockData();
+            }
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const processId = urlParams.get('processId');
+
+            if (!processId) {
+                console.error('未提供流程ID参数');
+                alert('流程ID不存在！请从项目管理页面进入。');
+                window.location.href = 'project-management.html';
+                return;
+            }
+
+            console.log('尝试获取流程:', processId);
+
+            // 获取流程数据
+            currentProcessFlow = processFlowService.getProcessFlow(processId);
+
+            if (!currentProcessFlow) {
+                console.error('流程不存在:', processId);
+                console.log('localStorage中的流程数据:', localStorage.getItem('process_flows'));
+                alert('流程不存在！流程ID: ' + processId);
+                window.location.href = 'project-management.html';
+                return;
+            }
+
+            console.log('成功获取流程数据:', currentProcessFlow);
+
+            // 渲染页面
+            renderProcessHeader();
+            renderProgress();
+            renderSteps();
+            updateBreadcrumb();
+        });
+
+        // 渲染流程头部
+        function renderProcessHeader() {
+            document.getElementById('processTitle').textContent = currentProcessFlow.name;
+            document.getElementById('processRequirement').textContent = '需求：' + currentProcessFlow.requirement;
+            document.getElementById('createdAt').textContent = new Date(currentProcessFlow.createdAt).toLocaleString('zh-CN');
+            document.getElementById('currentStep').textContent = getStepName(currentProcessFlow.currentStep);
+
+            const currentStepData = currentProcessFlow.steps[currentProcessFlow.currentStep.replace('_judgment', '')];
+            document.getElementById('currentAgent').textContent = currentStepData?.agentName || '人工操作';
+
+            // 更新状态
+            const statusMap = {
+                'pending': { text: '待开始', class: 'bg-yellow-100 text-yellow-700' },
+                'in_progress': { text: '进行中', class: 'bg-blue-100 text-blue-700' },
+                'completed': { text: '已完成', class: 'bg-green-100 text-green-700' }
+            };
+            const status = statusMap[currentProcessFlow.status] || statusMap['in_progress'];
+            const statusElement = document.getElementById('processStatus');
+            statusElement.textContent = status.text;
+            statusElement.className = `ml-4 px-3 py-1 rounded-full text-sm font-medium ${status.class}`;
+        }
+
+        // 获取步骤名称
+        function getStepName(stepId) {
+            const stepNames = {
+                '1.1': '1.1 需求澄清',
+                '1.2': '1.2 市场调研',
+                '1.3': '1.3 需求设计',
+                '1.4': '1.4 设计挑战',
+                '1.5': '1.5 挑战回应',
+                '1.6': '1.6 人类裁决',
+                '1.7': '1.7 设计更新',
+                '1.8': '1.8 人类评估',
+                '1.9': '1.9 文档修改',
+                '1.11': '1.11 差异检查',
+                '1.12': '1.12 文档精炼',
+                '1.13': '1.13 强制检查点'
+            };
+            return stepNames[stepId] || stepId;
+        }
+
+        // 渲染进度
+        function renderProgress() {
+            const progress = processFlowService.getProgressPercentage(currentProcessFlow);
+            document.getElementById('progressPercent').textContent = progress + '%';
+            document.getElementById('progressBar').style.width = progress + '%';
+
+            const steps = Object.values(currentProcessFlow.steps);
+            const completed = steps.filter(s => s.status === 'completed').length;
+            const inProgress = steps.filter(s => s.status === 'in_progress').length;
+
+            document.getElementById('totalSteps').textContent = steps.length;
+            document.getElementById('completedSteps').textContent = completed;
+            document.getElementById('inProgressSteps').textContent = inProgress;
+            document.getElementById('documentCount').textContent = currentProcessFlow.documents.length;
+        }
+
+        // 渲染步骤列表
+        function renderSteps() {
+            const container = document.getElementById('stepsContainer');
+            container.innerHTML = '';
+
+            const stepOrder = ['1.1', '1.2', '1.3', '1.4', '1.5', '1.6', '1.7', '1.8', '1.9', '1.11', '1.12', '1.13'];
+
+            stepOrder.forEach(stepId => {
+                const step = currentProcessFlow.steps[stepId];
+                if (!step) return;
+
+                const statusClass = {
+                    'pending': 'status-pending',
+                    'in_progress': 'status-in-progress',
+                    'completed': 'status-completed',
+                    'skipped': 'status-skipped'
+                }[step.status] || 'status-pending';
+
+                const statusText = {
+                    'pending': '待开始',
+                    'in_progress': '进行中',
+                    'completed': '已完成',
+                    'skipped': '已跳过'
+                }[step.status] || '未知';
+
+                const cardClass = step.status === 'in_progress' ? 'step-card active' :
+                                 step.status === 'completed' ? 'step-card completed' :
+                                 step.status === 'skipped' ? 'step-card skipped' : 'step-card';
+
+                // 已完成和进行中的环节都可以点击查看详情
+                const isClickable = step.status === 'completed' || step.status === 'in_progress';
+
+                const clickHandler = isClickable ? `onclick="handleStepClick('${stepId}')"` : '';
+                const cursorStyle = isClickable ? 'cursor-pointer' : '';
+
+                const stepHTML = `
+                    <div class="${cardClass} p-4 border rounded-lg ${cursorStyle}" ${clickHandler}>
+                        <div class="flex items-start justify-between">
+                            <div class="flex items-start space-x-4 flex-1">
+                                <div class="flex-shrink-0">
+                                    <i class="fa ${getStepIcon(stepId)} text-2xl ${getStepIconColor(step.status)}"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex items-center space-x-3 mb-1">
+                                        <h4 class="text-lg font-bold text-gray-800">${getStepName(stepId)}</h4>
+                                        <span class="status-badge ${statusClass}">${statusText}</span>
+                                        ${isClickable ? '<i class="fa fa-chevron-right text-gray-400"></i>' : ''}
+                                    </div>
+                                    <p class="text-sm text-gray-600 mb-2">${step.agentName ? 'Agent: ' + step.agentName : '人工操作'}</p>
+                                    ${step.output ? `<p class="text-sm text-gray-700 mb-2">📤 ${step.output}</p>` : ''}
+                                    <div class="flex items-center space-x-4 text-xs text-gray-500">
+                                        ${step.documents.length > 0 ? `<span><i class="fa fa-file-text mr-1"></i>文档: ${step.documents.length}个</span>` : ''}
+                                        ${step.startedAt ? `<span><i class="fa fa-clock-o mr-1"></i>开始于 ${new Date(step.startedAt).toLocaleString('zh-CN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                            ${step.completedAt ? `<div class="text-xs text-gray-500 flex-shrink-0 ml-4">完成于 ${new Date(step.completedAt).toLocaleString('zh-CN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</div>` : ''}
+                        </div>
+                    </div>
+                `;
+
+                container.innerHTML += stepHTML;
+            });
+        }
+
+        // 获取步骤图标
+        function getStepIcon(stepId) {
+            const icons = {
+                '1.1': 'fa-comments',
+                '1.2': 'fa-search',
+                '1.3': 'fa-file-text',
+                '1.4': 'fa-flag',
+                '1.5': 'fa-reply',
+                '1.6': 'fa-gavel',
+                '1.7': 'fa-refresh',
+                '1.8': 'fa-check-square',
+                '1.9': 'fa-edit',
+                '1.11': 'fa-exchange',
+                '1.12': 'fa-magic',
+                '1.13': 'fa-shield'
+            };
+            return icons[stepId] || 'fa-circle';
+        }
+
+        // 获取步骤图标颜色
+        function getStepIconColor(status) {
+            const colors = {
+                'pending': 'text-gray-400',
+                'in_progress': 'text-blue-500',
+                'completed': 'text-green-500',
+                'skipped': 'text-gray-300'
+            };
+            return colors[status] || 'text-gray-400';
+        }
+
+        // 处理步骤点击
+        function handleStepClick(stepId) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const processId = urlParams.get('processId');
+
+            // 1.1和1.6有专门的交互页面，其他环节跳转到通用详情页
+            if (stepId === '1.1' && currentProcessFlow.steps['1.1'].status === 'in_progress') {
+                window.location.href = `clarification-interaction.html?processId=${processId}`;
+            } else if (stepId === '1.6' && currentProcessFlow.steps['1.6'].status === 'in_progress') {
+                window.location.href = `challenge-decision.html?processId=${processId}`;
+            } else {
+                // 所有环节都可以查看详情
+                window.location.href = `step-detail.html?processId=${processId}&stepId=${stepId}`;
+            }
+        }
+
+        // 更新面包屑
+        function updateBreadcrumb() {
+            if (currentProcessFlow.projectId) {
+                document.getElementById('projectLink').href = `project-detail.html?id=${currentProcessFlow.projectId}`;
+            }
+            if (currentProcessFlow.versionId) {
+                document.getElementById('versionLink').href = `version-detail.html?projectId=${currentProcessFlow.projectId}&versionId=${currentProcessFlow.versionId}`;
+            }
+        }
+
+    </script>
+</body>
+</html>

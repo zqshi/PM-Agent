@@ -4,12 +4,579 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ProductCoCreate AI - 需求澄清</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <script>
-        // 自动重定向到项目管理页面
-        window.location.href = 'redirect.html';
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#4f46e5',
+                        success: '#10b981',
+                        warning: '#f59e0b',
+                        danger: '#ef4444'
+                    }
+                }
+            }
+        }
     </script>
+    <style>
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background-color: #f8fafc;
+        }
+        .sidebar {
+            width: 250px;
+        }
+        .clarification-item {
+            transition: all 0.3s ease;
+        }
+        .clarification-item:hover {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .question-tag {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .pulse-dot {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .progress-step {
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+        .progress-step::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 100%;
+            width: 100%;
+            height: 2px;
+            background-color: #e5e7eb;
+        }
+        .progress-step.completed::after {
+            background-color: #10b981;
+        }
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            z-index: 1;
+        }
+        .response-input {
+            min-height: 120px;
+            resize: vertical;
+        }
+    </style>
 </head>
-<body>
-    <p>页面正在重定向，请稍候... 如果没有自动跳转，请点击 <a href="redirect.html">这里</a></p>
+<body class="min-h-screen flex">
+    <!-- Sidebar -->
+    <aside class="sidebar bg-white shadow-md h-screen fixed left-0 top-0 z-10">
+        <div class="p-4 flex items-center justify-between border-b">
+            <div class="flex items-center">
+                <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/e10cd3e372b34c81bd38e133e4bd5b6f~tplv-a9rns2rl98-image.image?rcl=202510281322428F39A82D876F62A3D046&rk3s=8e244e95&rrcfp=f06b921b&x-expires=1764221004&x-signature=F1qcXPuf02II05L0PsQjVA3rO4o%3D" alt="Logo" class="h-8">
+                <h1 class="ml-2 text-lg font-bold text-gray-800">ProductCoCreate</h1>
+            </div>
+        </div>
+        <nav class="mt-4">
+            <ul>
+                <li>
+                    <a href="dashboard.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 transition-all">
+                        <i class="fa fa-dashboard w-6 text-center"></i>
+                        <span class="ml-3">仪表盘</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="project-management.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 transition-all">
+                        <i class="fa fa-folder-open w-6 text-center"></i>
+                        <span class="ml-3">项目管理</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="bg-blue-50 text-primary border-l-4 border-primary flex items-center px-4 py-3 hover:bg-blue-50 transition-all">
+                        <i class="fa fa-comments w-6 text-center"></i>
+                        <span class="ml-3">需求澄清</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 transition-all" onclick="event.preventDefault(); alert('系统设置功能正在开发中，敬请期待！');">
+                        <i class="fa fa-cog w-6 text-center"></i>
+                        <span class="ml-3">系统设置</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="ml-64 flex-1 min-h-screen p-6">
+        <!-- Breadcrumb -->
+        <nav class="flex mb-6 text-sm">
+            <a href="project-management.html" class="text-primary hover:text-secondary">项目管理</a>
+            <span class="mx-2 text-gray-400">/</span>
+            <a href="project-detail.html?id=1" class="text-primary hover:text-secondary">移动应用重新设计</a>
+            <span class="mx-2 text-gray-400">/</span>
+            <a href="version-detail.html?projectId=1&versionId=2" class="text-primary hover:text-secondary">v2.0</a>
+            <span class="mx-2 text-gray-400">/</span>
+            <span class="text-gray-600">需求澄清</span>
+        </nav>
+
+        <!-- Header -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div class="flex items-start justify-between">
+                <div class="flex-1">
+                    <div class="flex items-center mb-3">
+                        <h1 class="text-3xl font-bold text-gray-800">步骤1.1：需求澄清</h1>
+                        <span class="ml-4 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium" id="statusBadge">
+                            <i class="fa fa-spinner fa-spin mr-1"></i>分析中
+                        </span>
+                    </div>
+                    <p class="text-gray-600 mb-4">Agent正在分析您的需求并生成澄清问题，请稍候...</p>
+
+                    <!-- Progress Bar -->
+                    <div class="mb-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-sm font-medium text-gray-700">澄清进度</span>
+                            <span class="text-sm font-medium text-primary" id="progressText">已回复 0/5</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full transition-all duration-500" style="width: 0%" id="progressBar"></div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center space-x-4 text-sm text-gray-600">
+                        <span><i class="fa fa-calendar mr-2"></i>开始时间: 2025-10-28 10:30</span>
+                        <span><i class="fa fa-user mr-2"></i>负责人: 张三</span>
+                        <span><i class="fa fa-refresh mr-2"></i>当前轮次: 第1轮</span>
+                    </div>
+                </div>
+                <div class="flex space-x-2">
+                    <button class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-all" onclick="saveDraft()">
+                        <i class="fa fa-save mr-2"></i>保存草稿
+                    </button>
+                    <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-secondary transition-all" id="submitBtn" onclick="submitClarification()" disabled>
+                        <i class="fa fa-check mr-2"></i>提交澄清
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Agent Status -->
+        <div class="bg-gradient-to-r from-purple-500 to-indigo-600 rounded-lg shadow-md p-6 mb-6 text-white" id="agentStatus">
+            <div class="flex items-center">
+                <div class="pulse-dot w-3 h-3 bg-white rounded-full mr-3"></div>
+                <div class="flex-1">
+                    <h3 class="font-bold text-lg mb-1">需求分析Agent正在工作中...</h3>
+                    <p class="text-sm opacity-90">正在基于您提供的需求描述生成针对性的澄清问题</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-2xl font-bold">2/5</p>
+                    <p class="text-xs opacity-75">问题生成中</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Clarification Questions -->
+        <div class="space-y-6" id="clarificationList">
+            <!-- Question 1 -->
+            <div class="clarification-item bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="flex items-center space-x-3">
+                        <span class="question-tag">澄清问题 1</span>
+                        <h3 class="text-xl font-bold text-gray-800">目标用户与使用场景</h3>
+                    </div>
+                    <span class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-medium" data-status="pending">
+                        <i class="fa fa-clock-o mr-1"></i>待回复
+                    </span>
+                </div>
+
+                <div class="mb-4 bg-blue-50 p-4 rounded-lg">
+                    <p class="text-sm font-medium text-blue-900 mb-2"><i class="fa fa-question-circle mr-2"></i>澄清问题：</p>
+                    <ul class="list-disc list-inside text-gray-700 space-y-1 ml-2">
+                        <li>本产品的主要目标用户是哪些部门或角色的员工？</li>
+                        <li>用户在什么场景下会使用这个产品？</li>
+                        <li>不同用户角色的使用频率和深度如何？</li>
+                    </ul>
+                </div>
+
+                <div class="mb-4 bg-purple-50 p-4 rounded-lg">
+                    <p class="text-sm font-medium text-purple-900 mb-2"><i class="fa fa-lightbulb-o mr-2"></i>澄清目的：</p>
+                    <p class="text-gray-700">明确目标用户群体和典型使用场景，以便后续设计符合用户需求的功能和交互流程。</p>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fa fa-edit mr-1"></i>您的澄清回复：
+                        <span class="text-red-500 ml-1">*</span>
+                    </label>
+                    <textarea
+                        class="response-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="请详细描述目标用户和使用场景...&#10;&#10;例如：&#10;1. 主要用户：产品经理、项目经理、设计师&#10;2. 使用场景：新项目立项时进行需求设计和文档生成&#10;3. 使用频率：产品经理每天使用，其他角色每周使用"
+                        data-question-id="1"
+                        oninput="handleResponseInput(1)"
+                    ></textarea>
+                    <div class="flex items-center justify-between mt-2">
+                        <span class="text-xs text-gray-500">已输入 <span id="charCount1">0</span> 字符</span>
+                        <span class="text-xs text-gray-500">建议至少100字</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question 2 -->
+            <div class="clarification-item bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="flex items-center space-x-3">
+                        <span class="question-tag">澄清问题 2</span>
+                        <h3 class="text-xl font-bold text-gray-800">核心痛点与期望</h3>
+                    </div>
+                    <span class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-medium" data-status="pending">
+                        <i class="fa fa-clock-o mr-1"></i>待回复
+                    </span>
+                </div>
+
+                <div class="mb-4 bg-blue-50 p-4 rounded-lg">
+                    <p class="text-sm font-medium text-blue-900 mb-2"><i class="fa fa-question-circle mr-2"></i>澄清问题：</p>
+                    <ul class="list-disc list-inside text-gray-700 space-y-1 ml-2">
+                        <li>用户当前在需求设计过程中遇到的最大痛点是什么？</li>
+                        <li>用户期望通过本产品解决哪些具体问题？</li>
+                        <li>用户对需求设计效率和质量的期望是什么？</li>
+                    </ul>
+                </div>
+
+                <div class="mb-4 bg-purple-50 p-4 rounded-lg">
+                    <p class="text-sm font-medium text-purple-900 mb-2"><i class="fa fa-lightbulb-o mr-2"></i>澄清目的：</p>
+                    <p class="text-gray-700">识别用户核心痛点，确定产品的核心价值主张和关键功能优先级。</p>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fa fa-edit mr-1"></i>您的澄清回复：
+                        <span class="text-red-500 ml-1">*</span>
+                    </label>
+                    <textarea
+                        class="response-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="请详细描述当前痛点和期望..."
+                        data-question-id="2"
+                        oninput="handleResponseInput(2)"
+                    ></textarea>
+                    <div class="flex items-center justify-between mt-2">
+                        <span class="text-xs text-gray-500">已输入 <span id="charCount2">0</span> 字符</span>
+                        <span class="text-xs text-gray-500">建议至少100字</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question 3 -->
+            <div class="clarification-item bg-white rounded-lg shadow-md p-6 border-l-4 border-purple-500">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="flex items-center space-x-3">
+                        <span class="question-tag">澄清问题 3</span>
+                        <h3 class="text-xl font-bold text-gray-800">功能边界与限制</h3>
+                    </div>
+                    <span class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-medium" data-status="pending">
+                        <i class="fa fa-clock-o mr-1"></i>待回复
+                    </span>
+                </div>
+
+                <div class="mb-4 bg-blue-50 p-4 rounded-lg">
+                    <p class="text-sm font-medium text-blue-900 mb-2"><i class="fa fa-question-circle mr-2"></i>澄清问题：</p>
+                    <ul class="list-disc list-inside text-gray-700 space-y-1 ml-2">
+                        <li>产品功能的边界是什么？哪些是必须包含的，哪些是不需要的？</li>
+                        <li>是否有技术、预算或时间上的限制？</li>
+                        <li>是否需要与现有系统集成？</li>
+                    </ul>
+                </div>
+
+                <div class="mb-4 bg-purple-50 p-4 rounded-lg">
+                    <p class="text-sm font-medium text-purple-900 mb-2"><i class="fa fa-lightbulb-o mr-2"></i>澄清目的：</p>
+                    <p class="text-gray-700">明确产品范围和限制条件，避免范围蔓延，确保在约束条件下设计可行方案。</p>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fa fa-edit mr-1"></i>您的澄清回复：
+                        <span class="text-red-500 ml-1">*</span>
+                    </label>
+                    <textarea
+                        class="response-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="请详细描述功能边界和限制条件..."
+                        data-question-id="3"
+                        oninput="handleResponseInput(3)"
+                    ></textarea>
+                    <div class="flex items-center justify-between mt-2">
+                        <span class="text-xs text-gray-500">已输入 <span id="charCount3">0</span> 字符</span>
+                        <span class="text-xs text-gray-500">建议至少100字</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question 4 -->
+            <div class="clarification-item bg-white rounded-lg shadow-md p-6 border-l-4 border-orange-500">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="flex items-center space-x-3">
+                        <span class="question-tag">澄清问题 4</span>
+                        <h3 class="text-xl font-bold text-gray-800">成功标准与验收条件</h3>
+                    </div>
+                    <span class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-medium" data-status="pending">
+                        <i class="fa fa-clock-o mr-1"></i>待回复
+                    </span>
+                </div>
+
+                <div class="mb-4 bg-blue-50 p-4 rounded-lg">
+                    <p class="text-sm font-medium text-blue-900 mb-2"><i class="fa fa-question-circle mr-2"></i>澄清问题：</p>
+                    <ul class="list-disc list-inside text-gray-700 space-y-1 ml-2">
+                        <li>如何判断产品是否成功？有哪些具体的KPI或指标？</li>
+                        <li>产品上线后的验收标准是什么？</li>
+                        <li>期望达到的业务目标是什么？</li>
+                    </ul>
+                </div>
+
+                <div class="mb-4 bg-purple-50 p-4 rounded-lg">
+                    <p class="text-sm font-medium text-purple-900 mb-2"><i class="fa fa-lightbulb-o mr-2"></i>澄清目的：</p>
+                    <p class="text-gray-700">建立明确的成功标准，以便在设计和开发过程中有清晰的目标导向。</p>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fa fa-edit mr-1"></i>您的澄清回复：
+                        <span class="text-red-500 ml-1">*</span>
+                    </label>
+                    <textarea
+                        class="response-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="请详细描述成功标准和验收条件..."
+                        data-question-id="4"
+                        oninput="handleResponseInput(4)"
+                    ></textarea>
+                    <div class="flex items-center justify-between mt-2">
+                        <span class="text-xs text-gray-500">已输入 <span id="charCount4">0</span> 字符</span>
+                        <span class="text-xs text-gray-500">建议至少100字</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question 5 -->
+            <div class="clarification-item bg-white rounded-lg shadow-md p-6 border-l-4 border-red-500">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="flex items-center space-x-3">
+                        <span class="question-tag">澄清问题 5</span>
+                        <h3 class="text-xl font-bold text-gray-800">时间与资源约束</h3>
+                    </div>
+                    <span class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-medium" data-status="pending">
+                        <i class="fa fa-clock-o mr-1"></i>待回复
+                    </span>
+                </div>
+
+                <div class="mb-4 bg-blue-50 p-4 rounded-lg">
+                    <p class="text-sm font-medium text-blue-900 mb-2"><i class="fa fa-question-circle mr-2"></i>澄清问题：</p>
+                    <ul class="list-disc list-inside text-gray-700 space-y-1 ml-2">
+                        <li>产品期望的上线时间是什么时候？</li>
+                        <li>团队规模和组成是怎样的？</li>
+                        <li>预算范围是多少？</li>
+                    </ul>
+                </div>
+
+                <div class="mb-4 bg-purple-50 p-4 rounded-lg">
+                    <p class="text-sm font-medium text-purple-900 mb-2"><i class="fa fa-lightbulb-o mr-2"></i>澄清目的：</p>
+                    <p class="text-gray-700">了解时间和资源约束，确保设计方案的可行性和可交付性。</p>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fa fa-edit mr-1"></i>您的澄清回复：
+                        <span class="text-red-500 ml-1">*</span>
+                    </label>
+                    <textarea
+                        class="response-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="请详细描述时间和资源约束..."
+                        data-question-id="5"
+                        oninput="handleResponseInput(5)"
+                    ></textarea>
+                    <div class="flex items-center justify-between mt-2">
+                        <span class="text-xs text-gray-500">已输入 <span id="charCount5">0</span> 字符</span>
+                        <span class="text-xs text-gray-500">建议至少100字</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Action Bar -->
+        <div class="sticky bottom-0 bg-white border-t shadow-lg p-4 mt-6 rounded-t-lg">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="text-sm text-gray-600">
+                        <i class="fa fa-info-circle mr-2"></i>
+                        <span>请完整回复所有澄清问题后再提交</span>
+                    </div>
+                    <div class="text-sm font-medium" id="completionStatus">
+                        <span class="text-gray-500">完成度: </span>
+                        <span class="text-primary" id="completionText">0/5</span>
+                    </div>
+                </div>
+                <div class="flex space-x-3">
+                    <button class="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-all" onclick="saveDraft()">
+                        <i class="fa fa-save mr-2"></i>保存草稿
+                    </button>
+                    <button class="px-6 py-2 bg-primary text-white rounded-md hover:bg-secondary transition-all" id="submitBtnBottom" onclick="submitClarification()" disabled>
+                        <i class="fa fa-check mr-2"></i>提交澄清 (0/5)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // 模拟Agent分析完成
+        setTimeout(() => {
+            document.getElementById('agentStatus').innerHTML = `
+                <div class="flex items-center">
+                    <div class="w-3 h-3 bg-white rounded-full mr-3"></div>
+                    <div class="flex-1">
+                        <h3 class="font-bold text-lg mb-1">✓ 澄清问题已生成</h3>
+                        <p class="text-sm opacity-90">Agent已基于您的需求生成5个澄清问题，请逐一回复</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-2xl font-bold">5/5</p>
+                        <p class="text-xs opacity-75">问题已就绪</p>
+                    </div>
+                </div>
+            `;
+            document.getElementById('statusBadge').innerHTML = '<i class="fa fa-check-circle mr-1"></i>等待回复';
+            document.getElementById('statusBadge').className = 'ml-4 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium';
+        }, 2000);
+
+        // 响应数据存储
+        let responses = {};
+        let completedCount = 0;
+
+        function handleResponseInput(questionId) {
+            const textarea = document.querySelector(`textarea[data-question-id="${questionId}"]`);
+            const charCount = textarea.value.length;
+            const charCountSpan = document.getElementById(`charCount${questionId}`);
+            const statusBadge = textarea.closest('.clarification-item').querySelector('[data-status]');
+
+            // 更新字符计数
+            charCountSpan.textContent = charCount;
+
+            // 更新问题状态
+            if (charCount >= 10) {
+                if (!responses[questionId]) {
+                    completedCount++;
+                }
+                responses[questionId] = textarea.value;
+                statusBadge.innerHTML = '<i class="fa fa-check-circle mr-1"></i>已回复';
+                statusBadge.className = 'px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium';
+            } else {
+                if (responses[questionId]) {
+                    completedCount--;
+                }
+                delete responses[questionId];
+                statusBadge.innerHTML = '<i class="fa fa-clock-o mr-1"></i>待回复';
+                statusBadge.className = 'px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-medium';
+            }
+
+            // 更新整体进度
+            updateProgress();
+
+            // 自动保存到localStorage
+            localStorage.setItem('clarificationDraft', JSON.stringify(responses));
+        }
+
+        function updateProgress() {
+            const total = 5;
+            const percentage = (completedCount / total) * 100;
+
+            document.getElementById('progressBar').style.width = percentage + '%';
+            document.getElementById('progressText').textContent = `已回复 ${completedCount}/${total}`;
+            document.getElementById('completionText').textContent = `${completedCount}/${total}`;
+
+            // 更新提交按钮状态
+            const submitBtn = document.getElementById('submitBtn');
+            const submitBtnBottom = document.getElementById('submitBtnBottom');
+            if (completedCount === total) {
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                submitBtnBottom.disabled = false;
+                submitBtnBottom.classList.remove('opacity-50', 'cursor-not-allowed');
+            } else {
+                submitBtn.disabled = true;
+                submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                submitBtnBottom.disabled = true;
+                submitBtnBottom.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+            submitBtnBottom.innerHTML = `<i class="fa fa-check mr-2"></i>提交澄清 (${completedCount}/${total})`;
+        }
+
+        function saveDraft() {
+            localStorage.setItem('clarificationDraft', JSON.stringify(responses));
+
+            // 显示保存成功提示
+            const toast = document.createElement('div');
+            toast.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+            toast.innerHTML = '<i class="fa fa-check-circle mr-2"></i>草稿已保存';
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 2000);
+        }
+
+        function submitClarification() {
+            if (completedCount !== 5) {
+                alert('请完整回复所有5个澄清问题');
+                return;
+            }
+
+            // 显示提交确认
+            if (confirm('确认提交所有澄清回复？提交后将触发Agent进行充分性评估。')) {
+                // 显示加载状态
+                const submitBtn = document.getElementById('submitBtn');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fa fa-spinner fa-spin mr-2"></i>提交中...';
+
+                // 模拟提交
+                setTimeout(() => {
+                    // 清除草稿
+                    localStorage.removeItem('clarificationDraft');
+
+                    // 显示成功提示
+                    alert('澄清回复已提交！Agent将评估澄清是否充分。\n\n如果充分，将生成需求收集澄清分析文档；\n如果不充分，将生成新一轮澄清问题。');
+
+                    // 跳转到版本详情页
+                    window.location.href = 'version-detail.html?projectId=1&versionId=2';
+                }, 1500);
+            }
+        }
+
+        // 页面加载时恢复草稿
+        window.addEventListener('DOMContentLoaded', () => {
+            const draft = localStorage.getItem('clarificationDraft');
+            if (draft) {
+                responses = JSON.parse(draft);
+
+                // 恢复textarea内容
+                Object.keys(responses).forEach(questionId => {
+                    const textarea = document.querySelector(`textarea[data-question-id="${questionId}"]`);
+                    if (textarea) {
+                        textarea.value = responses[questionId];
+                        handleResponseInput(parseInt(questionId));
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>

@@ -1,0 +1,737 @@
+{
+  "id": "process_1730076000000",
+  "name": "智能客服系统需求流程",
+  "requirement": "开发一个基于AI的智能客服系统，能够自动回答用户常见问题，支持多轮对话，具备情感识别能力，并与现有CRM系统集成",
+  "versionId": "version_001",
+  "projectId": "project_001",
+  "status": "in_progress",
+  "currentStep": "1.8",
+  "createdAt": "2025-10-20T09:00:00.000Z",
+  "updatedAt": "2025-10-28T14:30:00.000Z",
+
+  "steps": {
+    "1.1": {
+      "id": "1.1",
+      "name": "需求澄清",
+      "status": "completed",
+      "startedAt": "2025-10-20T09:00:00.000Z",
+      "completedAt": "2025-10-20T15:30:00.000Z",
+      "input": "开发一个基于AI的智能客服系统，能够自动回答用户常见问题，支持多轮对话，具备情感识别能力，并与现有CRM系统集成",
+      "output": "已完成需求澄清，明确了目标用户、核心功能边界、AI能力需求和系统集成要求",
+      "agentName": "product-demand-manager-agent",
+      "documents": [
+        {
+          "id": "doc_clarification_1730076000001",
+          "type": "需求澄清问题",
+          "version": "v1.0",
+          "createdAt": "2025-10-20T09:00:00.000Z",
+          "content": {
+            "requirement": "开发一个基于AI的智能客服系统，能够自动回答用户常见问题，支持多轮对话，具备情感识别能力，并与现有CRM系统集成",
+            "questions": [
+              {
+                "id": "q1",
+                "category": "目标用户与使用场景",
+                "questions": [
+                  "1. 主要使用者是哪些部门的员工或用户角色？",
+                  "2. 典型的使用场景有哪些？请描述2-3个核心场景。",
+                  "3. 预计的并发用户数量级和使用频率？"
+                ],
+                "purpose": "明确目标用户群体和使用场景，帮助确定系统的功能优先级和交互设计方向。",
+                "userResponse": "主要是客服团队和终端客户。核心场景包括：1)客户咨询产品信息 2)售后问题处理 3)投诉升级处理。预计日活用户1000-2000，高峰期并发200左右。"
+              },
+              {
+                "id": "q2",
+                "category": "核心功能边界",
+                "questions": [
+                  "1. 产品需要解决的核心问题是什么？",
+                  "2. 哪些功能是MVP必需的？哪些可以在后续版本实现？",
+                  "3. 是否有不希望包含的功能或场景？"
+                ],
+                "purpose": "确定产品功能边界，避免功能蔓延，确保MVP可以快速上线。",
+                "userResponse": "核心问题是降低人工客服压力，提升响应速度。MVP必需：知识库问答、多轮对话、人工转接。后续版本：语音交互、视频客服。不包含营销推广功能。"
+              },
+              {
+                "id": "q3",
+                "category": "数据与集成",
+                "questions": [
+                  "1. 需要处理哪些类型的数据？数据规模如何？",
+                  "2. 是否需要与现有系统集成？如果是，请说明集成方式。",
+                  "3. 数据安全和隐私有什么特殊要求？"
+                ],
+                "purpose": "了解数据处理需求和系统集成要求，为技术架构设计提供依据。",
+                "userResponse": "主要处理文本对话数据和客户信息。需要与Salesforce CRM集成，通过API方式。需符合GDPR和国内隐私保护法规，敏感信息需加密存储。"
+              },
+              {
+                "id": "q4",
+                "category": "AI能力需求",
+                "questions": [
+                  "1. 期望AI提供什么样的能力？（如：内容生成、分析、推荐等）",
+                  "2. 对AI准确率和响应速度有什么要求？",
+                  "3. 用户是否需要对AI输出进行干预和调整？"
+                ],
+                "purpose": "明确AI能力的具体需求和质量标准，确保技术方案可行性。",
+                "userResponse": "需要AI具备：1)意图识别和实体提取 2)多轮对话管理 3)情感分析。准确率要求>85%，响应时间<2秒。客服人员可以实时查看AI对话并随时介入。"
+              }
+            ]
+          },
+          "status": "completed"
+        },
+        {
+          "id": "doc_analysis_1730076000002",
+          "type": "需求收集澄清分析",
+          "version": "v1.0",
+          "createdAt": "2025-10-20T15:30:00.000Z",
+          "content": {
+            "originalRequirement": "开发一个基于AI的智能客服系统，能够自动回答用户常见问题，支持多轮对话，具备情感识别能力，并与现有CRM系统集成",
+            "summary": "系统需要服务客服团队和终端客户，日活1000-2000，核心功能包括知识库问答、多轮对话、情感分析和CRM集成，需符合数据隐私法规要求",
+            "needsMarketResearch": true
+          },
+          "status": "completed"
+        }
+      ]
+    },
+
+    "1.2": {
+      "id": "1.2",
+      "name": "市场调研",
+      "status": "completed",
+      "startedAt": "2025-10-21T09:00:00.000Z",
+      "completedAt": "2025-10-21T17:00:00.000Z",
+      "input": "需求收集澄清分析文档",
+      "output": "完成市场和竞品调研，识别主要竞争对手和差异化机会",
+      "agentName": "product-research-analyst-agent",
+      "documents": [
+        {
+          "id": "doc_research_1730162400000",
+          "type": "需求调研分析",
+          "version": "v1.0",
+          "createdAt": "2025-10-21T17:00:00.000Z",
+          "content": {
+            "marketOverview": "智能客服市场规模持续增长，2024年国内市场达到150亿元，预计2025年增长30%。主要驱动因素包括人力成本上升、AI技术成熟、客户服务质量要求提高。",
+            "competitors": [
+              {
+                "name": "智齿科技",
+                "strengths": ["成熟的AI引擎", "丰富的行业案例", "完善的知识库管理"],
+                "weaknesses": ["价格较高", "定制化能力有限"],
+                "marketShare": "25%"
+              },
+              {
+                "name": "网易七鱼",
+                "strengths": ["多渠道整合能力强", "易用性好", "性价比高"],
+                "weaknesses": ["AI情感识别能力一般", "企业级功能较弱"],
+                "marketShare": "20%"
+              },
+              {
+                "name": "环信",
+                "strengths": ["技术稳定性好", "私有化部署支持", "开发者友好"],
+                "weaknesses": ["UI/UX体验一般", "AI能力相对较弱"],
+                "marketShare": "18%"
+              }
+            ],
+            "opportunities": [
+              "情感识别和共情能力可作为差异化优势",
+              "深度CRM集成可提升客户价值",
+              "行业垂直解决方案存在市场空白"
+            ],
+            "recommendations": [
+              "重点打造情感识别和共情对话能力",
+              "提供开箱即用的CRM集成方案",
+              "优先覆盖电商、金融、SaaS三个行业"
+            ]
+          },
+          "status": "completed"
+        }
+      ]
+    },
+
+    "1.3": {
+      "id": "1.3",
+      "name": "需求设计",
+      "status": "completed",
+      "startedAt": "2025-10-22T09:00:00.000Z",
+      "completedAt": "2025-10-23T18:00:00.000Z",
+      "input": "需求澄清分析和市场调研报告",
+      "output": "完成PRD文档编写，包含功能规格、用户故事、系统架构设计",
+      "agentName": "product-demand-manager-agent",
+      "documents": [
+        {
+          "id": "doc_prd_1730335200000",
+          "type": "产品需求文档",
+          "version": "v1.0",
+          "createdAt": "2025-10-23T18:00:00.000Z",
+          "content": {
+            "productVision": "打造业界领先的智能客服系统，通过AI情感识别和深度CRM集成，帮助企业提升客户服务质量和效率",
+            "coreFeatures": [
+              {
+                "name": "智能对话引擎",
+                "description": "基于NLP的多轮对话管理，支持意图识别、实体提取、上下文理解",
+                "priority": "P0",
+                "userStories": [
+                  "作为客户，我希望能用自然语言描述问题，系统能准确理解我的意图",
+                  "作为客户，我希望对话过程流畅自然，不需要重复说明背景信息"
+                ]
+              },
+              {
+                "name": "情感识别与共情",
+                "description": "实时分析用户情绪状态，调整回复语气和策略，必要时升级人工",
+                "priority": "P0",
+                "userStories": [
+                  "作为客户，当我表达不满时，系统能识别我的情绪并给予恰当回应",
+                  "作为客服，我希望系统能自动识别高情绪风险对话并提醒我介入"
+                ]
+              },
+              {
+                "name": "知识库管理",
+                "description": "支持FAQ、SOP、产品文档等多种知识类型，智能检索和推荐",
+                "priority": "P0",
+                "userStories": [
+                  "作为管理员，我能方便地导入和维护知识库内容",
+                  "作为系统，我能基于对话历史持续优化知识库匹配准确率"
+                ]
+              },
+              {
+                "name": "CRM深度集成",
+                "description": "与Salesforce集成，同步客户信息、工单、历史记录",
+                "priority": "P0",
+                "userStories": [
+                  "作为客服，对话中能实时查看客户在CRM中的信息和历史",
+                  "作为系统，对话结束后自动将记录同步到CRM工单系统"
+                ]
+              },
+              {
+                "name": "人工协同",
+                "description": "AI无法处理时平滑转接人工，客服可实时监控和接管",
+                "priority": "P0",
+                "userStories": [
+                  "作为客户，当AI无法解决我的问题时，能快速转接到人工客服",
+                  "作为客服，我能看到AI对话历史并无缝接手继续服务"
+                ]
+              }
+            ],
+            "technicalRequirements": {
+              "performance": "响应时间<2秒，并发支持200+",
+              "accuracy": "意图识别准确率>85%，情感识别准确率>80%",
+              "availability": "系统可用性>99.5%",
+              "security": "符合GDPR和国内隐私法规，敏感数据加密存储"
+            },
+            "systemArchitecture": {
+              "frontend": "React + TypeScript",
+              "backend": "Node.js + Python (AI服务)",
+              "database": "PostgreSQL + Redis",
+              "aiEngine": "基于LLM的对话引擎 + 情感分析模型",
+              "integration": "Salesforce API + Webhook"
+            }
+          },
+          "status": "completed"
+        }
+      ]
+    },
+
+    "1.4": {
+      "id": "1.4",
+      "name": "设计挑战",
+      "status": "completed",
+      "startedAt": "2025-10-24T09:00:00.000Z",
+      "completedAt": "2025-10-24T15:00:00.000Z",
+      "input": "产品需求文档 v1.0",
+      "output": "识别8个关键设计挑战点",
+      "agentName": "product-demand-challenge-agent",
+      "documents": [
+        {
+          "id": "doc_challenge_1730408400000",
+          "type": "设计挑战报告",
+          "version": "v1.0",
+          "createdAt": "2025-10-24T15:00:00.000Z",
+          "content": {
+            "challenges": [
+              {
+                "id": "challenge_1",
+                "category": "技术可行性",
+                "title": "情感识别准确率目标可行性",
+                "description": "PRD要求情感识别准确率>80%，但当前市场主流产品平均准确率在70-75%之间，是否需要调整目标或增加投入？",
+                "severity": "high",
+                "impact": "影响核心差异化能力，需明确投入产出比"
+              },
+              {
+                "id": "challenge_2",
+                "category": "用户体验",
+                "title": "AI-人工切换的用户体验",
+                "description": "如何设计AI转人工的流程，既要避免频繁打断，又要确保及时升级？转接判断标准是什么？",
+                "severity": "high",
+                "impact": "直接影响客户满意度"
+              },
+              {
+                "id": "challenge_3",
+                "category": "系统集成",
+                "title": "Salesforce实时同步性能",
+                "description": "对话中实时查询Salesforce可能导致延迟，需要缓存策略吗？数据一致性如何保证？",
+                "severity": "medium",
+                "impact": "影响响应速度和数据准确性"
+              },
+              {
+                "id": "challenge_4",
+                "category": "数据隐私",
+                "title": "对话数据的存储和使用范围",
+                "description": "对话记录用于AI训练是否需要客户授权？数据保留期限多久？如何处理删除请求？",
+                "severity": "high",
+                "impact": "合规风险，可能影响产品上线"
+              },
+              {
+                "id": "challenge_5",
+                "category": "业务逻辑",
+                "title": "知识库维护责任和流程",
+                "description": "谁负责知识库的创建、审核、更新？如何保证知识的准确性和时效性？",
+                "severity": "medium",
+                "impact": "影响AI回答质量"
+              },
+              {
+                "id": "challenge_6",
+                "category": "成本控制",
+                "title": "LLM调用成本",
+                "description": "使用LLM进行对话可能产生高额API调用费用，每月预算是多少？是否需要成本优化策略？",
+                "severity": "medium",
+                "impact": "影响长期运营成本"
+              },
+              {
+                "id": "challenge_7",
+                "category": "功能边界",
+                "title": "多语言支持的必要性",
+                "description": "MVP是否需要支持多语言？如果需要，优先支持哪些语言？",
+                "severity": "low",
+                "impact": "影响开发周期和成本"
+              },
+              {
+                "id": "challenge_8",
+                "category": "业务连续性",
+                "title": "AI服务故障时的降级方案",
+                "description": "当AI引擎故障时，如何保证客服系统继续运行？是否需要纯人工模式？",
+                "severity": "high",
+                "impact": "影响系统可用性"
+              }
+            ],
+            "summary": "共识别8个挑战点，其中4个高严重度、3个中等严重度、1个低严重度，建议优先解决高严重度挑战"
+          },
+          "status": "completed"
+        }
+      ]
+    },
+
+    "1.5": {
+      "id": "1.5",
+      "name": "挑战回应",
+      "status": "completed",
+      "startedAt": "2025-10-24T16:00:00.000Z",
+      "completedAt": "2025-10-25T11:00:00.000Z",
+      "input": "设计挑战报告 v1.0",
+      "output": "针对8个挑战点提供回应方案",
+      "agentName": "product-demand-manager-agent",
+      "documents": [
+        {
+          "id": "doc_response_1730462400000",
+          "type": "挑战回应文档",
+          "version": "v1.0",
+          "createdAt": "2025-10-25T11:00:00.000Z",
+          "content": {
+            "responses": [
+              {
+                "challengeId": "challenge_1",
+                "response": "采用渐进式目标：MVP阶段目标75%，通过3个月数据积累和模型优化，6个月后达到80%。投入：增加1名算法工程师，预算15万/月。",
+                "status": "accepted_with_modification"
+              },
+              {
+                "challengeId": "challenge_2",
+                "response": "设计三级转接机制：1)AI主动建议转人工(用户可选) 2)用户主动要求转人工(立即响应) 3)系统自动升级(连续3次未能解决)。提供转接前的对话摘要给客服。",
+                "status": "proposed_solution"
+              },
+              {
+                "challengeId": "challenge_3",
+                "response": "采用缓存策略：客户基础信息缓存30分钟，工单状态实时查询但异步加载。对话过程中允许200ms的数据获取时间，总响应<2秒。",
+                "status": "proposed_solution"
+              },
+              {
+                "challengeId": "challenge_4",
+                "response": "遵循GDPR标准：1)首次对话前展示隐私声明并获取授权 2)对话数据保留1年 3)提供数据下载和删除接口 4)训练数据需脱敏处理。",
+                "status": "accepted"
+              },
+              {
+                "challengeId": "challenge_5",
+                "response": "建立知识库治理流程：1)客服团队负责创建 2)质量团队负责审核 3)每月Review更新 4)AI自动标记低质量知识条目。提供知识库管理后台。",
+                "status": "proposed_solution"
+              },
+              {
+                "challengeId": "challenge_6",
+                "response": "成本优化策略：1)简单问题使用检索而非LLM 2)批量处理降低API调用 3)自建小模型处理常见场景 4)月预算3万元，超过预警。",
+                "status": "proposed_solution"
+              },
+              {
+                "challengeId": "challenge_7",
+                "response": "MVP仅支持中文，v2.0考虑英文支持。根据实际业务需求再评估其他语言。",
+                "status": "accepted"
+              },
+              {
+                "challengeId": "challenge_8",
+                "response": "设计降级方案：1)AI故障时自动切换纯人工模式 2)保留基础FAQ检索功能(无AI) 3)故障期间所有对话直接进入人工队列 4)提供故障监控和告警。",
+                "status": "proposed_solution"
+              }
+            ],
+            "summary": "所有挑战均已回应，3个直接接受，5个提出解决方案，需要人类裁决确认"
+          },
+          "status": "completed"
+        }
+      ]
+    },
+
+    "1.6": {
+      "id": "1.6",
+      "name": "人类裁决",
+      "status": "completed",
+      "startedAt": "2025-10-25T14:00:00.000Z",
+      "completedAt": "2025-10-25T17:30:00.000Z",
+      "input": "挑战回应文档 v1.0",
+      "output": "人类决策完成，6个方案通过，2个需要修改",
+      "agentName": null,
+      "documents": [
+        {
+          "id": "doc_decision_1730487000000",
+          "type": "人类裁决结果",
+          "version": "v1.0",
+          "createdAt": "2025-10-25T17:30:00.000Z",
+          "content": {
+            "decisions": [
+              {
+                "challengeId": "challenge_1",
+                "decision": "approved",
+                "feedback": "渐进式目标合理，同意投入增加算法工程师",
+                "decidedBy": "产品总监 张伟",
+                "decidedAt": "2025-10-25T15:20:00.000Z"
+              },
+              {
+                "challengeId": "challenge_2",
+                "decision": "approved_with_modification",
+                "feedback": "三级转接机制很好，但建议连续2次未能解决就自动升级，而非3次",
+                "modification": "将自动升级触发条件从'连续3次未能解决'改为'连续2次未能解决'",
+                "decidedBy": "客服总监 李明",
+                "decidedAt": "2025-10-25T15:35:00.000Z"
+              },
+              {
+                "challengeId": "challenge_3",
+                "decision": "approved",
+                "feedback": "缓存策略合理",
+                "decidedBy": "技术总监 王强",
+                "decidedAt": "2025-10-25T15:45:00.000Z"
+              },
+              {
+                "challengeId": "challenge_4",
+                "decision": "approved",
+                "feedback": "符合合规要求",
+                "decidedBy": "法务部 陈静",
+                "decidedAt": "2025-10-25T16:00:00.000Z"
+              },
+              {
+                "challengeId": "challenge_5",
+                "decision": "approved",
+                "feedback": "知识库治理流程清晰",
+                "decidedBy": "客服总监 李明",
+                "decidedAt": "2025-10-25T16:15:00.000Z"
+              },
+              {
+                "challengeId": "challenge_6",
+                "decision": "approved_with_modification",
+                "feedback": "成本优化策略可行，但月预算需要提高到5万元，为峰值流量预留buffer",
+                "modification": "月预算从3万元调整为5万元",
+                "decidedBy": "CFO 刘芳",
+                "decidedAt": "2025-10-25T16:30:00.000Z"
+              },
+              {
+                "challengeId": "challenge_7",
+                "decision": "approved",
+                "feedback": "同意MVP仅支持中文",
+                "decidedBy": "产品总监 张伟",
+                "decidedAt": "2025-10-25T16:45:00.000Z"
+              },
+              {
+                "challengeId": "challenge_8",
+                "decision": "approved",
+                "feedback": "降级方案完善，保障了系统可用性",
+                "decidedBy": "技术总监 王强",
+                "decidedAt": "2025-10-25T17:00:00.000Z"
+              }
+            ],
+            "overallResult": "8个挑战全部通过裁决，其中6个直接通过，2个附带修改意见通过",
+            "nextSteps": "根据裁决结果更新PRD文档"
+          },
+          "status": "completed"
+        }
+      ]
+    },
+
+    "1.7": {
+      "id": "1.7",
+      "name": "设计更新",
+      "status": "completed",
+      "startedAt": "2025-10-26T09:00:00.000Z",
+      "completedAt": "2025-10-26T16:00:00.000Z",
+      "input": "人类裁决结果 + 原PRD文档",
+      "output": "更新PRD文档至v2.0版本",
+      "agentName": "product-demand-manager-agent",
+      "documents": [
+        {
+          "id": "doc_prd_1730553600000",
+          "type": "产品需求文档",
+          "version": "v2.0",
+          "createdAt": "2025-10-26T16:00:00.000Z",
+          "content": {
+            "changeLog": [
+              "调整情感识别目标：MVP阶段75%，6个月后80%",
+              "优化AI转人工机制：连续2次未能解决自动升级",
+              "调整LLM月预算：从3万提升至5万元",
+              "新增降级方案详细说明"
+            ],
+            "productVision": "打造业界领先的智能客服系统，通过AI情感识别和深度CRM集成，帮助企业提升客户服务质量和效率",
+            "coreFeatures": [
+              {
+                "name": "智能对话引擎",
+                "description": "基于NLP的多轮对话管理，支持意图识别、实体提取、上下文理解",
+                "priority": "P0",
+                "technicalSpec": {
+                  "intentAccuracy": ">85%",
+                  "responseTime": "<2s",
+                  "concurrentUsers": "200+",
+                  "autoEscalation": "连续2次未能解决自动转人工"
+                }
+              },
+              {
+                "name": "情感识别与共情",
+                "description": "实时分析用户情绪状态，调整回复语气和策略，必要时升级人工",
+                "priority": "P0",
+                "technicalSpec": {
+                  "mvpTarget": "75%准确率",
+                  "sixMonthTarget": "80%准确率",
+                  "realTimeAnalysis": "对话过程中实时分析",
+                  "escalationTrigger": "检测到高情绪风险自动提醒客服"
+                }
+              },
+              {
+                "name": "知识库管理",
+                "description": "支持FAQ、SOP、产品文档等多种知识类型，智能检索和推荐",
+                "priority": "P0",
+                "governanceProcess": {
+                  "creation": "客服团队",
+                  "review": "质量团队",
+                  "update": "每月Review",
+                  "quality": "AI自动标记低质量条目"
+                }
+              },
+              {
+                "name": "CRM深度集成",
+                "description": "与Salesforce集成，同步客户信息、工单、历史记录",
+                "priority": "P0",
+                "technicalSpec": {
+                  "basicInfoCache": "30分钟",
+                  "ticketQuery": "实时异步加载",
+                  "maxLatency": "200ms数据获取，总响应<2s"
+                }
+              },
+              {
+                "name": "人工协同",
+                "description": "AI无法处理时平滑转接人工，客服可实时监控和接管",
+                "priority": "P0",
+                "escalationLevels": [
+                  "AI主动建议转人工（用户可选）",
+                  "用户主动要求转人工（立即响应）",
+                  "系统自动升级（连续2次未能解决）"
+                ],
+                "handoff": "提供对话摘要给接手客服"
+              }
+            ],
+            "operationalRequirements": {
+              "llmBudget": "5万元/月",
+              "costOptimization": [
+                "简单问题使用检索而非LLM",
+                "批量处理降低API调用",
+                "自建小模型处理常见场景",
+                "超预算自动告警"
+              ],
+              "dataCompliance": {
+                "authorization": "首次对话前获取隐私授权",
+                "retention": "对话数据保留1年",
+                "userRights": "提供数据下载和删除接口",
+                "training": "训练数据需脱敏处理"
+              },
+              "disasterRecovery": {
+                "autoFallback": "AI故障自动切换纯人工模式",
+                "basicFunction": "保留基础FAQ检索(无AI)",
+                "queueManagement": "故障期间对话直接进入人工队列",
+                "monitoring": "故障监控和告警机制"
+              }
+            },
+            "technicalRequirements": {
+              "performance": "响应时间<2秒，并发支持200+",
+              "accuracy": "意图识别>85%，情感识别MVP 75%(6个月后80%)",
+              "availability": "系统可用性>99.5%",
+              "security": "符合GDPR和国内隐私法规，敏感数据加密存储"
+            },
+            "systemArchitecture": {
+              "frontend": "React + TypeScript",
+              "backend": "Node.js + Python (AI服务)",
+              "database": "PostgreSQL + Redis",
+              "aiEngine": "基于LLM的对话引擎 + 情感分析模型",
+              "integration": "Salesforce API + Webhook"
+            },
+            "mvpScope": {
+              "included": ["中文支持", "知识库问答", "多轮对话", "情感识别", "CRM集成", "人工转接"],
+              "excluded": ["多语言", "语音交互", "视频客服", "营销功能"],
+              "v2Planning": ["英文支持", "语音交互"]
+            }
+          },
+          "status": "completed"
+        }
+      ]
+    },
+
+    "1.8": {
+      "id": "1.8",
+      "name": "人类评估",
+      "status": "in_progress",
+      "startedAt": "2025-10-28T09:00:00.000Z",
+      "completedAt": null,
+      "input": "产品需求文档 v2.0",
+      "output": null,
+      "agentName": null,
+      "documents": []
+    },
+
+    "1.9": {
+      "id": "1.9",
+      "name": "文档修改",
+      "status": "pending",
+      "startedAt": null,
+      "completedAt": null,
+      "input": null,
+      "output": null,
+      "agentName": "product-demand-manager-agent",
+      "documents": []
+    },
+
+    "1.11": {
+      "id": "1.11",
+      "name": "差异检查",
+      "status": "pending",
+      "startedAt": null,
+      "completedAt": null,
+      "input": null,
+      "output": null,
+      "agentName": null,
+      "documents": []
+    },
+
+    "1.12": {
+      "id": "1.12",
+      "name": "文档精炼",
+      "status": "pending",
+      "startedAt": null,
+      "completedAt": null,
+      "input": null,
+      "output": null,
+      "agentName": "product-demand-refine-agent",
+      "documents": []
+    },
+
+    "1.13": {
+      "id": "1.13",
+      "name": "强制检查点",
+      "status": "pending",
+      "startedAt": null,
+      "completedAt": null,
+      "input": null,
+      "output": null,
+      "agentName": null,
+      "documents": []
+    }
+  },
+
+  "documents": [
+    {
+      "id": "doc_clarification_1730076000001",
+      "type": "需求澄清问题",
+      "stepId": "1.1",
+      "version": "v1.0",
+      "createdAt": "2025-10-20T09:00:00.000Z"
+    },
+    {
+      "id": "doc_analysis_1730076000002",
+      "type": "需求收集澄清分析",
+      "stepId": "1.1",
+      "version": "v1.0",
+      "createdAt": "2025-10-20T15:30:00.000Z"
+    },
+    {
+      "id": "doc_research_1730162400000",
+      "type": "需求调研分析",
+      "stepId": "1.2",
+      "version": "v1.0",
+      "createdAt": "2025-10-21T17:00:00.000Z"
+    },
+    {
+      "id": "doc_prd_1730335200000",
+      "type": "产品需求文档",
+      "stepId": "1.3",
+      "version": "v1.0",
+      "createdAt": "2025-10-23T18:00:00.000Z"
+    },
+    {
+      "id": "doc_challenge_1730408400000",
+      "type": "设计挑战报告",
+      "stepId": "1.4",
+      "version": "v1.0",
+      "createdAt": "2025-10-24T15:00:00.000Z"
+    },
+    {
+      "id": "doc_response_1730462400000",
+      "type": "挑战回应文档",
+      "stepId": "1.5",
+      "version": "v1.0",
+      "createdAt": "2025-10-25T11:00:00.000Z"
+    },
+    {
+      "id": "doc_decision_1730487000000",
+      "type": "人类裁决结果",
+      "stepId": "1.6",
+      "version": "v1.0",
+      "createdAt": "2025-10-25T17:30:00.000Z"
+    },
+    {
+      "id": "doc_prd_1730553600000",
+      "type": "产品需求文档",
+      "stepId": "1.7",
+      "version": "v2.0",
+      "createdAt": "2025-10-26T16:00:00.000Z"
+    }
+  ],
+
+  "metadata": {
+    "totalSteps": 12,
+    "completedSteps": 7,
+    "inProgressSteps": 1,
+    "pendingSteps": 4,
+    "progressPercentage": 58,
+    "estimatedCompletion": "2025-11-05",
+    "teamMembers": [
+      {
+        "role": "产品总监",
+        "name": "张伟",
+        "involvement": "需求澄清、裁决"
+      },
+      {
+        "role": "客服总监",
+        "name": "李明",
+        "involvement": "需求澄清、裁决"
+      },
+      {
+        "role": "技术总监",
+        "name": "王强",
+        "involvement": "裁决、技术评审"
+      }
+    ]
+  }
+}

@@ -131,7 +131,7 @@
                         </label>
                     </div>
                     <div class="text-sm">
-                        <a href="#" class="font-medium text-primary hover:text-secondary">
+                        <a href="#" class="font-medium text-primary hover:text-secondary" onclick="event.preventDefault(); alert('密码重置功能正在开发中！\n\n请联系系统管理员重置密码。');">
                             忘记密码?
                         </a>
                     </div>
@@ -164,39 +164,56 @@
                 </button>
             </div>
             <p class="text-center text-sm text-gray-600">
-                还没有账号? <a href="#" class="font-medium text-primary hover:text-secondary">注册</a>
+                还没有账号? <a href="#" class="font-medium text-primary hover:text-secondary" onclick="event.preventDefault(); alert('用户注册功能正在开发中！\n\n请联系系统管理员创建账号。');">注册</a>
             </p>
         </div>
     </div>
 
     <script>
+        // Real-time input validation
+        function validateLoginForm() {
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const submitButton = document.querySelector('button[type="submit"]');
+
+            // Enable button only if both fields have content
+            const isValid = email.length > 0 && password.length > 0;
+            submitButton.disabled = !isValid;
+
+            if (!isValid) {
+                submitButton.classList.add('opacity-50', 'cursor-not-allowed');
+            } else {
+                submitButton.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
         // Login form submission
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            
+
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            
+
             // Simple validation
             if (!email || !password) {
                 alert('请输入邮箱和密码');
                 return;
             }
-            
+
             // Simulate login process
             const submitButton = this.querySelector('button[type="submit"]');
             const originalText = submitButton.innerHTML;
-            
+
             submitButton.disabled = true;
             submitButton.innerHTML = '<i class="fa fa-spinner fa-spin mr-2"></i> 登录中...';
-            
+
             // Simulate API call
             setTimeout(() => {
                 // Redirect to dashboard
                 window.location.href = 'dashboard.html';
             }, 1500);
         });
-        
+
         // Add animation to form elements on page load
         document.addEventListener('DOMContentLoaded', function() {
             const formElements = document.querySelectorAll('input, button');
@@ -205,6 +222,13 @@
                     el.classList.add('animate-fade-in');
                 }, 100 * index);
             });
+
+            // Add input event listeners for real-time validation
+            document.getElementById('email').addEventListener('input', validateLoginForm);
+            document.getElementById('password').addEventListener('input', validateLoginForm);
+
+            // Initial validation check
+            validateLoginForm();
         });
     </script>
 </body>

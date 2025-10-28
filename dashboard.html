@@ -172,7 +172,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 transition-all-300">
+                    <a href="#" class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 transition-all-300" onclick="event.preventDefault(); alert('系统设置功能正在开发中，敬请期待！');">
                         <i class="fa fa-cog w-6 text-center"></i>
                         <span class="ml-3 sidebar-text">系统设置</span>
                     </a>
@@ -385,7 +385,7 @@
             <div class="bg-white rounded-lg shadow-md p-6">
                 <div class="flex items-center justify-between mb-6">
                     <h2 class="text-lg font-bold text-gray-800">最近活动</h2>
-                    <a href="#" class="text-sm font-medium text-primary hover:text-secondary">查看全部</a>
+                    <a href="project-management.html" class="text-sm font-medium text-primary hover:text-secondary">查看全部</a>
                 </div>
                 <div class="space-y-4">
                     <div class="flex items-start">
@@ -445,7 +445,7 @@
             <div class="bg-white rounded-lg shadow-md p-6">
                 <div class="flex items-center justify-between mb-6">
                     <h2 class="text-lg font-bold text-gray-800">即将到来的任务</h2>
-                    <a href="#" class="text-sm font-medium text-primary hover:text-secondary">查看全部</a>
+                    <a href="project-management.html" class="text-sm font-medium text-primary hover:text-secondary">查看全部</a>
                 </div>
                 <div class="space-y-4">
                     <div class="p-4 border rounded-lg task-card">
@@ -520,7 +520,7 @@
         <div class="bg-white rounded-lg shadow-md p-6 mt-6">
             <div class="flex items-center justify-between mb-6">
                 <h2 class="text-lg font-bold text-gray-800">Running Processes</h2>
-                <button class="px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-secondary transition-all-300 flex items-center">
+                <button class="px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-secondary transition-all-300 flex items-center" onclick="createNewProcessDashboard()">
                     <i class="fa fa-plus mr-2"></i> 新建流程
                 </button>
             </div>
@@ -573,8 +573,8 @@
                                 Oct 31, 2025
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <a href="#" class="text-primary hover:text-secondary mr-3">查看</a>
-                                <a href="#" class="text-gray-600 hover:text-gray-900">编辑</a>
+                                <a href="version-detail.html?projectId=1&versionId=2" class="text-primary hover:text-secondary mr-3">查看</a>
+                                <a href="#" class="text-gray-600 hover:text-gray-900" onclick="event.preventDefault(); alert('编辑功能正在开发中！');">编辑</a>
                             </td>
                         </tr>
                         <tr>
@@ -601,8 +601,8 @@
                                 Nov 5, 2025
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <a href="#" class="text-primary hover:text-secondary mr-3">查看</a>
-                                <a href="#" class="text-gray-600 hover:text-gray-900">编辑</a>
+                                <a href="version-detail.html?projectId=2&versionId=1" class="text-primary hover:text-secondary mr-3">查看</a>
+                                <a href="#" class="text-gray-600 hover:text-gray-900" onclick="event.preventDefault(); alert('编辑功能正在开发中！');">编辑</a>
                             </td>
                         </tr>
                         <tr>
@@ -629,8 +629,8 @@
                                 Nov 15, 2025
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <a href="#" class="text-primary hover:text-secondary mr-3">查看</a>
-                                <a href="#" class="text-gray-600 hover:text-gray-900">编辑</a>
+                                <a href="version-detail.html?projectId=2&versionId=2" class="text-primary hover:text-secondary mr-3">查看</a>
+                                <a href="#" class="text-gray-600 hover:text-gray-900" onclick="event.preventDefault(); alert('编辑功能正在开发中！');">编辑</a>
                             </td>
                         </tr>
                         <tr>
@@ -657,8 +657,8 @@
                                 Oct 29, 2025
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <a href="#" class="text-primary hover:text-secondary mr-3">查看</a>
-                                <a href="#" class="text-gray-600 hover:text-gray-900">编辑</a>
+                                <a href="version-detail.html?projectId=5&versionId=1" class="text-primary hover:text-secondary mr-3">查看</a>
+                                <a href="#" class="text-gray-600 hover:text-gray-900" onclick="event.preventDefault(); alert('编辑功能正在开发中！');">编辑</a>
                             </td>
                         </tr>
                     </tbody>
@@ -805,7 +805,106 @@
                 }
             }
         });
-        
+
+        // 创建新流程（Dashboard版本）
+        function createNewProcessDashboard() {
+            const processName = prompt('请输入新流程的名称：', '');
+
+            if (processName && processName.trim()) {
+                // 生成mock数据
+                const processId = Date.now();
+                const projects = ['Mobile App Redesign', 'Dashboard UI/UX Design', 'E-commerce Platform Upgrade', 'Legacy System Migration'];
+                const stages = [
+                    { badge: 'status-in-progress', text: '挑战与裁决' },
+                    { badge: 'status-in-progress', text: '设计执行' },
+                    { badge: 'status-pending', text: '需求收集' },
+                    { badge: 'status-review', text: '测试' }
+                ];
+
+                const randomProject = projects[Math.floor(Math.random() * projects.length)];
+                const randomStage = stages[Math.floor(Math.random() * stages.length)];
+                const randomProgress = Math.floor(Math.random() * 40) + 10; // 10-50%
+
+                // 计算随机截止日期（1-3个月后）
+                const today = new Date();
+                const dueDate = new Date(today);
+                dueDate.setMonth(dueDate.getMonth() + Math.floor(Math.random() * 3) + 1);
+                const dueDateStr = dueDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+
+                // 创建新流程行的HTML
+                const newProcessRow = `
+                    <tr class="animate-fade-in">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-gray-900">${processName}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-500">${randomProject}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="status-badge ${randomStage.badge}">${randomStage.text}</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="w-full max-w-xs">
+                                <div class="flex items-center justify-between text-xs text-gray-500 mb-1">
+                                    <span>${randomProgress}%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-bar-fill bg-blue-500" style="width: ${randomProgress}%"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            ${dueDateStr}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <a href="version-detail.html?projectId=1&versionId=1" class="text-primary hover:text-secondary mr-3">查看</a>
+                            <a href="#" class="text-gray-600 hover:text-gray-900" onclick="event.preventDefault(); alert('编辑功能正在开发中！');">编辑</a>
+                        </td>
+                    </tr>
+                `;
+
+                // 将新流程插入到表格的tbody开头
+                const tbody = document.querySelector('.bg-white.rounded-lg.shadow-md.mt-6 tbody');
+                if (tbody) {
+                    const tempTr = document.createElement('tbody');
+                    tempTr.innerHTML = newProcessRow;
+                    tbody.insertBefore(tempTr.firstElementChild, tbody.firstChild);
+
+                    // 显示成功消息
+                    showDashboardToast('success', `流程 "${processName}" 创建成功！`);
+                } else {
+                    alert('无法找到流程列表，请刷新页面重试。');
+                }
+            } else if (processName !== null) {
+                alert('流程名称不能为空！');
+            }
+        }
+
+        // 显示Toast提示（Dashboard版本）
+        function showDashboardToast(type, message) {
+            const colors = {
+                success: 'bg-green-500',
+                error: 'bg-red-500',
+                info: 'bg-blue-500'
+            };
+            const icons = {
+                success: 'fa-check-circle',
+                error: 'fa-times-circle',
+                info: 'fa-info-circle'
+            };
+
+            const toast = document.createElement('div');
+            toast.className = `fixed top-4 right-4 ${colors[type]} text-white px-6 py-3 rounded-lg shadow-lg z-50`;
+            toast.style.animation = 'fadeIn 0.5s ease-in-out';
+            toast.innerHTML = `<i class="fa ${icons[type]} mr-2"></i>${message}`;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
         // Add animation to cards on page load
         document.addEventListener('DOMContentLoaded', function() {
             const cards = document.querySelectorAll('.task-card');

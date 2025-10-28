@@ -6,6 +6,7 @@
     <title>ProductCoCreate AI - 项目管理</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="js/process-flow-service.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -81,7 +82,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 transition-all">
+                    <a href="#" class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 transition-all" onclick="event.preventDefault(); alert('系统设置功能正在开发中，敬请期待！');">
                         <i class="fa fa-cog w-6 text-center"></i>
                         <span class="ml-3">系统设置</span>
                     </a>
@@ -180,6 +181,41 @@
 
         <!-- Project List -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="projectList">
+            <!-- AI智能客服平台 -->
+            <div class="project-card bg-white rounded-lg shadow-md p-6" data-project-id="project_001" data-status="active" onclick="window.location.href='project-detail.html?id=project_001'">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">AI智能客服平台</h3>
+                        <span class="status-badge status-active">进行中</span>
+                    </div>
+                    <i class="fa fa-chevron-right text-gray-400"></i>
+                </div>
+                <p class="text-sm text-gray-600 mb-4">基于人工智能的新一代客服系统，提供智能对话、情感识别、多渠道接入等功能</p>
+                <div class="mb-4 flex items-center space-x-4 text-xs text-gray-500">
+                    <span><i class="fa fa-code-fork mr-1"></i>1个版本</span>
+                    <span><i class="fa fa-refresh fa-spin mr-1"></i>1个进行中流程</span>
+                    <span><i class="fa fa-file mr-1"></i>8个文档</span>
+                </div>
+                <div class="mb-3">
+                    <div class="flex items-center justify-between text-xs text-gray-600 mb-1">
+                        <span>整体进度</span>
+                        <span class="font-bold">58%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full" style="width: 58%"></div>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between">
+                    <div class="flex -space-x-2">
+                        <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs border-2 border-white" title="张伟">ZW</div>
+                        <div class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white text-xs border-2 border-white" title="李明">LM</div>
+                        <div class="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center text-white text-xs border-2 border-white" title="王强">WQ</div>
+                        <div class="w-8 h-8 rounded-full bg-gray-400 flex items-center justify-center text-white text-xs border-2 border-white">+2</div>
+                    </div>
+                    <span class="text-xs text-gray-500">更新于 刚刚</span>
+                </div>
+            </div>
+
             <!-- Project Card 1 -->
             <div class="project-card bg-white rounded-lg shadow-md p-6" data-project-id="1" data-status="active">
                 <div class="flex items-start justify-between mb-4">
@@ -337,8 +373,193 @@
 
         // 创建新项目
         document.getElementById('createProjectBtn').addEventListener('click', function() {
-            alert('创建新项目功能');
+            const projectName = prompt('请输入项目名称：', '');
+
+            if (projectName && projectName.trim()) {
+                const projectDesc = prompt('请输入项目描述：', '');
+
+                // 生成mock数据
+                const projectId = Date.now();
+                const statuses = [
+                    { badge: 'status-active', text: '进行中', dataStatus: 'active' },
+                    { badge: 'status-planning', text: '规划中', dataStatus: 'planning' }
+                ];
+                const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
+                const randomVersionCount = Math.floor(Math.random() * 3) + 1; // 1-3个版本
+                const randomDocCount = Math.floor(Math.random() * 20) + 10; // 10-29个文档
+                const randomDaysAgo = Math.floor(Math.random() * 7); // 0-7天前
+
+                const teamMembers = [
+                    { initials: 'ZS', color: 'bg-blue-500' },
+                    { initials: 'LS', color: 'bg-green-500' },
+                    { initials: 'WW', color: 'bg-purple-500' },
+                    { initials: 'ZL', color: 'bg-red-500' },
+                    { initials: 'SQ', color: 'bg-yellow-500' }
+                ];
+
+                // 随机选择3个团队成员
+                const selectedMembers = [];
+                const memberCount = 3;
+                const usedIndices = new Set();
+                while (selectedMembers.length < memberCount) {
+                    const index = Math.floor(Math.random() * teamMembers.length);
+                    if (!usedIndices.has(index)) {
+                        usedIndices.add(index);
+                        selectedMembers.push(teamMembers[index]);
+                    }
+                }
+                const additionalCount = Math.floor(Math.random() * 5) + 1; // +1到+5
+
+                const timeText = randomDaysAgo === 0 ? '今天' :
+                                randomDaysAgo === 1 ? '1天前' :
+                                `${randomDaysAgo}天前`;
+
+                // 创建新项目卡片的HTML
+                const newProjectHTML = `
+                    <div class="project-card bg-white rounded-lg shadow-md p-6" data-project-id="${projectId}" data-status="${randomStatus.dataStatus}">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="flex-1">
+                                <h3 class="text-xl font-bold text-gray-800 mb-2">${projectName}</h3>
+                                <span class="status-badge ${randomStatus.badge}">${randomStatus.text}</span>
+                            </div>
+                            <i class="fa fa-chevron-right text-gray-400"></i>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-4">${projectDesc || '新创建的项目'}</p>
+                        <div class="mb-4 flex items-center space-x-4 text-xs text-gray-500">
+                            <span><i class="fa fa-code-fork mr-1"></i>${randomVersionCount}个版本</span>
+                            <span><i class="fa fa-file mr-1"></i>${randomDocCount}个文档</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex -space-x-2">
+                                ${selectedMembers.map(member =>
+                                    `<div class="w-8 h-8 rounded-full ${member.color} flex items-center justify-center text-white text-xs border-2 border-white">${member.initials}</div>`
+                                ).join('')}
+                                <div class="w-8 h-8 rounded-full bg-gray-400 flex items-center justify-center text-white text-xs border-2 border-white">+${additionalCount}</div>
+                            </div>
+                            <span class="text-xs text-gray-500">创建于 ${timeText}</span>
+                        </div>
+                    </div>
+                `;
+
+                // 将新项目插入到项目列表的开头
+                const projectList = document.getElementById('projectList');
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = newProjectHTML;
+                const newCard = tempDiv.firstElementChild;
+
+                // 添加点击事件
+                newCard.addEventListener('click', function() {
+                    window.location.href = `project-detail.html?id=${projectId}`;
+                });
+
+                projectList.insertBefore(newCard, projectList.firstChild);
+
+                // 更新统计数据
+                updateProjectStats(1, randomStatus.dataStatus === 'active' ? 1 : 0,
+                                  randomStatus.dataStatus === 'planning' ? 1 : 0,
+                                  randomVersionCount, randomDocCount);
+
+                // 更新筛选按钮数字
+                updateFilterCounts(1, randomStatus.dataStatus);
+
+                // 显示成功消息
+                showProjectToast('success', `项目 "${projectName}" 创建成功！`);
+
+            } else if (projectName !== null) {
+                alert('项目名称不能为空！');
+            }
         });
+
+        // 更新项目统计数据
+        function updateProjectStats(projectChange, activeChange, planningChange, versionChange, docChange) {
+            // 更新总项目数
+            const totalElement = document.querySelector('.grid.grid-cols-4 > div:nth-child(1) .text-2xl');
+            if (totalElement) {
+                const current = parseInt(totalElement.textContent);
+                totalElement.textContent = current + projectChange;
+            }
+
+            // 更新进行中项目数
+            const activeElement = document.querySelector('.grid.grid-cols-4 > div:nth-child(2) .text-2xl');
+            if (activeElement && activeChange !== 0) {
+                const current = parseInt(activeElement.textContent);
+                activeElement.textContent = current + activeChange;
+            }
+
+            // 更新总版本数
+            const versionElement = document.querySelector('.grid.grid-cols-4 > div:nth-child(3) .text-2xl');
+            if (versionElement && versionChange !== 0) {
+                const current = parseInt(versionElement.textContent);
+                versionElement.textContent = current + versionChange;
+            }
+
+            // 更新团队成员数（假设每个新项目增加随机成员）
+            const teamElement = document.querySelector('.grid.grid-cols-4 > div:nth-child(4) .text-2xl');
+            if (teamElement) {
+                const current = parseInt(teamElement.textContent);
+                const memberIncrease = Math.floor(Math.random() * 3) + 1; // 1-3个新成员
+                teamElement.textContent = current + memberIncrease;
+            }
+        }
+
+        // 更新筛选按钮的计数
+        function updateFilterCounts(projectChange, status) {
+            // 更新"全部项目"计数
+            const allBtn = document.querySelector('.filter-btn[data-filter="all"]');
+            if (allBtn) {
+                const match = allBtn.textContent.match(/全部项目 \((\d+)\)/);
+                if (match) {
+                    const current = parseInt(match[1]);
+                    allBtn.textContent = `全部项目 (${current + projectChange})`;
+                }
+            }
+
+            // 根据状态更新对应筛选器的计数
+            if (status === 'active') {
+                const activeBtn = document.querySelector('.filter-btn[data-filter="active"]');
+                if (activeBtn) {
+                    const match = activeBtn.textContent.match(/进行中 \((\d+)\)/);
+                    if (match) {
+                        const current = parseInt(match[1]);
+                        activeBtn.textContent = `进行中 (${current + projectChange})`;
+                    }
+                }
+            } else if (status === 'planning') {
+                const planningBtn = document.querySelector('.filter-btn[data-filter="planning"]');
+                if (planningBtn) {
+                    const match = planningBtn.textContent.match(/规划中 \((\d+)\)/);
+                    if (match) {
+                        const current = parseInt(match[1]);
+                        planningBtn.textContent = `规划中 (${current + projectChange})`;
+                    }
+                }
+            }
+        }
+
+        // 显示Toast提示
+        function showProjectToast(type, message) {
+            const colors = {
+                success: 'bg-green-500',
+                error: 'bg-red-500',
+                info: 'bg-blue-500'
+            };
+            const icons = {
+                success: 'fa-check-circle',
+                error: 'fa-times-circle',
+                info: 'fa-info-circle'
+            };
+
+            const toast = document.createElement('div');
+            toast.className = `fixed top-4 right-4 ${colors[type]} text-white px-6 py-3 rounded-lg shadow-lg z-50`;
+            toast.style.animation = 'fadeIn 0.3s ease-in-out';
+            toast.innerHTML = `<i class="fa ${icons[type]} mr-2"></i>${message}`;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
     </script>
 </body>
 </html>

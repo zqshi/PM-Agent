@@ -6,6 +6,7 @@
     <title>ProductCoCreate AI - 版本详情</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="js/process-flow-service.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -133,7 +134,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 transition-all">
+                    <a href="#" class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 transition-all" onclick="event.preventDefault(); alert('系统设置功能正在开发中，敬请期待！');">
                         <i class="fa fa-cog w-6 text-center"></i>
                         <span class="ml-3">系统设置</span>
                     </a>
@@ -167,14 +168,6 @@
                         <span><i class="fa fa-clock-o mr-2"></i>预计发布: 2025-12-31</span>
                         <span><i class="fa fa-user mr-2"></i>负责人: 张三</span>
                     </div>
-                </div>
-                <div class="flex space-x-2">
-                    <button class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-all">
-                        <i class="fa fa-share-alt mr-2"></i>分享
-                    </button>
-                    <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-secondary transition-all">
-                        <i class="fa fa-cog mr-2"></i>设置
-                    </button>
                 </div>
             </div>
         </div>
@@ -214,7 +207,7 @@
                 <button class="tab-btn active" data-tab="process">
                     <i class="fa fa-cogs mr-2"></i>流程管理
                 </button>
-                <button class="tab-btn" data-tab="document">
+                <button class="tab-btn hidden" data-tab="document">
                     <i class="fa fa-file-text mr-2"></i>文档管理
                 </button>
                 <button class="tab-btn" data-tab="statistics">
@@ -226,257 +219,39 @@
             <div id="process-tab" class="tab-content active p-6">
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="text-xl font-bold text-gray-800">流程列表</h3>
-                    <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-secondary transition-all text-sm">
+                    <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-secondary transition-all text-sm" onclick="createNewProcess()">
                         <i class="fa fa-plus mr-2"></i>创建新流程
                     </button>
                 </div>
 
                 <!-- Process List -->
-                <div class="space-y-4">
-                    <!-- Process 1 -->
-                    <div class="border rounded-lg">
-                        <div class="process-card p-6" onclick="toggleProcess('process1')">
+                <div class="space-y-4" id="processList">
+                    <!-- 动态流程将在这里插入 -->
+
+                    <!-- Process 1 - Mock示例流程 -->
+                    <div class="border rounded-lg hover:shadow-md transition-shadow">
+                        <div class="process-card p-6 cursor-pointer" onclick="window.location.href='process-flow-detail.html?processId=mock_process_1'">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center space-x-4 flex-1">
-                                    <i class="fa fa-chevron-down text-gray-400 transition-transform" id="process1-icon"></i>
                                     <div class="flex-1">
                                         <div class="flex items-center space-x-3 mb-2">
                                             <h4 class="text-lg font-bold text-gray-800">用户登录功能优化</h4>
-                                            <span class="process-stage stage-requirement">需求分析</span>
+                                            <span class="process-stage stage-requirement">需求澄清</span>
                                             <span class="badge badge-in-progress">进行中</span>
                                         </div>
-                                        <p class="text-sm text-gray-600">优化用户登录流程，支持多种登录方式</p>
+                                        <p class="text-sm text-gray-600 mb-3">优化用户登录流程，支持多种登录方式（用户名/邮箱/手机号登录）</p>
+                                        <div class="flex items-center space-x-4 text-xs text-gray-500">
+                                            <span><i class="fa fa-check-circle text-green-500 mr-1"></i>0个已完成</span>
+                                            <span><i class="fa fa-refresh fa-spin text-blue-500 mr-1"></i>1个进行中</span>
+                                            <span><i class="fa fa-file-text mr-1"></i>3个文档</span>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="text-right ml-4">
-                                    <p class="text-sm text-gray-600 mb-1">进度: 45%</p>
+                                    <p class="text-sm text-gray-600 mb-1">进度: 15%</p>
                                     <p class="text-xs text-gray-500">更新于 2小时前</p>
+                                    <i class="fa fa-chevron-right text-gray-400 mt-2"></i>
                                 </div>
-                            </div>
-                        </div>
-
-                        <!-- Sub Items -->
-                        <div id="process1-content" class="sub-item hidden pb-4">
-                            <!-- Requirement Clarification -->
-                            <div class="sub-item-header" onclick="window.location.href='requirement-clarification.html?processId=1'">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center space-x-3">
-                                        <i class="fa fa-comments text-blue-500"></i>
-                                        <span class="font-medium text-gray-800">需求澄清</span>
-                                        <span class="badge badge-in-progress">2个待处理</span>
-                                    </div>
-                                    <i class="fa fa-chevron-right text-gray-400"></i>
-                                </div>
-                                <p class="text-xs text-gray-500 mt-1 ml-7">最近更新: 张三提出了关于第三方登录的问题</p>
-                            </div>
-
-                            <!-- Challenge and Arbitration -->
-                            <div class="sub-item-header" onclick="window.location.href='challenge-arbitration.html?processId=1'">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center space-x-3">
-                                        <i class="fa fa-gavel text-orange-500"></i>
-                                        <span class="font-medium text-gray-800">挑战与裁决</span>
-                                        <span class="badge badge-pending">1个待裁决</span>
-                                    </div>
-                                    <i class="fa fa-chevron-right text-gray-400"></i>
-                                </div>
-                                <p class="text-xs text-gray-500 mt-1 ml-7">最近更新: 技术方案争议需要产品经理裁决</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Process 2 -->
-                    <div class="border rounded-lg">
-                        <div class="process-card p-6" onclick="toggleProcess('process2')">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center space-x-4 flex-1">
-                                    <i class="fa fa-chevron-down text-gray-400 transition-transform" id="process2-icon"></i>
-                                    <div class="flex-1">
-                                        <div class="flex items-center space-x-3 mb-2">
-                                            <h4 class="text-lg font-bold text-gray-800">个人中心界面重构</h4>
-                                            <span class="process-stage stage-design">设计阶段</span>
-                                            <span class="badge badge-in-progress">进行中</span>
-                                        </div>
-                                        <p class="text-sm text-gray-600">重新设计个人中心的UI和交互</p>
-                                    </div>
-                                </div>
-                                <div class="text-right ml-4">
-                                    <p class="text-sm text-gray-600 mb-1">进度: 70%</p>
-                                    <p class="text-xs text-gray-500">更新于 5小时前</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div id="process2-content" class="sub-item hidden pb-4">
-                            <div class="sub-item-header" onclick="window.location.href='requirement-clarification.html?processId=2'">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center space-x-3">
-                                        <i class="fa fa-comments text-blue-500"></i>
-                                        <span class="font-medium text-gray-800">需求澄清</span>
-                                        <span class="badge badge-completed">已完成</span>
-                                    </div>
-                                    <i class="fa fa-chevron-right text-gray-400"></i>
-                                </div>
-                                <p class="text-xs text-gray-500 mt-1 ml-7">所有需求已澄清完毕</p>
-                            </div>
-
-                            <div class="sub-item-header" onclick="window.location.href='challenge-arbitration.html?processId=2'">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center space-x-3">
-                                        <i class="fa fa-gavel text-orange-500"></i>
-                                        <span class="font-medium text-gray-800">挑战与裁决</span>
-                                        <span class="badge badge-completed">无待处理</span>
-                                    </div>
-                                    <i class="fa fa-chevron-right text-gray-400"></i>
-                                </div>
-                                <p class="text-xs text-gray-500 mt-1 ml-7">暂无需要裁决的事项</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Process 3 -->
-                    <div class="border rounded-lg">
-                        <div class="process-card p-6" onclick="toggleProcess('process3')">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center space-x-4 flex-1">
-                                    <i class="fa fa-chevron-down text-gray-400 transition-transform" id="process3-icon"></i>
-                                    <div class="flex-1">
-                                        <div class="flex items-center space-x-3 mb-2">
-                                            <h4 class="text-lg font-bold text-gray-800">支付功能集成</h4>
-                                            <span class="process-stage stage-development">开发阶段</span>
-                                            <span class="badge badge-completed">已完成</span>
-                                        </div>
-                                        <p class="text-sm text-gray-600">集成第三方支付SDK</p>
-                                    </div>
-                                </div>
-                                <div class="text-right ml-4">
-                                    <p class="text-sm text-gray-600 mb-1">进度: 100%</p>
-                                    <p class="text-xs text-gray-500">完成于 2天前</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div id="process3-content" class="sub-item hidden pb-4">
-                            <div class="sub-item-header" onclick="window.location.href='requirement-clarification.html?processId=3'">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center space-x-3">
-                                        <i class="fa fa-comments text-blue-500"></i>
-                                        <span class="font-medium text-gray-800">需求澄清</span>
-                                        <span class="badge badge-completed">已完成</span>
-                                    </div>
-                                    <i class="fa fa-chevron-right text-gray-400"></i>
-                                </div>
-                                <p class="text-xs text-gray-500 mt-1 ml-7">共处理了 5 个需求澄清</p>
-                            </div>
-
-                            <div class="sub-item-header" onclick="window.location.href='challenge-arbitration.html?processId=3'">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center space-x-3">
-                                        <i class="fa fa-gavel text-orange-500"></i>
-                                        <span class="font-medium text-gray-800">挑战与裁决</span>
-                                        <span class="badge badge-completed">已完成</span>
-                                    </div>
-                                    <i class="fa fa-chevron-right text-gray-400"></i>
-                                </div>
-                                <p class="text-xs text-gray-500 mt-1 ml-7">共处理了 2 个裁决事项</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Process 4 -->
-                    <div class="border rounded-lg">
-                        <div class="process-card p-6" onclick="toggleProcess('process4')">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center space-x-4 flex-1">
-                                    <i class="fa fa-chevron-down text-gray-400 transition-transform" id="process4-icon"></i>
-                                    <div class="flex-1">
-                                        <div class="flex items-center space-x-3 mb-2">
-                                            <h4 class="text-lg font-bold text-gray-800">性能优化</h4>
-                                            <span class="process-stage stage-testing">测试阶段</span>
-                                            <span class="badge badge-completed">已完成</span>
-                                        </div>
-                                        <p class="text-sm text-gray-600">应用性能优化和测试</p>
-                                    </div>
-                                </div>
-                                <div class="text-right ml-4">
-                                    <p class="text-sm text-gray-600 mb-1">进度: 100%</p>
-                                    <p class="text-xs text-gray-500">完成于 1周前</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div id="process4-content" class="sub-item hidden pb-4">
-                            <div class="sub-item-header" onclick="window.location.href='requirement-clarification.html?processId=4'">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center space-x-3">
-                                        <i class="fa fa-comments text-blue-500"></i>
-                                        <span class="font-medium text-gray-800">需求澄清</span>
-                                        <span class="badge badge-completed">已完成</span>
-                                    </div>
-                                    <i class="fa fa-chevron-right text-gray-400"></i>
-                                </div>
-                                <p class="text-xs text-gray-500 mt-1 ml-7">共处理了 3 个需求澄清</p>
-                            </div>
-
-                            <div class="sub-item-header" onclick="window.location.href='challenge-arbitration.html?processId=4'">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center space-x-3">
-                                        <i class="fa fa-gavel text-orange-500"></i>
-                                        <span class="font-medium text-gray-800">挑战与裁决</span>
-                                        <span class="badge badge-completed">已完成</span>
-                                    </div>
-                                    <i class="fa fa-chevron-right text-gray-400"></i>
-                                </div>
-                                <p class="text-xs text-gray-500 mt-1 ml-7">共处理了 1 个裁决事项</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Process 5 -->
-                    <div class="border rounded-lg">
-                        <div class="process-card p-6" onclick="toggleProcess('process5')">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center space-x-4 flex-1">
-                                    <i class="fa fa-chevron-down text-gray-400 transition-transform" id="process5-icon"></i>
-                                    <div class="flex-1">
-                                        <div class="flex items-center space-x-3 mb-2">
-                                            <h4 class="text-lg font-bold text-gray-800">数据统计功能</h4>
-                                            <span class="process-stage stage-requirement">需求分析</span>
-                                            <span class="badge badge-pending">待开始</span>
-                                        </div>
-                                        <p class="text-sm text-gray-600">添加用户行为数据统计功能</p>
-                                    </div>
-                                </div>
-                                <div class="text-right ml-4">
-                                    <p class="text-sm text-gray-600 mb-1">进度: 10%</p>
-                                    <p class="text-xs text-gray-500">创建于 3天前</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div id="process5-content" class="sub-item hidden pb-4">
-                            <div class="sub-item-header" onclick="window.location.href='requirement-clarification.html?processId=5'">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center space-x-3">
-                                        <i class="fa fa-comments text-blue-500"></i>
-                                        <span class="font-medium text-gray-800">需求澄清</span>
-                                        <span class="badge badge-pending">待启动</span>
-                                    </div>
-                                    <i class="fa fa-chevron-right text-gray-400"></i>
-                                </div>
-                                <p class="text-xs text-gray-500 mt-1 ml-7">还未开始需求澄清</p>
-                            </div>
-
-                            <div class="sub-item-header" onclick="window.location.href='challenge-arbitration.html?processId=5'">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center space-x-3">
-                                        <i class="fa fa-gavel text-orange-500"></i>
-                                        <span class="font-medium text-gray-800">挑战与裁决</span>
-                                        <span class="badge badge-pending">待启动</span>
-                                    </div>
-                                    <i class="fa fa-chevron-right text-gray-400"></i>
-                                </div>
-                                <p class="text-xs text-gray-500 mt-1 ml-7">暂无需要裁决的事项</p>
                             </div>
                         </div>
                     </div>
@@ -487,7 +262,7 @@
             <div id="document-tab" class="tab-content p-6">
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="text-xl font-bold text-gray-800">文档列表</h3>
-                    <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-secondary transition-all text-sm">
+                    <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-secondary transition-all text-sm" onclick="uploadDocument()">
                         <i class="fa fa-plus mr-2"></i>上传文档
                     </button>
                 </div>
@@ -678,6 +453,75 @@
         </div>
     </main>
 
+    <!-- 创建新流程弹窗 -->
+    <div id="processModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+        <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between">
+                <h3 class="text-xl font-bold text-gray-800">创建新流程</h3>
+                <button onclick="closeProcessModal()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fa fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <div class="p-6">
+                <!-- 流程名称 -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        流程名称 <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" id="processName"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                        placeholder="请输入流程名称" />
+                </div>
+
+                <!-- 产品需求描述 -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        产品需求描述 <span class="text-red-500">*</span>
+                    </label>
+                    <textarea id="productRequirement" rows="6"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent font-mono text-sm"
+                        placeholder="请详细说明产品需求"></textarea>
+                    <p class="text-xs text-gray-500 mt-1">
+                        <i class="fa fa-lightbulb-o mr-1"></i>
+                        可以直接输入需求描述，或者上传附件文档
+                    </p>
+                </div>
+
+                <!-- 附件上传 -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        附件上传（可选）
+                    </label>
+                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary transition-all cursor-pointer"
+                         onclick="document.getElementById('processAttachment').click()">
+                        <input type="file" id="processAttachment" class="hidden" multiple
+                               accept=".pdf,.doc,.docx,.txt,.md"
+                               onchange="handleFileSelect(event)">
+                        <i class="fa fa-cloud-upload text-4xl text-gray-400 mb-2"></i>
+                        <p class="text-sm text-gray-600 mb-1">点击或拖拽文件到这里上传</p>
+                        <p class="text-xs text-gray-500">支持 PDF、Word、TXT、Markdown 格式</p>
+                    </div>
+                    <div id="fileList" class="mt-3 space-y-2">
+                        <!-- 已选文件列表将显示在这里 -->
+                    </div>
+                </div>
+
+                <!-- 按钮区域 -->
+                <div class="flex items-center justify-end space-x-3 pt-4 border-t">
+                    <button onclick="closeProcessModal()"
+                        class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-all">
+                        取消
+                    </button>
+                    <button onclick="confirmCreateProcess()"
+                        class="px-4 py-2 bg-primary text-white rounded-md hover:bg-secondary transition-all">
+                        <i class="fa fa-check mr-2"></i>创建流程
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Tab切换
         document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -696,30 +540,328 @@
             });
         });
 
-        // 流程折叠展开
-        function toggleProcess(processId) {
-            const content = document.getElementById(`${processId}-content`);
-            const icon = document.getElementById(`${processId}-icon`);
 
-            if (content.classList.contains('hidden')) {
-                content.classList.remove('hidden');
-                icon.style.transform = 'rotate(180deg)';
-            } else {
-                content.classList.add('hidden');
-                icon.style.transform = 'rotate(0deg)';
+        // 存储上传的文件
+        let uploadedFiles = [];
+
+        // 创建新流程 - 打开弹窗
+        function createNewProcess() {
+            const modal = document.getElementById('processModal');
+            modal.classList.remove('hidden');
+        }
+
+        // 关闭流程创建弹窗
+        function closeProcessModal() {
+            const modal = document.getElementById('processModal');
+            modal.classList.add('hidden');
+
+            // 清空表单
+            document.getElementById('processName').value = '';
+            document.getElementById('productRequirement').value = '';
+            document.getElementById('fileList').innerHTML = '';
+            uploadedFiles = [];
+        }
+
+        // 处理文件选择
+        function handleFileSelect(event) {
+            const files = Array.from(event.target.files);
+            uploadedFiles = uploadedFiles.concat(files);
+
+            // 更新文件列表显示
+            updateFileList();
+        }
+
+        // 更新文件列表显示
+        function updateFileList() {
+            const fileList = document.getElementById('fileList');
+            fileList.innerHTML = '';
+
+            uploadedFiles.forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'flex items-center justify-between p-2 bg-gray-50 rounded border';
+                fileItem.innerHTML = `
+                    <div class="flex items-center space-x-2">
+                        <i class="fa fa-file-text text-gray-500"></i>
+                        <span class="text-sm text-gray-700">${file.name}</span>
+                        <span class="text-xs text-gray-500">(${(file.size / 1024).toFixed(1)} KB)</span>
+                    </div>
+                    <button onclick="removeFile(${index})" class="text-red-500 hover:text-red-700">
+                        <i class="fa fa-times"></i>
+                    </button>
+                `;
+                fileList.appendChild(fileItem);
+            });
+        }
+
+        // 删除文件
+        function removeFile(index) {
+            uploadedFiles.splice(index, 1);
+            updateFileList();
+        }
+
+        // 确认创建流程
+        function confirmCreateProcess() {
+            const processName = document.getElementById('processName').value.trim();
+            const productRequirement = document.getElementById('productRequirement').value.trim();
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const projectId = urlParams.get('projectId');
+            const versionId = urlParams.get('versionId');
+
+            // 验证输入
+            if (!processName) {
+                alert('请输入流程名称！');
+                return;
+            }
+
+            if (!productRequirement && uploadedFiles.length === 0) {
+                alert('请输入产品需求描述或上传附件！');
+                return;
+            }
+
+            // 构建完整的需求描述
+            let fullRequirement = productRequirement;
+            if (uploadedFiles.length > 0) {
+                fullRequirement += '\n\n附件文件：\n';
+                uploadedFiles.forEach(file => {
+                    fullRequirement += `- ${file.name}\n`;
+                });
+            }
+
+            // 调用服务层创建流程
+            const processFlow = processFlowService.createProcessFlow({
+                processName: processName,
+                productRequirement: fullRequirement,
+                versionId: versionId,
+                projectId: projectId
+            });
+
+            // 关闭弹窗
+            closeProcessModal();
+
+            // 显示成功消息
+            const toast = createToast('success', `流程 "${processName}" 创建成功！已自动生成澄清问题。`);
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+
+            // 跳转到流程详情页
+            setTimeout(() => {
+                window.location.href = `process-flow-detail.html?processId=${processFlow.id}`;
+            }, 1500);
+        }
+
+        // 更新流程统计数据
+        function updateProcessStats(totalChange, completedChange, inProgressChange) {
+            // 更新流程数量统计
+            const totalElement = document.querySelector('.grid.grid-cols-4 > div:nth-child(1) .text-2xl');
+            const completedElement = document.querySelector('.grid.grid-cols-4 > div:nth-child(2) .text-2xl');
+            const inProgressElement = document.querySelector('.grid.grid-cols-4 > div:nth-child(3) .text-2xl');
+
+            if (totalElement) {
+                const currentTotal = parseInt(totalElement.textContent);
+                totalElement.textContent = currentTotal + totalChange;
+            }
+            if (completedElement && completedChange !== 0) {
+                const currentCompleted = parseInt(completedElement.textContent);
+                completedElement.textContent = currentCompleted + completedChange;
+            }
+            if (inProgressElement && inProgressChange !== 0) {
+                const currentInProgress = parseInt(inProgressElement.textContent);
+                inProgressElement.textContent = currentInProgress + inProgressChange;
+            }
+        }
+
+        // 创建Toast提示
+        function createToast(type, message) {
+            const colors = {
+                success: 'bg-green-500',
+                error: 'bg-red-500',
+                info: 'bg-blue-500',
+                warning: 'bg-yellow-500'
+            };
+            const icons = {
+                success: 'fa-check-circle',
+                error: 'fa-times-circle',
+                info: 'fa-info-circle',
+                warning: 'fa-exclamation-triangle'
+            };
+
+            const toast = document.createElement('div');
+            toast.className = `fixed top-4 right-4 ${colors[type]} text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in`;
+            toast.innerHTML = `<i class="fa ${icons[type]} mr-2"></i>${message}`;
+            return toast;
+        }
+
+
+        // 上传文档
+        function uploadDocument() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const projectId = urlParams.get('projectId');
+            const versionId = urlParams.get('versionId');
+
+            const fileName = prompt('请输入要上传的文档名称：', '需求文档.pdf');
+
+            if (fileName && fileName.trim()) {
+                // 生成mock数据
+                const docTypes = [
+                    { icon: 'fa-file-pdf-o', color: 'text-red-500', type: 'PDF' },
+                    { icon: 'fa-file-word-o', color: 'text-blue-500', type: 'Word' },
+                    { icon: 'fa-file-excel-o', color: 'text-green-500', type: 'Excel' },
+                    { icon: 'fa-file-text-o', color: 'text-gray-500', type: 'Text' }
+                ];
+
+                // 根据文件名后缀判断类型
+                let docType = docTypes[3]; // 默认文本类型
+                if (fileName.includes('.pdf')) docType = docTypes[0];
+                else if (fileName.includes('.doc') || fileName.includes('.docx')) docType = docTypes[1];
+                else if (fileName.includes('.xls') || fileName.includes('.xlsx')) docType = docTypes[2];
+
+                const randomSize = (Math.random() * 5 + 0.5).toFixed(1); // 0.5-5.5 MB
+                const authors = ['张三', '李四', '王五', '赵六'];
+                const randomAuthor = authors[Math.floor(Math.random() * authors.length)];
+
+                // 创建新文档的HTML
+                const newDocHTML = `
+                    <div class="border rounded-lg p-4 hover:shadow-md transition-all cursor-pointer" onclick="alert('查看文档: ${fileName}')">
+                        <div class="flex items-start space-x-3">
+                            <i class="fa ${docType.icon} text-3xl ${docType.color}"></i>
+                            <div class="flex-1">
+                                <h4 class="font-medium text-gray-800 mb-1">${fileName}</h4>
+                                <div class="flex items-center space-x-4 text-xs text-gray-500">
+                                    <span><i class="fa fa-file-o mr-1"></i>${docType.type}</span>
+                                    <span><i class="fa fa-database mr-1"></i>${randomSize}MB</span>
+                                    <span><i class="fa fa-user mr-1"></i>${randomAuthor}</span>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-2">刚刚上传</p>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="text-blue-500 hover:text-blue-700" onclick="event.stopPropagation(); alert('下载: ${fileName}');">
+                                    <i class="fa fa-download"></i>
+                                </button>
+                                <button class="text-red-500 hover:text-red-700" onclick="event.stopPropagation(); if(confirm('确定要删除 ${fileName} 吗？')) { this.closest('.border').remove(); createToast('success', '文档已删除'); }">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // 将新文档插入到文档列表的开头
+                const docList = document.querySelector('#document-tab .grid');
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = newDocHTML;
+                docList.insertBefore(tempDiv.firstElementChild, docList.firstChild);
+
+                // 更新文档统计数据
+                updateDocumentStats(1);
+
+                // 显示成功消息
+                const toast = createToast('success', `文档 "${fileName}" 上传成功！`);
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), 3000);
+
+            } else if (fileName !== null) {
+                alert('文档名称不能为空！');
+            }
+        }
+
+        // 更新文档统计数据
+        function updateDocumentStats(change) {
+            const docCountElement = document.querySelector('.grid.grid-cols-4 > div:nth-child(4) .text-2xl');
+            if (docCountElement) {
+                const currentCount = parseInt(docCountElement.textContent);
+                docCountElement.textContent = currentCount + change;
             }
         }
 
         // 根据URL参数加载数据
         window.addEventListener('DOMContentLoaded', function() {
+            // 确保数据已初始化
+            if (typeof processFlowService !== 'undefined') {
+                processFlowService.initializeMockData();
+            }
+
             const urlParams = new URLSearchParams(window.location.search);
             const projectId = urlParams.get('projectId');
             const versionId = urlParams.get('versionId');
 
             console.log('项目ID:', projectId, '版本ID:', versionId);
 
-            // 这里可以根据参数加载实际数据
+            // 如果是version_001，加载mock流程数据
+            if (versionId === 'version_001') {
+                loadMockProcessData();
+            }
         });
+
+        // 加载Mock流程数据
+        function loadMockProcessData() {
+            const processList = document.getElementById('processList');
+            const flowsData = localStorage.getItem('process_flows');
+
+            if (flowsData) {
+                const flows = JSON.parse(flowsData);
+                const flow = flows['process_1730076000000'];
+
+                if (flow) {
+                    // 计算完成的环节数
+                    const completedSteps = Object.values(flow.steps).filter(s => s.status === 'completed').length;
+                    const inProgressSteps = Object.values(flow.steps).filter(s => s.status === 'in_progress').length;
+                    const totalSteps = Object.keys(flow.steps).length;
+                    const progress = Math.round((completedSteps / totalSteps) * 100);
+
+                    // 创建流程卡片
+                    const processCard = document.createElement('div');
+                    processCard.className = 'border rounded-lg';
+
+                    const processId = 'process_mock';
+                    processCard.innerHTML = `
+                        <div class="process-card p-6" onclick="window.location.href='process-flow-detail.html?processId=${flow.id}'">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-4 flex-1">
+                                    <i class="fa fa-chevron-right text-gray-400 transition-transform" id="${processId}-icon"></i>
+                                    <div class="flex-1">
+                                        <div class="flex items-center space-x-3 mb-2">
+                                            <h4 class="text-lg font-bold text-gray-800">${flow.name}</h4>
+                                            <span class="process-stage stage-requirement">第${flow.currentStep}环节</span>
+                                            <span class="badge badge-in-progress">${flow.status === 'in_progress' ? '进行中' : '已完成'}</span>
+                                        </div>
+                                        <p class="text-sm text-gray-600">${flow.requirement.substring(0, 60)}...</p>
+                                        <div class="mt-2 flex items-center space-x-4 text-xs text-gray-500">
+                                            <span><i class="fa fa-check-circle text-green-500 mr-1"></i>${completedSteps}个已完成</span>
+                                            <span><i class="fa fa-refresh fa-spin text-blue-500 mr-1"></i>${inProgressSteps}个进行中</span>
+                                            <span><i class="fa fa-file-text mr-1"></i>${flow.documents.length}个文档</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-right ml-4">
+                                    <p class="text-sm text-gray-600 mb-1">进度: ${progress}%</p>
+                                    <p class="text-xs text-gray-500">更新于 ${getTimeAgo(flow.updatedAt)}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    // 插入到流程列表最前面
+                    processList.insertBefore(processCard, processList.firstChild);
+
+                    console.log('✅ 已加载Mock流程数据');
+                }
+            }
+        }
+
+        // 计算时间差
+        function getTimeAgo(isoString) {
+            const now = new Date();
+            const date = new Date(isoString);
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+
+            if (diffMins < 60) return `${diffMins}分钟前`;
+            const diffHours = Math.floor(diffMins / 60);
+            if (diffHours < 24) return `${diffHours}小时前`;
+            const diffDays = Math.floor(diffHours / 24);
+            return `${diffDays}天前`;
+        }
     </script>
 </body>
 </html>

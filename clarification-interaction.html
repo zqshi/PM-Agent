@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>需求澄清 - AI协作流程</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="js/process-flow-service.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#4f46e5',
+                        success: '#10b981',
+                        warning: '#f59e0b',
+                        danger: '#ef4444'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background-color: #f8fafc;
+        }
+        .sidebar {
+            width: 250px;
+        }
+        .question-card {
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+        .question-card.answered {
+            border-left-color: #10b981;
+            background-color: #f0fdf4;
+        }
+        .question-item {
+            padding: 12px 16px;
+            border-left: 3px solid #e5e7eb;
+            margin-bottom: 12px;
+            transition: all 0.2s ease;
+        }
+        .question-item:hover {
+            border-left-color: #3b82f6;
+            background-color: #f9fafb;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        .save-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: none;
+            z-index: 1000;
+        }
+        .save-indicator.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+        .progress-ring-circle {
+            transition: stroke-dashoffset 0.5s ease;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex">
+    <!-- Sidebar -->
+    <aside class="sidebar bg-white shadow-md h-screen fixed left-0 top-0 z-10 overflow-y-auto">
+        <div class="p-4 flex items-center justify-between border-b">
+            <div class="flex items-center">
+                <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/e10cd3e372b34c81bd38e133e4bd5b6f~tplv-a9rns2rl98-image.image?rcl=202510281322428F39A82D876F62A3D046&rk3s=8e244e95&rrcfp=f06b921b&x-expires=1764221004&x-signature=F1qcXPuf02II05L0PsQjVA3rO4o%3D" alt="Logo" class="h-8">
+                <h1 class="ml-2 text-lg font-bold text-gray-800">ProductCoCreate</h1>
+            </div>
+        </div>
+
+        <!-- Progress Overview -->
+        <div class="p-4 border-b bg-blue-50">
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="text-sm font-bold text-gray-800">回答进度</h3>
+                <span class="text-lg font-bold text-primary" id="progressText">0%</span>
+            </div>
+            <div class="relative w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                <div class="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-500" style="width: 0%" id="progressBar"></div>
+            </div>
+            <p class="text-xs text-gray-600 mt-2">已回答 <span id="answeredCount">0</span> / <span id="totalQuestions">0</span> 个问题</p>
+        </div>
+
+        <!-- Question Categories Navigation -->
+        <nav class="mt-2">
+            <div class="px-4 py-2 text-xs font-bold text-gray-500 uppercase">问题分类</div>
+            <ul id="categoryNav">
+                <!-- Categories will be dynamically generated -->
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="ml-64 flex-1 min-h-screen p-6">
+        <!-- Save Indicator -->
+        <div class="save-indicator" id="saveIndicator">
+            <div class="flex items-center space-x-2">
+                <i class="fa fa-check-circle text-success"></i>
+                <span class="text-sm text-gray-700">自动保存成功</span>
+            </div>
+        </div>
+
+        <!-- Breadcrumb -->
+        <nav class="flex mb-6 text-sm">
+            <a href="project-management.html" class="text-primary hover:text-secondary">项目管理</a>
+            <span class="mx-2 text-gray-400">/</span>
+            <a href="#" class="text-primary hover:text-secondary" id="projectLink">项目</a>
+            <span class="mx-2 text-gray-400">/</span>
+            <a href="#" class="text-primary hover:text-secondary" id="versionLink">版本</a>
+            <span class="mx-2 text-gray-400">/</span>
+            <a href="#" class="text-primary hover:text-secondary" id="processLink">流程</a>
+            <span class="mx-2 text-gray-400">/</span>
+            <span class="text-gray-600">需求澄清</span>
+        </nav>
+
+        <!-- Header -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div class="flex items-start justify-between">
+                <div class="flex-1">
+                    <div class="flex items-center mb-2">
+                        <i class="fa fa-comments text-3xl text-blue-500 mr-3"></i>
+                        <h1 class="text-3xl font-bold text-gray-800">需求澄清</h1>
+                        <span class="ml-4 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">步骤 1.1</span>
+                    </div>
+                    <p class="text-gray-600 mb-4">为了更好地理解您的需求，Product Manager Agent 准备了以下澄清问题。请详细回答这些问题，以帮助我们生成更准确的产品设计文档。</p>
+                    <div class="flex items-center space-x-6 text-sm text-gray-600">
+                        <span><i class="fa fa-lightbulb-o mr-2"></i>提示：所有回答会自动保存</span>
+                        <span><i class="fa fa-info-circle mr-2"></i>可以随时返回修改答案</span>
+                    </div>
+                </div>
+                <button class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-all" onclick="window.location.href=document.getElementById('processLink').href">
+                    <i class="fa fa-arrow-left mr-2"></i>返回流程
+                </button>
+            </div>
+        </div>
+
+        <!-- Original Requirement -->
+        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-6 mb-6 border-l-4 border-primary">
+            <h3 class="text-lg font-bold text-gray-800 mb-2 flex items-center">
+                <i class="fa fa-file-text mr-2 text-primary"></i>原始需求
+            </h3>
+            <p class="text-gray-700 whitespace-pre-wrap" id="originalRequirement">加载中...</p>
+        </div>
+
+        <!-- Questions Container -->
+        <div id="questionsContainer">
+            <!-- Questions will be dynamically generated here -->
+        </div>
+
+        <!-- Submit Button -->
+        <div class="bg-white rounded-lg shadow-md p-6 mt-6 sticky bottom-6">
+            <div class="flex items-center justify-between">
+                <div class="text-sm text-gray-600">
+                    <i class="fa fa-info-circle mr-2"></i>
+                    回答完所有问题后，点击提交按钮，系统将自动生成需求分析文档
+                </div>
+                <button class="px-8 py-3 bg-primary text-white rounded-md hover:bg-secondary transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed" id="submitBtn" onclick="submitClarification()" disabled>
+                    <i class="fa fa-paper-plane mr-2"></i>提交澄清回答
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let currentProcessFlow = null;
+        let clarificationDoc = null;
+        let autoSaveTimeout = null;
+
+        // 将问题数组按分类分组
+        function groupQuestionsByCategory(questions) {
+            const categories = {};
+
+            // 按category分组
+            questions.forEach(q => {
+                if (!categories[q.category]) {
+                    categories[q.category] = {
+                        category: q.category,
+                        purpose: `了解${q.category}相关信息`,
+                        questions: [],
+                        answers: [],
+                        userResponse: ''
+                    };
+                }
+                categories[q.category].questions.push(q.question);
+
+                // 如果问题已回答，添加到userResponse
+                if (q.status === 'answered' && q.answer) {
+                    if (categories[q.category].userResponse) {
+                        categories[q.category].userResponse += '\n\n';
+                    }
+                    categories[q.category].userResponse += `Q: ${q.question}\nA: ${q.answer}`;
+                }
+            });
+
+            // 转换为数组格式
+            return Object.values(categories);
+        }
+
+        // 页面加载时获取流程数据
+        window.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const processId = urlParams.get('processId');
+
+            if (!processId) {
+                alert('流程ID不存在！');
+                window.location.href = 'project-management.html';
+                return;
+            }
+
+            // 获取流程数据
+            currentProcessFlow = processFlowService.getProcessFlow(processId);
+
+            if (!currentProcessFlow) {
+                alert('流程不存在！');
+                window.location.href = 'project-management.html';
+                return;
+            }
+
+            // 获取澄清问题 - 优先从步骤1.1的clarificationQuestions字段读取
+            const step11 = currentProcessFlow.steps['1.1'];
+            if (step11 && step11.clarificationQuestions) {
+                // 从步骤数据中构造clarificationDoc格式
+                clarificationDoc = {
+                    type: 'clarification_questions',
+                    version: 1,
+                    content: {
+                        questions: groupQuestionsByCategory(step11.clarificationQuestions)
+                    }
+                };
+            } else {
+                // 旧格式：从documents中获取
+                clarificationDoc = currentProcessFlow.documents.find(doc =>
+                    doc.type === 'clarification_questions' && doc.version === 1
+                );
+            }
+
+            if (!clarificationDoc) {
+                alert('澄清问题文档不存在！');
+                window.location.href = `process-flow-detail.html?processId=${processId}`;
+                return;
+            }
+
+            // 渲染页面
+            renderOriginalRequirement();
+            renderQuestions();
+            renderCategoryNav();
+            updateProgress();
+            updateBreadcrumb();
+        });
+
+        // 渲染原始需求
+        function renderOriginalRequirement() {
+            document.getElementById('originalRequirement').textContent = currentProcessFlow.requirement;
+        }
+
+        // 渲染问题列表
+        function renderQuestions() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = '';
+
+            clarificationDoc.content.questions.forEach((category, catIndex) => {
+                const hasAnswered = category.userResponse && category.userResponse.trim().length > 0;
+
+                const cardHTML = `
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-6 question-card ${hasAnswered ? 'answered' : ''}" id="category-${catIndex}">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="flex-1">
+                                <h3 class="text-xl font-bold text-gray-800 mb-2 flex items-center">
+                                    <span class="inline-block w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center mr-3 text-sm">${catIndex + 1}</span>
+                                    ${category.category}
+                                </h3>
+                                <p class="text-sm text-gray-600 italic ml-11">${category.purpose}</p>
+                            </div>
+                            ${hasAnswered ? '<i class="fa fa-check-circle text-2xl text-success"></i>' : '<i class="fa fa-circle-o text-2xl text-gray-300"></i>'}
+                        </div>
+
+                        <div class="ml-11 space-y-3 mb-4">
+                            ${category.questions.map((q, qIndex) => `
+                                <div class="question-item bg-gray-50 rounded">
+                                    <p class="text-sm font-medium text-gray-700">${qIndex + 1}. ${q}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+
+                        <div class="ml-11">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                您的回答：
+                                <span class="text-danger">*</span>
+                            </label>
+                            <textarea
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                                placeholder="请详细回答上述问题..."
+                                data-category-index="${catIndex}"
+                                oninput="handleAnswerInput(this)"
+                            >${category.userResponse || ''}</textarea>
+                            <p class="text-xs text-gray-500 mt-1">
+                                <i class="fa fa-info-circle mr-1"></i>
+                                请尽可能详细地回答，这将帮助我们更好地理解您的需求
+                            </p>
+                        </div>
+                    </div>
+                `;
+
+                container.innerHTML += cardHTML;
+            });
+        }
+
+        // 渲染分类导航
+        function renderCategoryNav() {
+            const nav = document.getElementById('categoryNav');
+            nav.innerHTML = '';
+
+            clarificationDoc.content.questions.forEach((category, index) => {
+                const hasAnswered = category.userResponse && category.userResponse.trim().length > 0;
+                const icon = hasAnswered ? 'fa-check-circle text-success' : 'fa-circle-o text-gray-400';
+
+                const navItem = `
+                    <li>
+                        <a href="#category-${index}" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 transition-all">
+                            <i class="fa ${icon} w-5 text-center mr-2"></i>
+                            <span class="flex-1 truncate">${category.category}</span>
+                        </a>
+                    </li>
+                `;
+                nav.innerHTML += navItem;
+            });
+        }
+
+        // 处理回答输入
+        function handleAnswerInput(textarea) {
+            const categoryIndex = parseInt(textarea.dataset.categoryIndex);
+            const answer = textarea.value;
+
+            // 更新数据
+            clarificationDoc.content.questions[categoryIndex].userResponse = answer;
+
+            // 更新卡片样式
+            const card = document.getElementById(`category-${categoryIndex}`);
+            const hasAnswered = answer.trim().length > 0;
+
+            if (hasAnswered) {
+                card.classList.add('answered');
+                card.querySelector('.fa-circle-o')?.classList.replace('fa-circle-o', 'fa-check-circle');
+                card.querySelector('.text-gray-300')?.classList.replace('text-gray-300', 'text-success');
+            } else {
+                card.classList.remove('answered');
+                card.querySelector('.fa-check-circle')?.classList.replace('fa-check-circle', 'fa-circle-o');
+                card.querySelector('.text-success')?.classList.replace('text-success', 'text-gray-300');
+            }
+
+            // 更新进度
+            updateProgress();
+            renderCategoryNav();
+
+            // 自动保存（防抖）
+            clearTimeout(autoSaveTimeout);
+            autoSaveTimeout = setTimeout(() => {
+                saveProgress();
+            }, 1000);
+        }
+
+        // 更新进度
+        function updateProgress() {
+            const total = clarificationDoc.content.questions.length;
+            const answered = clarificationDoc.content.questions.filter(q =>
+                q.userResponse && q.userResponse.trim().length > 0
+            ).length;
+
+            const percentage = Math.round((answered / total) * 100);
+
+            document.getElementById('progressText').textContent = percentage + '%';
+            document.getElementById('progressBar').style.width = percentage + '%';
+            document.getElementById('answeredCount').textContent = answered;
+            document.getElementById('totalQuestions').textContent = total;
+
+            // 更新提交按钮状态
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = answered < total;
+        }
+
+        // 保存进度
+        function saveProgress() {
+            // 更新文档
+            processFlowService.updateDocument(currentProcessFlow.id, clarificationDoc.id, clarificationDoc);
+
+            // 显示保存指示器
+            const indicator = document.getElementById('saveIndicator');
+            indicator.classList.add('show');
+            setTimeout(() => {
+                indicator.classList.remove('show');
+            }, 2000);
+        }
+
+        // 提交澄清回答
+        function submitClarification() {
+            if (!confirm('确认提交所有回答？提交后将生成需求分析文档，并进入下一步骤。')) {
+                return;
+            }
+
+            // 准备响应数据
+            const responses = {};
+            clarificationDoc.content.questions.forEach((category, index) => {
+                responses[`q${index + 1}`] = category.userResponse;
+            });
+
+            // 调用服务层提交
+            const result = processFlowService.submitClarificationResponses(currentProcessFlow.id, responses);
+
+            if (result.success) {
+                if (result.needsMoreClarification) {
+                    alert('您的回答已提交！系统检测到还需要进一步澄清，已生成新的问题。');
+                    location.reload();
+                } else {
+                    alert('澄清回答已提交！系统正在生成需求分析文档...');
+                    // 跳转回流程详情页
+                    setTimeout(() => {
+                        window.location.href = `process-flow-detail.html?processId=${currentProcessFlow.id}`;
+                    }, 1500);
+                }
+            } else {
+                alert('提交失败：' + result.message);
+            }
+        }
+
+        // 更新面包屑
+        function updateBreadcrumb() {
+            const processId = new URLSearchParams(window.location.search).get('processId');
+
+            if (currentProcessFlow.projectId) {
+                document.getElementById('projectLink').href = `project-detail.html?id=${currentProcessFlow.projectId}`;
+            }
+            if (currentProcessFlow.versionId) {
+                document.getElementById('versionLink').href = `version-detail.html?projectId=${currentProcessFlow.projectId}&versionId=${currentProcessFlow.versionId}`;
+            }
+            document.getElementById('processLink').href = `process-flow-detail.html?processId=${processId}`;
+            document.getElementById('processLink').textContent = currentProcessFlow.name;
+        }
+    </script>
+</body>
+</html>

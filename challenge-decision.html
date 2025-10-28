@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>挑战裁决 - AI协作流程</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="js/process-flow-service.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#4f46e5',
+                        success: '#10b981',
+                        warning: '#f59e0b',
+                        danger: '#ef4444'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background-color: #f8fafc;
+        }
+        .sidebar {
+            width: 250px;
+        }
+        .challenge-card {
+            transition: all 0.3s ease;
+        }
+        .challenge-card.selected {
+            border: 2px solid #2563eb;
+            background-color: #eff6ff;
+        }
+        .agent-option {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid #e5e7eb;
+        }
+        .agent-option:hover {
+            border-color: #3b82f6;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .agent-option.selected {
+            border-color: #2563eb;
+            background-color: #eff6ff;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+        .agent-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: bold;
+            color: white;
+        }
+        .pm-avatar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .arch-avatar {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        .custom-avatar {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        .diff-highlight {
+            background-color: #fef3c7;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex">
+    <!-- Sidebar -->
+    <aside class="sidebar bg-white shadow-md h-screen fixed left-0 top-0 z-10 overflow-y-auto">
+        <div class="p-4 flex items-center justify-between border-b">
+            <div class="flex items-center">
+                <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/e10cd3e372b34c81bd38e133e4bd5b6f~tplv-a9rns2rl98-image.image?rcl=202510281322428F39A82D876F62A3D046&rk3s=8e244e95&rrcfp=f06b921b&x-expires=1764221004&x-signature=F1qcXPuf02II05L0PsQjVA3rO4o%3D" alt="Logo" class="h-8">
+                <h1 class="ml-2 text-lg font-bold text-gray-800">ProductCoCreate</h1>
+            </div>
+        </div>
+
+        <!-- Challenges Navigation -->
+        <div class="p-4 border-b bg-orange-50">
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="text-sm font-bold text-gray-800">待裁决挑战</h3>
+                <span class="text-lg font-bold text-warning" id="pendingCount">0</span>
+            </div>
+            <p class="text-xs text-gray-600">已裁决 <span id="decidedCount">0</span> / <span id="totalChallenges">0</span></p>
+        </div>
+
+        <nav class="mt-2">
+            <div class="px-4 py-2 text-xs font-bold text-gray-500 uppercase">挑战列表</div>
+            <ul id="challengeNav">
+                <!-- Challenges will be dynamically generated -->
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="ml-64 flex-1 min-h-screen p-6">
+        <!-- Breadcrumb -->
+        <nav class="flex mb-6 text-sm">
+            <a href="project-management.html" class="text-primary hover:text-secondary">项目管理</a>
+            <span class="mx-2 text-gray-400">/</span>
+            <a href="#" class="text-primary hover:text-secondary" id="projectLink">项目</a>
+            <span class="mx-2 text-gray-400">/</span>
+            <a href="#" class="text-primary hover:text-secondary" id="versionLink">版本</a>
+            <span class="mx-2 text-gray-400">/</span>
+            <a href="#" class="text-primary hover:text-secondary" id="processLink">流程</a>
+            <span class="mx-2 text-gray-400">/</span>
+            <span class="text-gray-600">挑战裁决</span>
+        </nav>
+
+        <!-- Header -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div class="flex items-start justify-between">
+                <div class="flex-1">
+                    <div class="flex items-center mb-2">
+                        <i class="fa fa-gavel text-3xl text-orange-500 mr-3"></i>
+                        <h1 class="text-3xl font-bold text-gray-800">挑战与裁决</h1>
+                        <span class="ml-4 px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-sm font-medium">步骤 1.6</span>
+                    </div>
+                    <p class="text-gray-600 mb-4">Architect Agent 对 Product Manager 的设计提出了挑战，双方观点存在分歧。作为产品决策者，请您审阅双方观点并做出最终裁决。</p>
+                    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
+                        <div class="flex items-start">
+                            <i class="fa fa-info-circle text-yellow-600 mt-1 mr-3"></i>
+                            <div class="text-sm text-yellow-800">
+                                <p class="font-medium mb-1">裁决指南：</p>
+                                <ul class="list-disc list-inside space-y-1 text-xs">
+                                    <li>仔细阅读双方的观点和理由</li>
+                                    <li>考虑技术可行性、用户价值和商业目标的平衡</li>
+                                    <li>您可以选择任一方的观点，或提出自己的折中方案</li>
+                                    <li>您的决策将指导后续的文档更新和开发工作</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-all" onclick="window.location.href=document.getElementById('processLink').href">
+                    <i class="fa fa-arrow-left mr-2"></i>返回流程
+                </button>
+            </div>
+        </div>
+
+        <!-- Challenges Container -->
+        <div id="challengesContainer">
+            <!-- Challenges will be dynamically generated here -->
+        </div>
+
+        <!-- Submit Button -->
+        <div class="bg-white rounded-lg shadow-md p-6 mt-6 sticky bottom-6">
+            <div class="flex items-center justify-between">
+                <div class="text-sm text-gray-600">
+                    <i class="fa fa-info-circle mr-2"></i>
+                    对所有挑战做出裁决后，点击提交按钮继续流程
+                </div>
+                <button class="px-8 py-3 bg-primary text-white rounded-md hover:bg-secondary transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed" id="submitBtn" onclick="submitArbitration()" disabled>
+                    <i class="fa fa-check mr-2"></i>提交裁决结果
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let currentProcessFlow = null;
+        let challengeDoc = null;
+        let decisions = {};
+
+        // 页面加载时获取流程数据
+        window.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const processId = urlParams.get('processId');
+
+            if (!processId) {
+                alert('流程ID不存在！');
+                window.location.href = 'project-management.html';
+                return;
+            }
+
+            // 获取流程数据
+            currentProcessFlow = processFlowService.getProcessFlow(processId);
+
+            if (!currentProcessFlow) {
+                alert('流程不存在！');
+                window.location.href = 'project-management.html';
+                return;
+            }
+
+            // 获取挑战文档
+            challengeDoc = currentProcessFlow.documents.find(doc =>
+                doc.stepId === '1.4' && doc.type === 'challenge'
+            );
+
+            if (!challengeDoc) {
+                alert('挑战文档不存在！可能该流程尚未到达挑战步骤。');
+                window.location.href = `process-flow-detail.html?processId=${processId}`;
+                return;
+            }
+
+            // 渲染页面
+            renderChallenges();
+            renderChallengeNav();
+            updateProgress();
+            updateBreadcrumb();
+        });
+
+        // 渲染挑战列表
+        function renderChallenges() {
+            const container = document.getElementById('challengesContainer');
+            container.innerHTML = '';
+
+            if (!challengeDoc.content.challenges || challengeDoc.content.challenges.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-white rounded-lg shadow-md p-12 text-center">
+                        <i class="fa fa-check-circle text-6xl text-success mb-4"></i>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">无需裁决</h3>
+                        <p class="text-gray-600">Architect Agent 没有提出挑战，双方观点一致。</p>
+                        <button class="mt-4 px-6 py-2 bg-primary text-white rounded-md hover:bg-secondary" onclick="window.location.href=document.getElementById('processLink').href">
+                            返回流程详情
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            challengeDoc.content.challenges.forEach((challenge, index) => {
+                const cardHTML = `
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-6 challenge-card" id="challenge-${index}">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="flex-1">
+                                <h3 class="text-xl font-bold text-gray-800 mb-2 flex items-center">
+                                    <span class="inline-block w-8 h-8 bg-warning text-white rounded-full flex items-center justify-center mr-3 text-sm">${index + 1}</span>
+                                    ${challenge.section || '挑战点 ' + (index + 1)}
+                                </h3>
+                                <p class="text-sm text-gray-600 ml-11">${challenge.reason || '双方对此部分存在不同看法'}</p>
+                            </div>
+                        </div>
+
+                        <!-- PM观点 -->
+                        <div class="ml-11 mb-6">
+                            <div class="bg-purple-50 border-l-4 border-purple-500 p-4 rounded">
+                                <div class="flex items-center mb-3">
+                                    <div class="agent-avatar pm-avatar mr-3">PM</div>
+                                    <div>
+                                        <h4 class="font-bold text-gray-800">Product Manager Agent</h4>
+                                        <p class="text-xs text-gray-600">原设计观点</p>
+                                    </div>
+                                </div>
+                                <div class="pl-20">
+                                    <p class="text-sm text-gray-700 mb-2 font-medium">观点：</p>
+                                    <p class="text-sm text-gray-800 mb-3 whitespace-pre-wrap">${challenge.pmPosition}</p>
+                                    <p class="text-sm text-gray-700 mb-2 font-medium">理由：</p>
+                                    <ul class="text-sm text-gray-800 space-y-1">
+                                        ${challenge.pmReasoning?.map(r => `<li class="flex items-start"><i class="fa fa-chevron-right text-purple-500 mr-2 mt-1"></i><span>${r}</span></li>`).join('') || '<li>未提供详细理由</li>'}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Architect观点 -->
+                        <div class="ml-11 mb-6">
+                            <div class="bg-pink-50 border-l-4 border-pink-500 p-4 rounded">
+                                <div class="flex items-center mb-3">
+                                    <div class="agent-avatar arch-avatar mr-3">AR</div>
+                                    <div>
+                                        <h4 class="font-bold text-gray-800">Architect Agent</h4>
+                                        <p class="text-xs text-gray-600">挑战观点</p>
+                                    </div>
+                                </div>
+                                <div class="pl-20">
+                                    <p class="text-sm text-gray-700 mb-2 font-medium">观点：</p>
+                                    <p class="text-sm text-gray-800 mb-3 whitespace-pre-wrap">${challenge.architectPosition}</p>
+                                    <p class="text-sm text-gray-700 mb-2 font-medium">理由：</p>
+                                    <ul class="text-sm text-gray-800 space-y-1">
+                                        ${challenge.architectReasoning?.map(r => `<li class="flex items-start"><i class="fa fa-chevron-right text-pink-500 mr-2 mt-1"></i><span>${r}</span></li>`).join('') || '<li>未提供详细理由</li>'}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 裁决选项 -->
+                        <div class="ml-11">
+                            <h4 class="text-lg font-bold text-gray-800 mb-4">请做出您的裁决：</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                <!-- PM选项 -->
+                                <div class="agent-option rounded-lg p-4" onclick="selectDecision(${index}, 'pm')" data-option="pm">
+                                    <div class="flex items-center mb-2">
+                                        <div class="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold mr-3">PM</div>
+                                        <div class="flex-1">
+                                            <p class="font-bold text-gray-800">支持 PM</p>
+                                            <p class="text-xs text-gray-600">采纳原设计</p>
+                                        </div>
+                                        <i class="fa fa-circle-o text-2xl text-gray-300" data-icon></i>
+                                    </div>
+                                </div>
+
+                                <!-- Architect选项 -->
+                                <div class="agent-option rounded-lg p-4" onclick="selectDecision(${index}, 'architect')" data-option="architect">
+                                    <div class="flex items-center mb-2">
+                                        <div class="w-10 h-10 bg-pink-500 rounded-full flex items-center justify-center text-white font-bold mr-3">AR</div>
+                                        <div class="flex-1">
+                                            <p class="font-bold text-gray-800">支持 Architect</p>
+                                            <p class="text-xs text-gray-600">采纳挑战观点</p>
+                                        </div>
+                                        <i class="fa fa-circle-o text-2xl text-gray-300" data-icon></i>
+                                    </div>
+                                </div>
+
+                                <!-- 自定义选项 -->
+                                <div class="agent-option rounded-lg p-4" onclick="selectDecision(${index}, 'custom')" data-option="custom">
+                                    <div class="flex items-center mb-2">
+                                        <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold mr-3"><i class="fa fa-user"></i></div>
+                                        <div class="flex-1">
+                                            <p class="font-bold text-gray-800">自定义方案</p>
+                                            <p class="text-xs text-gray-600">提出折中方案</p>
+                                        </div>
+                                        <i class="fa fa-circle-o text-2xl text-gray-300" data-icon></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 自定义方案输入框 -->
+                            <div class="hidden" id="custom-input-${index}">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    请描述您的折中方案：
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <textarea
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                                    placeholder="请详细说明您的决策和理由..."
+                                    rows="4"
+                                    id="custom-text-${index}"
+                                    oninput="updateCustomDecision(${index}, this.value)"
+                                ></textarea>
+                            </div>
+
+                            <!-- 裁决理由 -->
+                            <div class="mt-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    裁决理由（可选）：
+                                </label>
+                                <textarea
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                                    placeholder="说明您做出此决策的原因..."
+                                    rows="3"
+                                    id="reason-${index}"
+                                    oninput="updateDecisionReason(${index}, this.value)"
+                                ></textarea>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                container.innerHTML += cardHTML;
+            });
+        }
+
+        // 选择裁决
+        function selectDecision(challengeIndex, option) {
+            const card = document.getElementById(`challenge-${challengeIndex}`);
+
+            // 清除之前的选择
+            card.querySelectorAll('.agent-option').forEach(opt => {
+                opt.classList.remove('selected');
+                const icon = opt.querySelector('[data-icon]');
+                icon.classList.replace('fa-check-circle', 'fa-circle-o');
+                icon.classList.replace('text-primary', 'text-gray-300');
+            });
+
+            // 标记新选择
+            const selectedOption = card.querySelector(`[data-option="${option}"]`);
+            selectedOption.classList.add('selected');
+            const icon = selectedOption.querySelector('[data-icon]');
+            icon.classList.replace('fa-circle-o', 'fa-check-circle');
+            icon.classList.replace('text-gray-300', 'text-primary');
+
+            // 显示/隐藏自定义输入框
+            const customInput = document.getElementById(`custom-input-${challengeIndex}`);
+            if (option === 'custom') {
+                customInput.classList.remove('hidden');
+            } else {
+                customInput.classList.add('hidden');
+            }
+
+            // 保存决策
+            if (!decisions[challengeIndex]) {
+                decisions[challengeIndex] = {};
+            }
+            decisions[challengeIndex].option = option;
+
+            if (option !== 'custom') {
+                decisions[challengeIndex].customText = null;
+            }
+
+            updateProgress();
+        }
+
+        // 更新自定义决策文本
+        function updateCustomDecision(challengeIndex, text) {
+            if (!decisions[challengeIndex]) {
+                decisions[challengeIndex] = { option: 'custom' };
+            }
+            decisions[challengeIndex].customText = text;
+            updateProgress();
+        }
+
+        // 更新决策理由
+        function updateDecisionReason(challengeIndex, reason) {
+            if (!decisions[challengeIndex]) {
+                decisions[challengeIndex] = {};
+            }
+            decisions[challengeIndex].reason = reason;
+        }
+
+        // 渲染挑战导航
+        function renderChallengeNav() {
+            const nav = document.getElementById('challengeNav');
+            nav.innerHTML = '';
+
+            if (!challengeDoc.content.challenges || challengeDoc.content.challenges.length === 0) {
+                nav.innerHTML = '<li class="px-4 py-2 text-sm text-gray-500">无挑战事项</li>';
+                return;
+            }
+
+            challengeDoc.content.challenges.forEach((challenge, index) => {
+                const hasDecided = decisions[index]?.option;
+                const icon = hasDecided ? 'fa-check-circle text-success' : 'fa-circle-o text-gray-400';
+
+                const navItem = `
+                    <li>
+                        <a href="#challenge-${index}" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 transition-all">
+                            <i class="fa ${icon} w-5 text-center mr-2"></i>
+                            <span class="flex-1 truncate">${challenge.section || '挑战 ' + (index + 1)}</span>
+                        </a>
+                    </li>
+                `;
+                nav.innerHTML += navItem;
+            });
+        }
+
+        // 更新进度
+        function updateProgress() {
+            const total = challengeDoc.content.challenges?.length || 0;
+            let decided = 0;
+
+            Object.keys(decisions).forEach(key => {
+                const decision = decisions[key];
+                if (decision.option) {
+                    // 如果选择了custom，必须填写自定义文本
+                    if (decision.option === 'custom') {
+                        if (decision.customText && decision.customText.trim().length > 0) {
+                            decided++;
+                        }
+                    } else {
+                        decided++;
+                    }
+                }
+            });
+
+            document.getElementById('pendingCount').textContent = total - decided;
+            document.getElementById('decidedCount').textContent = decided;
+            document.getElementById('totalChallenges').textContent = total;
+
+            // 更新导航
+            renderChallengeNav();
+
+            // 更新提交按钮
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = decided < total;
+        }
+
+        // 提交裁决
+        function submitArbitration() {
+            if (!confirm('确认提交所有裁决？提交后将更新设计文档，并继续后续流程。')) {
+                return;
+            }
+
+            // 准备裁决数据
+            const arbitrationResults = [];
+            challengeDoc.content.challenges.forEach((challenge, index) => {
+                const decision = decisions[index];
+                if (!decision) return;
+
+                let finalDecision = '';
+                if (decision.option === 'pm') {
+                    finalDecision = challenge.pmPosition;
+                } else if (decision.option === 'architect') {
+                    finalDecision = challenge.architectPosition;
+                } else if (decision.option === 'custom') {
+                    finalDecision = decision.customText;
+                }
+
+                arbitrationResults.push({
+                    challengeId: `challenge_${index + 1}`,
+                    section: challenge.section,
+                    decision: decision.option,
+                    finalDecision: finalDecision,
+                    reason: decision.reason || ''
+                });
+            });
+
+            // 调用服务层提交（这里需要在service中添加对应方法）
+            // 暂时使用模拟逻辑
+            console.log('提交裁决结果：', arbitrationResults);
+
+            alert('裁决结果已提交！系统正在根据您的决策更新设计文档...');
+
+            // 跳转回流程详情页
+            setTimeout(() => {
+                window.location.href = `process-flow-detail.html?processId=${currentProcessFlow.id}`;
+            }, 1500);
+        }
+
+        // 更新面包屑
+        function updateBreadcrumb() {
+            const processId = new URLSearchParams(window.location.search).get('processId');
+
+            if (currentProcessFlow.projectId) {
+                document.getElementById('projectLink').href = `project-detail.html?id=${currentProcessFlow.projectId}`;
+            }
+            if (currentProcessFlow.versionId) {
+                document.getElementById('versionLink').href = `version-detail.html?projectId=${currentProcessFlow.projectId}&versionId=${currentProcessFlow.versionId}`;
+            }
+            document.getElementById('processLink').href = `process-flow-detail.html?processId=${processId}`;
+            document.getElementById('processLink').textContent = currentProcessFlow.name;
+        }
+    </script>
+</body>
+</html>
