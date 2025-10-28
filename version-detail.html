@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProductCoCreate AI - 版本详情</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#4f46e5',
+                        success: '#10b981',
+                        warning: '#f59e0b',
+                        danger: '#ef4444'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background-color: #f8fafc;
+        }
+        .sidebar {
+            width: 250px;
+        }
+        .tab-btn {
+            padding: 12px 24px;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+        .tab-btn.active {
+            color: #2563eb;
+            border-bottom-color: #2563eb;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .process-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .process-card:hover {
+            background-color: #f9fafb;
+        }
+        .process-stage {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .stage-requirement {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+        .stage-design {
+            background-color: #e9d5ff;
+            color: #6b21a8;
+        }
+        .stage-development {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        .stage-testing {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        .sub-item {
+            padding-left: 40px;
+            border-left: 2px solid #e5e7eb;
+            margin-left: 20px;
+        }
+        .sub-item-header {
+            padding: 12px 16px;
+            background-color: #f9fafb;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .sub-item-header:hover {
+            background-color: #f3f4f6;
+        }
+        .badge {
+            padding: 4px 10px;
+            border-radius: 9999px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        .badge-pending {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        .badge-in-progress {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+        .badge-completed {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex">
+    <!-- Sidebar -->
+    <aside class="sidebar bg-white shadow-md h-screen fixed left-0 top-0 z-10">
+        <div class="p-4 flex items-center justify-between border-b">
+            <div class="flex items-center">
+                <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/e10cd3e372b34c81bd38e133e4bd5b6f~tplv-a9rns2rl98-image.image?rcl=202510281322428F39A82D876F62A3D046&rk3s=8e244e95&rrcfp=f06b921b&x-expires=1764221004&x-signature=F1qcXPuf02II05L0PsQjVA3rO4o%3D" alt="Logo" class="h-8">
+                <h1 class="ml-2 text-lg font-bold text-gray-800">ProductCoCreate</h1>
+            </div>
+        </div>
+        <nav class="mt-4">
+            <ul>
+                <li>
+                    <a href="dashboard.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 transition-all">
+                        <i class="fa fa-dashboard w-6 text-center"></i>
+                        <span class="ml-3">仪表盘</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="project-management.html" class="bg-blue-50 text-primary border-l-4 border-primary flex items-center px-4 py-3 hover:bg-blue-50 transition-all">
+                        <i class="fa fa-folder-open w-6 text-center"></i>
+                        <span class="ml-3">项目管理</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 transition-all">
+                        <i class="fa fa-cog w-6 text-center"></i>
+                        <span class="ml-3">系统设置</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="ml-64 flex-1 min-h-screen p-6">
+        <!-- Breadcrumb -->
+        <nav class="flex mb-6 text-sm">
+            <a href="project-management.html" class="text-primary hover:text-secondary">项目管理</a>
+            <span class="mx-2 text-gray-400">/</span>
+            <a href="project-detail.html?id=1" class="text-primary hover:text-secondary" id="projectLink">移动应用重新设计</a>
+            <span class="mx-2 text-gray-400">/</span>
+            <span class="text-gray-600" id="versionName">v2.0 - 功能增强</span>
+        </nav>
+
+        <!-- Version Header -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div class="flex items-start justify-between">
+                <div class="flex-1">
+                    <div class="flex items-center mb-2">
+                        <h1 class="text-3xl font-bold text-gray-800" id="versionTitle">v2.0 - 功能增强</h1>
+                        <span class="ml-4 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">开发中</span>
+                    </div>
+                    <p class="text-gray-600 mb-4">增强版本，添加高级功能、优化性能和改进用户体验</p>
+                    <div class="flex items-center space-x-6 text-sm text-gray-600">
+                        <span><i class="fa fa-calendar mr-2"></i>创建于: 2025-10-01</span>
+                        <span><i class="fa fa-clock-o mr-2"></i>预计发布: 2025-12-31</span>
+                        <span><i class="fa fa-user mr-2"></i>负责人: 张三</span>
+                    </div>
+                </div>
+                <div class="flex space-x-2">
+                    <button class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-all">
+                        <i class="fa fa-share-alt mr-2"></i>分享
+                    </button>
+                    <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-secondary transition-all">
+                        <i class="fa fa-cog mr-2"></i>设置
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Overview -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold text-gray-800">整体进度</h3>
+                <span class="text-2xl font-bold text-primary">65%</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-3">
+                <div class="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full" style="width: 65%"></div>
+            </div>
+            <div class="grid grid-cols-4 gap-4 mt-6">
+                <div class="text-center">
+                    <p class="text-2xl font-bold text-gray-800">5</p>
+                    <p class="text-sm text-gray-600">总流程数</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-2xl font-bold text-success">3</p>
+                    <p class="text-sm text-gray-600">已完成</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-2xl font-bold text-warning">2</p>
+                    <p class="text-sm text-gray-600">进行中</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-2xl font-bold text-info">18</p>
+                    <p class="text-sm text-gray-600">文档数</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="bg-white rounded-lg shadow-md mb-6">
+            <div class="border-b flex space-x-1 px-6">
+                <button class="tab-btn active" data-tab="process">
+                    <i class="fa fa-cogs mr-2"></i>流程管理
+                </button>
+                <button class="tab-btn" data-tab="document">
+                    <i class="fa fa-file-text mr-2"></i>文档管理
+                </button>
+                <button class="tab-btn" data-tab="statistics">
+                    <i class="fa fa-bar-chart mr-2"></i>统计概览
+                </button>
+            </div>
+
+            <!-- Process Management Tab -->
+            <div id="process-tab" class="tab-content active p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-bold text-gray-800">流程列表</h3>
+                    <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-secondary transition-all text-sm">
+                        <i class="fa fa-plus mr-2"></i>创建新流程
+                    </button>
+                </div>
+
+                <!-- Process List -->
+                <div class="space-y-4">
+                    <!-- Process 1 -->
+                    <div class="border rounded-lg">
+                        <div class="process-card p-6" onclick="toggleProcess('process1')">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-4 flex-1">
+                                    <i class="fa fa-chevron-down text-gray-400 transition-transform" id="process1-icon"></i>
+                                    <div class="flex-1">
+                                        <div class="flex items-center space-x-3 mb-2">
+                                            <h4 class="text-lg font-bold text-gray-800">用户登录功能优化</h4>
+                                            <span class="process-stage stage-requirement">需求分析</span>
+                                            <span class="badge badge-in-progress">进行中</span>
+                                        </div>
+                                        <p class="text-sm text-gray-600">优化用户登录流程，支持多种登录方式</p>
+                                    </div>
+                                </div>
+                                <div class="text-right ml-4">
+                                    <p class="text-sm text-gray-600 mb-1">进度: 45%</p>
+                                    <p class="text-xs text-gray-500">更新于 2小时前</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sub Items -->
+                        <div id="process1-content" class="sub-item hidden pb-4">
+                            <!-- Requirement Clarification -->
+                            <div class="sub-item-header" onclick="window.location.href='requirement-clarification.html?processId=1'">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <i class="fa fa-comments text-blue-500"></i>
+                                        <span class="font-medium text-gray-800">需求澄清</span>
+                                        <span class="badge badge-in-progress">2个待处理</span>
+                                    </div>
+                                    <i class="fa fa-chevron-right text-gray-400"></i>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-1 ml-7">最近更新: 张三提出了关于第三方登录的问题</p>
+                            </div>
+
+                            <!-- Challenge and Arbitration -->
+                            <div class="sub-item-header" onclick="window.location.href='challenge-arbitration.html?processId=1'">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <i class="fa fa-gavel text-orange-500"></i>
+                                        <span class="font-medium text-gray-800">挑战与裁决</span>
+                                        <span class="badge badge-pending">1个待裁决</span>
+                                    </div>
+                                    <i class="fa fa-chevron-right text-gray-400"></i>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-1 ml-7">最近更新: 技术方案争议需要产品经理裁决</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Process 2 -->
+                    <div class="border rounded-lg">
+                        <div class="process-card p-6" onclick="toggleProcess('process2')">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-4 flex-1">
+                                    <i class="fa fa-chevron-down text-gray-400 transition-transform" id="process2-icon"></i>
+                                    <div class="flex-1">
+                                        <div class="flex items-center space-x-3 mb-2">
+                                            <h4 class="text-lg font-bold text-gray-800">个人中心界面重构</h4>
+                                            <span class="process-stage stage-design">设计阶段</span>
+                                            <span class="badge badge-in-progress">进行中</span>
+                                        </div>
+                                        <p class="text-sm text-gray-600">重新设计个人中心的UI和交互</p>
+                                    </div>
+                                </div>
+                                <div class="text-right ml-4">
+                                    <p class="text-sm text-gray-600 mb-1">进度: 70%</p>
+                                    <p class="text-xs text-gray-500">更新于 5小时前</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="process2-content" class="sub-item hidden pb-4">
+                            <div class="sub-item-header" onclick="window.location.href='requirement-clarification.html?processId=2'">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <i class="fa fa-comments text-blue-500"></i>
+                                        <span class="font-medium text-gray-800">需求澄清</span>
+                                        <span class="badge badge-completed">已完成</span>
+                                    </div>
+                                    <i class="fa fa-chevron-right text-gray-400"></i>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-1 ml-7">所有需求已澄清完毕</p>
+                            </div>
+
+                            <div class="sub-item-header" onclick="window.location.href='challenge-arbitration.html?processId=2'">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <i class="fa fa-gavel text-orange-500"></i>
+                                        <span class="font-medium text-gray-800">挑战与裁决</span>
+                                        <span class="badge badge-completed">无待处理</span>
+                                    </div>
+                                    <i class="fa fa-chevron-right text-gray-400"></i>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-1 ml-7">暂无需要裁决的事项</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Process 3 -->
+                    <div class="border rounded-lg">
+                        <div class="process-card p-6" onclick="toggleProcess('process3')">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-4 flex-1">
+                                    <i class="fa fa-chevron-down text-gray-400 transition-transform" id="process3-icon"></i>
+                                    <div class="flex-1">
+                                        <div class="flex items-center space-x-3 mb-2">
+                                            <h4 class="text-lg font-bold text-gray-800">支付功能集成</h4>
+                                            <span class="process-stage stage-development">开发阶段</span>
+                                            <span class="badge badge-completed">已完成</span>
+                                        </div>
+                                        <p class="text-sm text-gray-600">集成第三方支付SDK</p>
+                                    </div>
+                                </div>
+                                <div class="text-right ml-4">
+                                    <p class="text-sm text-gray-600 mb-1">进度: 100%</p>
+                                    <p class="text-xs text-gray-500">完成于 2天前</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="process3-content" class="sub-item hidden pb-4">
+                            <div class="sub-item-header" onclick="window.location.href='requirement-clarification.html?processId=3'">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <i class="fa fa-comments text-blue-500"></i>
+                                        <span class="font-medium text-gray-800">需求澄清</span>
+                                        <span class="badge badge-completed">已完成</span>
+                                    </div>
+                                    <i class="fa fa-chevron-right text-gray-400"></i>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-1 ml-7">共处理了 5 个需求澄清</p>
+                            </div>
+
+                            <div class="sub-item-header" onclick="window.location.href='challenge-arbitration.html?processId=3'">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <i class="fa fa-gavel text-orange-500"></i>
+                                        <span class="font-medium text-gray-800">挑战与裁决</span>
+                                        <span class="badge badge-completed">已完成</span>
+                                    </div>
+                                    <i class="fa fa-chevron-right text-gray-400"></i>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-1 ml-7">共处理了 2 个裁决事项</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Process 4 -->
+                    <div class="border rounded-lg">
+                        <div class="process-card p-6" onclick="toggleProcess('process4')">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-4 flex-1">
+                                    <i class="fa fa-chevron-down text-gray-400 transition-transform" id="process4-icon"></i>
+                                    <div class="flex-1">
+                                        <div class="flex items-center space-x-3 mb-2">
+                                            <h4 class="text-lg font-bold text-gray-800">性能优化</h4>
+                                            <span class="process-stage stage-testing">测试阶段</span>
+                                            <span class="badge badge-completed">已完成</span>
+                                        </div>
+                                        <p class="text-sm text-gray-600">应用性能优化和测试</p>
+                                    </div>
+                                </div>
+                                <div class="text-right ml-4">
+                                    <p class="text-sm text-gray-600 mb-1">进度: 100%</p>
+                                    <p class="text-xs text-gray-500">完成于 1周前</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="process4-content" class="sub-item hidden pb-4">
+                            <div class="sub-item-header" onclick="window.location.href='requirement-clarification.html?processId=4'">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <i class="fa fa-comments text-blue-500"></i>
+                                        <span class="font-medium text-gray-800">需求澄清</span>
+                                        <span class="badge badge-completed">已完成</span>
+                                    </div>
+                                    <i class="fa fa-chevron-right text-gray-400"></i>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-1 ml-7">共处理了 3 个需求澄清</p>
+                            </div>
+
+                            <div class="sub-item-header" onclick="window.location.href='challenge-arbitration.html?processId=4'">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <i class="fa fa-gavel text-orange-500"></i>
+                                        <span class="font-medium text-gray-800">挑战与裁决</span>
+                                        <span class="badge badge-completed">已完成</span>
+                                    </div>
+                                    <i class="fa fa-chevron-right text-gray-400"></i>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-1 ml-7">共处理了 1 个裁决事项</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Process 5 -->
+                    <div class="border rounded-lg">
+                        <div class="process-card p-6" onclick="toggleProcess('process5')">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-4 flex-1">
+                                    <i class="fa fa-chevron-down text-gray-400 transition-transform" id="process5-icon"></i>
+                                    <div class="flex-1">
+                                        <div class="flex items-center space-x-3 mb-2">
+                                            <h4 class="text-lg font-bold text-gray-800">数据统计功能</h4>
+                                            <span class="process-stage stage-requirement">需求分析</span>
+                                            <span class="badge badge-pending">待开始</span>
+                                        </div>
+                                        <p class="text-sm text-gray-600">添加用户行为数据统计功能</p>
+                                    </div>
+                                </div>
+                                <div class="text-right ml-4">
+                                    <p class="text-sm text-gray-600 mb-1">进度: 10%</p>
+                                    <p class="text-xs text-gray-500">创建于 3天前</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="process5-content" class="sub-item hidden pb-4">
+                            <div class="sub-item-header" onclick="window.location.href='requirement-clarification.html?processId=5'">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <i class="fa fa-comments text-blue-500"></i>
+                                        <span class="font-medium text-gray-800">需求澄清</span>
+                                        <span class="badge badge-pending">待启动</span>
+                                    </div>
+                                    <i class="fa fa-chevron-right text-gray-400"></i>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-1 ml-7">还未开始需求澄清</p>
+                            </div>
+
+                            <div class="sub-item-header" onclick="window.location.href='challenge-arbitration.html?processId=5'">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <i class="fa fa-gavel text-orange-500"></i>
+                                        <span class="font-medium text-gray-800">挑战与裁决</span>
+                                        <span class="badge badge-pending">待启动</span>
+                                    </div>
+                                    <i class="fa fa-chevron-right text-gray-400"></i>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-1 ml-7">暂无需要裁决的事项</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Document Management Tab -->
+            <div id="document-tab" class="tab-content p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-bold text-gray-800">文档列表</h3>
+                    <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-secondary transition-all text-sm">
+                        <i class="fa fa-plus mr-2"></i>上传文档
+                    </button>
+                </div>
+
+                <!-- Document List -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="border rounded-lg p-4 hover:shadow-md transition-all cursor-pointer">
+                        <div class="flex items-start space-x-4">
+                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                                <i class="fa fa-file-pdf-o text-2xl text-blue-600"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-bold text-gray-800 mb-1">产品需求文档 v2.0</h4>
+                                <p class="text-sm text-gray-600 mb-2">详细的产品功能需求说明</p>
+                                <div class="flex items-center text-xs text-gray-500 space-x-4">
+                                    <span><i class="fa fa-user mr-1"></i>张三</span>
+                                    <span><i class="fa fa-clock-o mr-1"></i>2天前</span>
+                                    <span><i class="fa fa-download mr-1"></i>23次</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="border rounded-lg p-4 hover:shadow-md transition-all cursor-pointer">
+                        <div class="flex items-start space-x-4">
+                            <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                                <i class="fa fa-file-image-o text-2xl text-purple-600"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-bold text-gray-800 mb-1">UI设计稿</h4>
+                                <p class="text-sm text-gray-600 mb-2">移动端界面设计文件</p>
+                                <div class="flex items-center text-xs text-gray-500 space-x-4">
+                                    <span><i class="fa fa-user mr-1"></i>李四</span>
+                                    <span><i class="fa fa-clock-o mr-1"></i>5天前</span>
+                                    <span><i class="fa fa-download mr-1"></i>45次</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="border rounded-lg p-4 hover:shadow-md transition-all cursor-pointer">
+                        <div class="flex items-start space-x-4">
+                            <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                                <i class="fa fa-file-code-o text-2xl text-green-600"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-bold text-gray-800 mb-1">技术方案文档</h4>
+                                <p class="text-sm text-gray-600 mb-2">技术架构和实现方案</p>
+                                <div class="flex items-center text-xs text-gray-500 space-x-4">
+                                    <span><i class="fa fa-user mr-1"></i>王五</span>
+                                    <span><i class="fa fa-clock-o mr-1"></i>1周前</span>
+                                    <span><i class="fa fa-download mr-1"></i>31次</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="border rounded-lg p-4 hover:shadow-md transition-all cursor-pointer">
+                        <div class="flex items-start space-x-4">
+                            <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                                <i class="fa fa-file-text-o text-2xl text-yellow-600"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-bold text-gray-800 mb-1">测试用例文档</h4>
+                                <p class="text-sm text-gray-600 mb-2">功能测试用例集合</p>
+                                <div class="flex items-center text-xs text-gray-500 space-x-4">
+                                    <span><i class="fa fa-user mr-1"></i>赵六</span>
+                                    <span><i class="fa fa-clock-o mr-1"></i>3天前</span>
+                                    <span><i class="fa fa-download mr-1"></i>18次</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics Tab -->
+            <div id="statistics-tab" class="tab-content p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-6">统计数据</h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg p-6 text-white">
+                        <p class="text-sm opacity-90 mb-2">总任务数</p>
+                        <p class="text-4xl font-bold mb-2">23</p>
+                        <p class="text-xs opacity-75">较上月增长 12%</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-lg p-6 text-white">
+                        <p class="text-sm opacity-90 mb-2">已完成任务</p>
+                        <p class="text-4xl font-bold mb-2">15</p>
+                        <p class="text-xs opacity-75">完成率 65%</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg p-6 text-white">
+                        <p class="text-sm opacity-90 mb-2">团队成员</p>
+                        <p class="text-4xl font-bold mb-2">8</p>
+                        <p class="text-xs opacity-75">平均工作负载 2.9</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="border rounded-lg p-6">
+                        <h4 class="font-bold text-gray-800 mb-4">流程阶段分布</h4>
+                        <div class="space-y-3">
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span>需求分析</span>
+                                    <span class="font-medium">40%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-blue-500 h-2 rounded-full" style="width: 40%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span>设计阶段</span>
+                                    <span class="font-medium">20%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-purple-500 h-2 rounded-full" style="width: 20%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span>开发阶段</span>
+                                    <span class="font-medium">20%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-green-500 h-2 rounded-full" style="width: 20%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span>测试阶段</span>
+                                    <span class="font-medium">20%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-yellow-500 h-2 rounded-full" style="width: 20%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="border rounded-lg p-6">
+                        <h4 class="font-bold text-gray-800 mb-4">活跃度统计</h4>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between pb-3 border-b">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-medium">ZS</div>
+                                    <div>
+                                        <p class="font-medium text-gray-800">张三</p>
+                                        <p class="text-xs text-gray-500">产品经理</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="font-bold text-gray-800">45</p>
+                                    <p class="text-xs text-gray-500">贡献数</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between pb-3 border-b">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-white font-medium">LS</div>
+                                    <div>
+                                        <p class="font-medium text-gray-800">李四</p>
+                                        <p class="text-xs text-gray-500">设计师</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="font-bold text-gray-800">38</p>
+                                    <p class="text-xs text-gray-500">贡献数</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 rounded-full bg-purple-500 flex items-center justify-center text-white font-medium">WW</div>
+                                    <div>
+                                        <p class="font-medium text-gray-800">王五</p>
+                                        <p class="text-xs text-gray-500">开发工程师</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="font-bold text-gray-800">32</p>
+                                    <p class="text-xs text-gray-500">贡献数</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Tab切换
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const tabName = this.dataset.tab;
+
+                // 更新按钮状态
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+
+                // 更新内容显示
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                document.getElementById(`${tabName}-tab`).classList.add('active');
+            });
+        });
+
+        // 流程折叠展开
+        function toggleProcess(processId) {
+            const content = document.getElementById(`${processId}-content`);
+            const icon = document.getElementById(`${processId}-icon`);
+
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                icon.style.transform = 'rotate(180deg)';
+            } else {
+                content.classList.add('hidden');
+                icon.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        // 根据URL参数加载数据
+        window.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const projectId = urlParams.get('projectId');
+            const versionId = urlParams.get('versionId');
+
+            console.log('项目ID:', projectId, '版本ID:', versionId);
+
+            // 这里可以根据参数加载实际数据
+        });
+    </script>
+</body>
+</html>

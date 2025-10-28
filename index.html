@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProductCoCreate AI - 登录</title>
+    <!-- Tailwind CSS v3 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#4f46e5',
+                        success: '#10b981',
+                        warning: '#f59e0b',
+                        danger: '#ef4444',
+                        info: '#3b82f6',
+                        light: '#f3f4f6',
+                        dark: '#111827'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif']
+                    },
+                    boxShadow: {
+                        'card': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                        'card-hover': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)'
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .bg-gradient-primary {
+                background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+            .transition-all-300 {
+                transition: all 300ms ease-in-out;
+            }
+            .card-hover {
+                @apply transition-all duration-300 hover:shadow-card-hover hover:-translate-y-1;
+            }
+        }
+    </style>
+    <style>
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background-color: #f8fafc;
+        }
+        .login-bg {
+            background-image: url('https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/2cea3515ac844fcb9585281dd265ce57~tplv-a9rns2rl98-image.image?rcl=202510281322428F39A82D876F62A3D046&rk3s=8e244e95&rrcfp=f06b921b&x-expires=1764221016&x-signature=4KAvjyRqn2VyaxJs%2BKDY4a7iAgE%3D');
+            background-size: cover;
+            background-position: center;
+        }
+        .logo {
+            max-width: 240px;
+        }
+        .form-input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #1d4ed8 0%, #4338ca 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+        .btn-outline {
+            transition: all 0.3s ease;
+        }
+        .btn-outline:hover {
+            background-color: rgba(37, 99, 235, 0.1);
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-pulse-slow {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <div class="flex items-center justify-center min-h-screen login-bg">
+        <div class="w-full max-w-md p-8 space-y-8 bg-white rounded-xl shadow-lg animate-fade-in">
+            <div class="text-center">
+                <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/e10cd3e372b34c81bd38e133e4bd5b6f~tplv-a9rns2rl98-image.image?rcl=202510281322428F39A82D876F62A3D046&rk3s=8e244e95&rrcfp=f06b921b&x-expires=1764221004&x-signature=F1qcXPuf02II05L0PsQjVA3rO4o%3D" alt="ProductCoCreate AI" class="logo mx-auto mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">欢迎使用 ProductCoCreate AI</h2>
+                <p class="mt-2 text-sm text-gray-600">登录以访问您的账户</p>
+                <!-- Default credentials hint -->
+                <div class="mt-4 p-3 bg-blue-50 rounded-md text-sm text-blue-700">
+                    <p><i class="fa fa-info-circle mr-1"></i> 演示账号: <strong>user@example.com</strong> / <strong>password123</strong></p>
+                </div>
+            </div>
+            <form class="mt-8 space-y-6" id="loginForm">
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700">电子邮箱</label>
+                    <input type="email" id="email" name="email" required 
+                           class="w-full px-4 py-3 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none form-input"
+                           placeholder="您的邮箱地址">
+                </div>
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700">密码</label>
+                    <input type="password" id="password" name="password" required 
+                           class="w-full px-4 py-3 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none form-input"
+                           placeholder="••••••••">
+                </div>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <input id="remember-me" name="remember-me" type="checkbox" 
+                               class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
+                        <label for="remember-me" class="ml-2 block text-sm text-gray-700">
+                            记住我
+                        </label>
+                    </div>
+                    <div class="text-sm">
+                        <a href="#" class="font-medium text-primary hover:text-secondary">
+                            忘记密码?
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <button type="submit" 
+                            class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white btn-primary">
+                        登录
+                    </button>
+                </div>
+            </form>
+            <div class="relative">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-gray-300"></div>
+                </div>
+                <div class="relative flex justify-center text-sm">
+                    <span class="px-2 bg-white text-gray-500">或者使用以下方式登录</span>
+                </div>
+            </div>
+            <div class="flex space-x-3">
+                <button type="button" 
+                        class="flex-1 inline-flex justify-center items-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 btn-outline">
+                    <i class="fa fa-google mr-2"></i>
+                    Google
+                </button>
+                <button type="button" 
+                        class="flex-1 inline-flex justify-center items-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 btn-outline">
+                    <i class="fa fa-github mr-2"></i>
+                    GitHub
+                </button>
+            </div>
+            <p class="text-center text-sm text-gray-600">
+                还没有账号? <a href="#" class="font-medium text-primary hover:text-secondary">注册</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Login form submission
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            // Simple validation
+            if (!email || !password) {
+                alert('请输入邮箱和密码');
+                return;
+            }
+            
+            // Simulate login process
+            const submitButton = this.querySelector('button[type="submit"]');
+            const originalText = submitButton.innerHTML;
+            
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fa fa-spinner fa-spin mr-2"></i> 登录中...';
+            
+            // Simulate API call
+            setTimeout(() => {
+                // Redirect to dashboard
+                window.location.href = 'dashboard.html';
+            }, 1500);
+        });
+        
+        // Add animation to form elements on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const formElements = document.querySelectorAll('input, button');
+            formElements.forEach((el, index) => {
+                setTimeout(() => {
+                    el.classList.add('animate-fade-in');
+                }, 100 * index);
+            });
+        });
+    </script>
+</body>
+</html>

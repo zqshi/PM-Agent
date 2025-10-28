@@ -1,0 +1,3112 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProductCoCreate AI - 项目管理</title>
+    <!-- Tailwind CSS v3 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#4f46e5',
+                        success: '#10b981',
+                        warning: '#f59e0b',
+                        danger: '#ef4444',
+                        info: '#3b82f6',
+                        light: '#f3f4f6',
+                        dark: '#111827'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif']
+                    },
+                    boxShadow: {
+                        'card': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                        'card-hover': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)'
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .bg-gradient-primary {
+                background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+            .transition-all-300 {
+                transition: all 300ms ease-in-out;
+            }
+            .card-hover {
+                @apply transition-all duration-300 hover:shadow-card-hover hover:-translate-y-1;
+            }
+            .sidebar-active {
+                @apply bg-blue-50 text-primary border-l-4 border-primary;
+            }
+        }
+    </style>
+    <style>
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background-color: #f8fafc;
+        }
+        .sidebar {
+            width: 250px;
+            transition: all 0.3s ease;
+        }
+        .sidebar-collapsed {
+            width: 80px;
+        }
+        .main-content {
+            transition: all 0.3s ease;
+        }
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .progress-bar {
+            height: 8px;
+            border-radius: 4px;
+            background-color: #e5e7eb;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #ef4444;
+            color: white;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-pulse-slow {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        .task-card {
+            transition: all 0.3s ease;
+        }
+        .task-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .status-badge {
+            padding: 2px 8px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .status-pending {
+            background-color: #fef3c7;
+            color: #d97706;
+        }
+        .status-in-progress {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+        .status-completed {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        .status-review {
+            background-color: #ede9fe;
+            color: #5b21b6;
+        }
+        .status-on-hold {
+            background-color: #e5e7eb;
+            color: #4b5563;
+        }
+        .tab-active {
+            @apply text-primary border-primary;
+        }
+        .project-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .version-card {
+            transition: all 0.3s ease;
+        }
+        .version-card:hover {
+            background-color: #f3f4f6;
+        }
+        .version-card.active {
+            border-left: 4px solid #2563eb;
+            background-color: #f0f9ff;
+        }
+        .process-step {
+            position: relative;
+            padding: 12px;
+            border-radius: 8px;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        .process-step.completed {
+            background-color: #d1fae5;
+            border: 1px solid #10b981;
+        }
+        .process-step.current {
+            background-color: #dbeafe;
+            border: 1px solid #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+        }
+        .process-step.pending {
+            background-color: #fef3c7;
+            border: 1px solid #f59e0b;
+        }
+        .process-connector {
+            position: absolute;
+            height: 2px;
+            background-color: #d1d5db;
+            top: 24px;
+            z-index: 1;
+        }
+        .process-connector.completed {
+            background-color: #10b981;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex">
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar bg-white shadow-md h-screen fixed left-0 top-0 z-10">
+        <div class="p-4 flex items-center justify-between border-b">
+            <div class="flex items-center">
+                <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/e10cd3e372b34c81bd38e133e4bd5b6f~tplv-a9rns2rl98-image.image?rcl=202510281322428F39A82D876F62A3D046&rk3s=8e244e95&rrcfp=f06b921b&x-expires=1764221004&x-signature=F1qcXPuf02II05L0PsQjVA3rO4o%3D" alt="ProductCoCreate AI" class="h-8">
+                <h1 class="ml-2 text-lg font-bold text-gray-800 sidebar-text">ProductCoCreate AI</h1>
+            </div>
+            <button id="toggleSidebar" class="text-gray-500 hover:text-primary focus:outline-none">
+                <i class="fa fa-bars"></i>
+            </button>
+        </div>
+        <nav class="mt-4">
+            <ul>
+                <li>
+                    <a href="dashboard.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 transition-all-300">
+                        <i class="fa fa-dashboard w-6 text-center"></i>
+                        <span class="ml-3 sidebar-text">仪表盘</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="project-management.html" class="sidebar-active flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 transition-all-300">
+                        <i class="fa fa-folder-open w-6 text-center"></i>
+                        <span class="ml-3 sidebar-text">项目管理</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 transition-all-300">
+                        <i class="fa fa-cog w-6 text-center"></i>
+                        <span class="ml-3 sidebar-text">系统设置</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        <div class="absolute bottom-0 w-full p-4 border-t">
+            <div class="flex items-center">
+                <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white">
+                    <span class="font-medium">JD</span>
+                </div>
+                <div class="ml-3 sidebar-text">
+                    <p class="text-sm font-medium text-gray-800">张三</p>
+                    <p class="text-xs text-gray-500">产品经理</p>
+                </div>
+                <button class="ml-auto text-gray-500 hover:text-primary focus:outline-none">
+                    <i class="fa fa-sign-out"></i>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main id="mainContent" class="main-content ml-64 flex-1 min-h-screen p-6">
+        <!-- Header -->
+        <header class="flex items-center justify-between mb-6">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800">项目管理</h1>
+                <p class="text-sm text-gray-600">创建和管理项目及版本，实现产品全流程收口</p>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="relative">
+                    <button class="text-gray-500 hover:text-primary focus:outline-none">
+                        <i class="fa fa-bell text-xl"></i>
+                        <span class="notification-badge">3</span>
+                    </button>
+                </div>
+                <div class="relative">
+                    <button id="searchToggle" class="text-gray-500 hover:text-primary focus:outline-none">
+                        <i class="fa fa-search text-xl"></i>
+                    </button>
+                    <div id="searchBar" class="hidden absolute right-0 mt-2 w-64 bg-white rounded-md shadow-lg">
+                        <div class="flex items-center px-3 py-2 border-b">
+                            <input type="text" placeholder="Search..." class="w-full focus:outline-none text-sm">
+                            <button class="text-gray-500 hover:text-primary focus:outline-none">
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <div id="contentArea">
+            <!-- Projects View (Default) -->
+            <div id="projectsView">
+                <!-- Projects Header -->
+                <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+                    <div class="flex flex-wrap items-center gap-4">
+                        <div>
+                            <label for="projectFilter" class="block text-sm font-medium text-gray-700 mb-1">筛选</label>
+                            <select id="projectFilter" class="w-48 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
+                                <option value="all">所有项目</option>
+                                <option value="active">活跃项目</option>
+                                <option value="completed">已完成项目</option>
+                                <option value="on-hold">暂停项目</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="projectSort" class="block text-sm font-medium text-gray-700 mb-1">排序</label>
+                            <select id="projectSort" class="w-48 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
+                                <option value="recent">最近创建</option>
+                                <option value="name">名称</option>
+                                <option value="progress">进度</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <button id="newProjectBtn" class="px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-secondary transition-all-300 flex items-center">
+                            <i class="fa fa-plus mr-2"></i> 新建项目
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Projects Summary -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                    <div class="bg-white rounded-lg shadow-md p-6 task-card">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">总项目数</p>
+                                <p class="text-2xl font-bold text-gray-800 mt-1">8</p>
+                            </div>
+                            <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-primary">
+                                <i class="fa fa-folder-open text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <div class="flex items-center">
+                                <span class="text-green-500 text-sm font-medium flex items-center">
+                                    <i class="fa fa-arrow-up mr-1"></i> 12%
+                                </span>
+                                <span class="text-gray-500 text-sm ml-2">from last month</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-md p-6 task-card">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">活跃项目</p>
+                                <p class="text-2xl font-bold text-blue-600 mt-1">5</p>
+                            </div>
+                            <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-primary">
+                                <i class="fa fa-play-circle text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <div class="flex items-center">
+                                <span class="text-green-500 text-sm font-medium flex items-center">
+                                    <i class="fa fa-arrow-up mr-1"></i> 8%
+                                </span>
+                                <span class="text-gray-500 text-sm ml-2">from last month</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-md p-6 task-card">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">已完成项目</p>
+                                <p class="text-2xl font-bold text-green-600 mt-1">2</p>
+                            </div>
+                            <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-success">
+                                <i class="fa fa-check-circle text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <div class="flex items-center">
+                                <span class="text-green-500 text-sm font-medium flex items-center">
+                                    <i class="fa fa-arrow-up mr-1"></i> 20%
+                                </span>
+                                <span class="text-gray-500 text-sm ml-2">from last month</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-md p-6 task-card">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">暂停项目</p>
+                                <p class="text-2xl font-bold text-gray-600 mt-1">1</p>
+                            </div>
+                            <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-500">
+                                <i class="fa fa-pause-circle text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <div class="flex items-center">
+                                <span class="text-red-500 text-sm font-medium flex items-center">
+                                    <i class="fa fa-arrow-down mr-1"></i> 5%
+                                </span>
+                                <span class="text-gray-500 text-sm ml-2">from last month</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Projects Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Project Card 1 -->
+                    <div class="project-card bg-white rounded-lg shadow-md overflow-hidden" data-project-id="1" data-project-name="移动应用重新设计">
+                        <div class="h-3 bg-blue-500"></div>
+                        <div class="p-6">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <h3 class="text-lg font-bold text-gray-800">移动应用重新设计</h3>
+                                    <p class="text-sm text-gray-500 mt-1">提升用户体验和界面设计</p>
+                                </div>
+                                <span class="status-badge status-in-progress">进行中</span>
+                            </div>
+                            
+                            <div class="mt-4">
+                                <div class="flex items-center justify-between text-sm text-gray-500 mb-1">
+                                    <span>进度</span>
+                                    <span>65%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-bar-fill bg-blue-500" style="width: 65%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <div class="flex -space-x-2">
+                                        <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white">
+                                            <span class="text-xs font-medium">JD</span>
+                                        </div>
+                                        <div class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white">
+                                            <span class="text-xs font-medium">AL</span>
+                                        </div>
+                                        <div class="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center text-white">
+                                            <span class="text-xs font-medium">SW</span>
+                                        </div>
+                                    </div>
+                                    <span class="ml-2 text-xs text-gray-500">3人</span>
+                                </div>
+                                <div class="text-xs text-gray-500">
+                                    <i class="fa fa-calendar-o mr-1"></i> 截止: 2025-12-15
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 pt-4 border-t border-gray-100">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <span class="text-xs text-gray-500 mr-3"><i class="fa fa-tag mr-1"></i> 移动应用</span>
+                                        <span class="text-xs text-gray-500"><i class="fa fa-code-fork mr-1"></i> v2.0</span>
+                                    </div>
+                                    <button class="text-primary hover:text-secondary text-sm font-medium">
+                                        查看详情 <i class="fa fa-arrow-right ml-1"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Project Card 2 -->
+                    <div class="project-card bg-white rounded-lg shadow-md overflow-hidden" data-project-id="2" data-project-name="仪表盘UI/UX设计">
+                        <div class="h-3 bg-purple-500"></div>
+                        <div class="p-6">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <h3 class="text-lg font-bold text-gray-800">仪表盘UI/UX设计</h3>
+                                    <p class="text-sm text-gray-500 mt-1">创建直观的数据可视化界面</p>
+                                </div>
+                                <span class="status-badge status-in-progress">进行中</span>
+                            </div>
+                            
+                            <div class="mt-4">
+                                <div class="flex items-center justify-between text-sm text-gray-500 mb-1">
+                                    <span>进度</span>
+                                    <span>40%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-bar-fill bg-purple-500" style="width: 40%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <div class="flex -space-x-2">
+                                        <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white">
+                                            <span class="text-xs font-medium">JD</span>
+                                        </div>
+                                        <div class="w-8 h-8 rounded-full bg-yellow-500 flex items-center justify-center text-white">
+                                            <span class="text-xs font-medium">TW</span>
+                                        </div>
+                                    </div>
+                                    <span class="ml-2 text-xs text-gray-500">2人</span>
+                                </div>
+                                <div class="text-xs text-gray-500">
+                                    <i class="fa fa-calendar-o mr-1"></i> 截止: 2025-11-30
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 pt-4 border-t border-gray-100">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <span class="text-xs text-gray-500 mr-3"><i class="fa fa-tag mr-1"></i> UI/UX</span>
+                                        <span class="text-xs text-gray-500"><i class="fa fa-code-fork mr-1"></i> v1.0</span>
+                                    </div>
+                                    <button class="text-primary hover:text-secondary text-sm font-medium">
+                                        查看详情 <i class="fa fa-arrow-right ml-1"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Project Card 3 -->
+                    <div class="project-card bg-white rounded-lg shadow-md overflow-hidden" data-project-id="3" data-project-name="电商平台升级">
+                        <div class="h-3 bg-green-500"></div>
+                        <div class="p-6">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <h3 class="text-lg font-bold text-gray-800">电商平台升级</h3>
+                                    <p class="text-sm text-gray-500 mt-1">优化购物体验和支付流程</p>
+                                </div>
+                                <span class="status-badge status-completed">已完成</span>
+                            </div>
+                            
+                            <div class="mt-4">
+                                <div class="flex items-center justify-between text-sm text-gray-500 mb-1">
+                                    <span>进度</span>
+                                    <span>100%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-bar-fill bg-green-500" style="width: 100%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <div class="flex -space-x-2">
+                                        <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white">
+                                            <span class="text-xs font-medium">JD</span>
+                                        </div>
+                                        <div class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white">
+                                            <span class="text-xs font-medium">AL</span>
+                                        </div>
+                                        <div class="w-8 h-8 rounded-full bg-red-500 flex items-center justify-center text-white">
+                                            <span class="text-xs font-medium">MK</span>
+                                        </div>
+                                        <div class="w-8 h-8 rounded-full bg-gray-500 flex items-center justify-center text-white">
+                                            <span class="text-xs font-medium">+2</span>
+                                        </div>
+                                    </div>
+                                    <span class="ml-2 text-xs text-gray-500">5人</span>
+                                </div>
+                                <div class="text-xs text-gray-500">
+                                    <i class="fa fa-calendar-o mr-1"></i> 完成: 2025-10-15
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 pt-4 border-t border-gray-100">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <span class="text-xs text-gray-500 mr-3"><i class="fa fa-tag mr-1"></i> 电商</span>
+                                        <span class="text-xs text-gray-500"><i class="fa fa-code-fork mr-1"></i> v3.0</span>
+                                    </div>
+                                    <button class="text-primary hover:text-secondary text-sm font-medium">
+                                        查看详情 <i class="fa fa-arrow-right ml-1"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Project Card 4 -->
+                    <div class="project-card bg-white rounded-lg shadow-md overflow-hidden" data-project-id="4" data-project-name="遗留系统迁移">
+                        <div class="h-3 bg-gray-500"></div>
+                        <div class="p-6">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <h3 class="text-lg font-bold text-gray-800">遗留系统迁移</h3>
+                                    <p class="text-sm text-gray-500 mt-1">将旧系统迁移到新架构</p>
+                                </div>
+                                <span class="status-badge status-on-hold">暂停</span>
+                            </div>
+                            
+                            <div class="mt-4">
+                                <div class="flex items-center justify-between text-sm text-gray-500 mb-1">
+                                    <span>进度</span>
+                                    <span>25%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-bar-fill bg-gray-500" style="width: 25%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <div class="flex -space-x-2">
+                                        <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white">
+                                            <span class="text-xs font-medium">JD</span>
+                                        </div>
+                                        <div class="w-8 h-8 rounded-full bg-red-500 flex items-center justify-center text-white">
+                                            <span class="text-xs font-medium">MK</span>
+                                        </div>
+                                    </div>
+                                    <span class="ml-2 text-xs text-gray-500">2人</span>
+                                </div>
+                                <div class="text-xs text-gray-500">
+                                    <i class="fa fa-calendar-o mr-1"></i> 暂停: 2025-10-10
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 pt-4 border-t border-gray-100">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <span class="text-xs text-gray-500 mr-3"><i class="fa fa-tag mr-1"></i> 系统</span>
+                                        <span class="text-xs text-gray-500"><i class="fa fa-code-fork mr-1"></i> v1.0</span>
+                                    </div>
+                                    <button class="text-primary hover:text-secondary text-sm font-medium">
+                                        查看详情 <i class="fa fa-arrow-right ml-1"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Project Card 5 -->
+                    <div class="project-card bg-white rounded-lg shadow-md overflow-hidden" data-project-id="5" data-project-name="内部工具开发">
+                        <div class="h-3 bg-yellow-500"></div>
+                        <div class="p-6">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <h3 class="text-lg font-bold text-gray-800">内部工具开发</h3>
+                                    <p class="text-sm text-gray-500 mt-1">提高团队工作效率的工具</p>
+                                </div>
+                                <span class="status-badge status-in-progress">进行中</span>
+                            </div>
+                            
+                            <div class="mt-4">
+                                <div class="flex items-center justify-between text-sm text-gray-500 mb-1">
+                                    <span>进度</span>
+                                    <span>75%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-bar-fill bg-yellow-500" style="width: 75%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <div class="flex -space-x-2">
+                                        <div class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white">
+                                            <span class="text-xs font-medium">AL</span>
+                                        </div>
+                                        <div class="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center text-white">
+                                            <span class="text-xs font-medium">SW</span>
+                                        </div>
+                                    </div>
+                                    <span class="ml-2 text-xs text-gray-500">2人</span>
+                                </div>
+                                <div class="text-xs text-gray-500">
+                                    <i class="fa fa-calendar-o mr-1"></i> 截止: 2025-11-20
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 pt-4 border-t border-gray-100">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <span class="text-xs text-gray-500 mr-3"><i class="fa fa-tag mr-1"></i> 工具</span>
+                                        <span class="text-xs text-gray-500"><i class="fa fa-code-fork mr-1"></i> v1.0</span>
+                                    </div>
+                                    <button class="text-primary hover:text-secondary text-sm font-medium">
+                                        查看详情 <i class="fa fa-arrow-right ml-1"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Add Project Card -->
+                    <div class="bg-white rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center h-80 cursor-pointer hover:border-primary transition-all-300" id="addProjectCard">
+                        <div class="text-center">
+                            <div class="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center text-primary mx-auto mb-4">
+                                <i class="fa fa-plus text-2xl"></i>
+                            </div>
+                            <h3 class="text-lg font-medium text-gray-700">创建新项目</h3>
+                            <p class="text-sm text-gray-500 mt-1">点击添加新的项目</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Project Details View (Hidden by default) -->
+            <div id="projectDetailsView" class="hidden">
+                <!-- Project Header -->
+                <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+                    <div class="flex items-center">
+                        <button id="backToProjects" class="text-gray-500 hover:text-primary mr-4">
+                            <i class="fa fa-arrow-left text-xl"></i>
+                        </button>
+                        <div>
+                            <h2 class="text-xl font-bold text-gray-800" id="projectDetailTitle">移动应用重新设计</h2>
+                            <div class="flex items-center mt-1">
+                                <span class="status-badge status-in-progress mr-3" id="projectDetailStatus">进行中</span>
+                                <span class="text-sm text-gray-500"><i class="fa fa-calendar-o mr-1"></i> 截止: 2025-12-15</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <button class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-all-300 flex items-center">
+                            <i class="fa fa-pencil mr-2"></i> 编辑项目
+                        </button>
+                        <button id="newVersionBtn" class="px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-secondary transition-all-300 flex items-center">
+                            <i class="fa fa-plus mr-2"></i> 新建版本
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Project Tabs -->
+                <div class="border-b border-gray-200 mb-6">
+                    <ul class="flex flex-wrap -mb-px" id="projectTabs" role="tablist">
+                        <li class="mr-2" role="presentation">
+                            <button class="inline-block p-4 border-b-2 border-transparent rounded-t-lg tab-active" id="overview-tab" data-tab="overview" type="button" role="tab">
+                                <i class="fa fa-info-circle mr-2"></i> 项目概览
+                            </button>
+                        </li>
+                        <li class="mr-2" role="presentation">
+                            <button class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300" id="versions-tab" data-tab="versions" type="button" role="tab">
+                                <i class="fa fa-code-fork mr-2"></i> 版本管理
+                            </button>
+                        </li>
+                        <li class="mr-2" role="presentation">
+                            <button class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 opacity-50 cursor-not-allowed" id="process-tab" data-tab="process" type="button" role="tab" disabled>
+                                <i class="fa fa-sitemap mr-2"></i> 流程管理
+                            </button>
+                        </li>
+                        <li class="mr-2" role="presentation">
+                            <button class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 opacity-50 cursor-not-allowed" id="documents-tab" data-tab="documents" type="button" role="tab" disabled>
+                                <i class="fa fa-file-text mr-2"></i> 文档管理
+                            </button>
+                        </li>
+                        <li class="mr-2" role="presentation">
+                            <button class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 opacity-50 cursor-not-allowed" id="requirements-tab" data-tab="requirements" type="button" role="tab" disabled>
+                                <i class="fa fa-question-circle mr-2"></i> 需求澄清
+                            </button>
+                        </li>
+                        <li class="mr-2" role="presentation">
+                            <button class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 opacity-50 cursor-not-allowed" id="challenges-tab" data-tab="challenges" type="button" role="tab" disabled>
+                                <i class="fa fa-balance-scale mr-2"></i> 挑战与裁决
+                            </button>
+                        </li>
+                        <li role="presentation">
+                            <button class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300" id="team-tab" data-tab="team" type="button" role="tab">
+                                <i class="fa fa-users mr-2"></i> 团队成员
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Version Selection Notice (Hidden by default) -->
+                <div id="versionSelectionNotice" class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6 hidden">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fa fa-info-circle text-blue-500"></i>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-blue-700">
+                                <span class="font-medium">请选择一个版本：</span> 
+                                流程管理、文档管理、需求澄清和挑战与裁决功能需要在选择具体版本后才能访问。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab Content -->
+                <div class="tab-content">
+                    <!-- Overview Tab -->
+                    <div class="tab-pane active" id="overview-content">
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            <!-- Project Info -->
+                            <div class="lg:col-span-2 space-y-6">
+                                <!-- Project Description -->
+                                <div class="bg-white rounded-lg shadow-md p-6">
+                                    <h3 class="text-lg font-bold text-gray-800 mb-4">项目描述</h3>
+                                    <p class="text-gray-600">
+                                        移动应用重新设计项目旨在提升用户体验和界面设计，包括重新设计用户界面、优化交互流程、增强功能模块等。项目将采用最新的设计趋势和技术，打造一个现代化、易用性强的移动应用。
+                                    </p>
+
+                                </div>
+
+                                <!-- Project Progress -->
+                                <div class="bg-white rounded-lg shadow-md p-6">
+                                    <h3 class="text-lg font-bold text-gray-800 mb-4">项目进度</h3>
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="text-gray-600">总体完成度</span>
+                                        <span class="font-medium text-gray-800">65%</span>
+                                    </div>
+                                    <div class="progress-bar mb-6">
+                                        <div class="progress-bar-fill bg-blue-500" style="width: 65%"></div>
+                                    </div>
+
+                                    <!-- Milestones -->
+                                    <h4 class="text-md font-medium text-gray-800 mb-3">关键里程碑</h4>
+                                    <div class="space-y-4">
+                                        <div class="flex items-center">
+                                            <div class="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center text-white mr-3">
+                                                <i class="fa fa-check text-xs"></i>
+                                            </div>
+                                            <div class="flex-1">
+                                                <div class="flex items-center justify-between">
+                                                    <span class="font-medium text-gray-800">需求分析</span>
+                                                    <span class="text-sm text-gray-500">完成于 2025-09-15</span>
+                                                </div>
+                                                <div class="progress-bar mt-1">
+                                                    <div class="progress-bar-fill bg-green-500" style="width: 100%"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <div class="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center text-white mr-3">
+                                                <i class="fa fa-check text-xs"></i>
+                                            </div>
+                                            <div class="flex-1">
+                                                <div class="flex items-center justify-between">
+                                                    <span class="font-medium text-gray-800">UI设计</span>
+                                                    <span class="text-sm text-gray-500">完成于 2025-10-05</span>
+                                                </div>
+                                                <div class="progress-bar mt-1">
+                                                    <div class="progress-bar-fill bg-green-500" style="width: 100%"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <div class="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center text-white mr-3">
+                                                <i class="fa fa-spinner fa-spin text-xs"></i>
+                                            </div>
+                                            <div class="flex-1">
+                                                <div class="flex items-center justify-between">
+                                                    <span class="font-medium text-gray-800">前端开发</span>
+                                                    <span class="text-sm text-gray-500">预计完成 2025-11-15</span>
+                                                </div>
+                                                <div class="progress-bar mt-1">
+                                                    <div class="progress-bar-fill bg-blue-500" style="width: 75%"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <div class="w-6 h-6 rounded-full bg-yellow-500 flex items-center justify-center text-white mr-3">
+                                                <i class="fa fa-clock-o text-xs"></i>
+                                            </div>
+                                            <div class="flex-1">
+                                                <div class="flex items-center justify-between">
+                                                    <span class="font-medium text-gray-800">测试与优化</span>
+                                                    <span class="text-sm text-gray-500">预计完成 2025-12-05</span>
+                                                </div>
+                                                <div class="progress-bar mt-1">
+                                                    <div class="progress-bar-fill bg-yellow-500" style="width: 0%"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <div class="w-6 h-6 rounded-full bg-yellow-500 flex items-center justify-center text-white mr-3">
+                                                <i class="fa fa-clock-o text-xs"></i>
+                                            </div>
+                                            <div class="flex-1">
+                                                <div class="flex items-center justify-between">
+                                                    <span class="font-medium text-gray-800">发布上线</span>
+                                                    <span class="text-sm text-gray-500">预计完成 2025-12-15</span>
+                                                </div>
+                                                <div class="progress-bar mt-1">
+                                                    <div class="progress-bar-fill bg-yellow-500" style="width: 0%"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Project Details Sidebar -->
+                            <div class="space-y-6">
+                                <!-- Project Stats -->
+                                <div class="bg-white rounded-lg shadow-md p-6">
+                                    <h3 class="text-lg font-bold text-gray-800 mb-4">项目统计</h3>
+                                    <div class="space-y-4">
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-gray-600">总任务数</span>
+                                            <span class="font-medium text-gray-800">42</span>
+                                        </div>
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-gray-600">已完成任务</span>
+                                            <span class="font-medium text-green-600">27</span>
+                                        </div>
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-gray-600">进行中任务</span>
+                                            <span class="font-medium text-blue-600">12</span>
+                                        </div>
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-gray-600">待处理任务</span>
+                                            <span class="font-medium text-yellow-600">3</span>
+                                        </div>
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-gray-600">已逾期任务</span>
+                                            <span class="font-medium text-red-600">0</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Project Team -->
+                                <div class="bg-white rounded-lg shadow-md p-6">
+                                    <div class="flex items-center justify-between mb-4">
+                                        <h3 class="text-lg font-bold text-gray-800">项目团队</h3>
+                                        <button class="text-primary hover:text-secondary text-sm font-medium">
+                                            管理
+                                        </button>
+                                    </div>
+                                    <div class="space-y-4">
+                                        <div class="flex items-center">
+                                            <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white">
+                                                <span class="font-medium">JD</span>
+                                            </div>
+                                            <div class="ml-3">
+                                                <p class="text-sm font-medium text-gray-800">张三</p>
+                                                <p class="text-xs text-gray-500">产品经理 (负责人)</p>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <div class="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-white">
+                                                <span class="font-medium">AL</span>
+                                            </div>
+                                            <div class="ml-3">
+                                                <p class="text-sm font-medium text-gray-800">李四</p>
+                                                <p class="text-xs text-gray-500">UI设计师</p>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <div class="w-10 h-10 rounded-full bg-purple-500 flex items-center justify-center text-white">
+                                                <span class="font-medium">SW</span>
+                                            </div>
+                                            <div class="ml-3">
+                                                <p class="text-sm font-medium text-gray-800">王五</p>
+                                                <p class="text-xs text-gray-500">前端开发</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Project Tags -->
+                                <div class="bg-white rounded-lg shadow-md p-6">
+                                    <h3 class="text-lg font-bold text-gray-800 mb-4">项目标签</h3>
+                                    <div class="flex flex-wrap gap-2">
+                                        <span class="px-3 py-1 text-xs font-medium text-gray-700 bg-gray-100 rounded-full">移动应用</span>
+                                        <span class="px-3 py-1 text-xs font-medium text-gray-700 bg-gray-100 rounded-full">UI/UX</span>
+                                        <span class="px-3 py-1 text-xs font-medium text-gray-700 bg-gray-100 rounded-full">前端</span>
+                                        <span class="px-3 py-1 text-xs font-medium text-gray-700 bg-gray-100 rounded-full">用户体验</span>
+                                        <span class="px-3 py-1 text-xs font-medium text-gray-700 bg-gray-100 rounded-full">设计</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Process Management Tab -->
+                    <div class="tab-pane hidden" id="process-content">
+                        <div class="bg-white rounded-lg shadow-md p-6">
+                            <div class="flex items-center justify-between mb-6">
+                                <h3 class="text-lg font-bold text-gray-800">流程管理</h3>
+                                <div class="flex items-center space-x-3">
+                                    <button class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-all-300 flex items-center">
+                                        <i class="fa fa-download mr-2"></i> 导出流程
+                                    </button>
+                                    <button class="px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-secondary transition-all-300 flex items-center">
+                                        <i class="fa fa-plus mr-2"></i> 新建流程
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Process Flow Visualization -->
+                            <div class="mb-8">
+                                <h4 class="text-md font-medium text-gray-800 mb-4">产品开发全流程</h4>
+                                <div class="relative py-8">
+                                    <!-- Process Steps -->
+                                    <div class="flex flex-wrap justify-between relative">
+                                        <!-- Step 1 -->
+                                        <div class="process-step completed w-1/5 mb-8 mx-1">
+                                            <div class="text-center">
+                                                <div class="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-white mx-auto mb-2">
+                                                    <i class="fa fa-check"></i>
+                                                </div>
+                                                <h5 class="font-medium text-gray-800">需求收集</h5>
+                                                <p class="text-xs text-gray-500 mt-1">完成于 2025-09-05</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Step 2 -->
+                                        <div class="process-step completed w-1/5 mb-8 mx-1">
+                                            <div class="text-center">
+                                                <div class="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-white mx-auto mb-2">
+                                                    <i class="fa fa-check"></i>
+                                                </div>
+                                                <h5 class="font-medium text-gray-800">需求分析</h5>
+                                                <p class="text-xs text-gray-500 mt-1">完成于 2025-09-15</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Step 3 -->
+                                        <div class="process-step completed w-1/5 mb-8 mx-1">
+                                            <div class="text-center">
+                                                <div class="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-white mx-auto mb-2">
+                                                    <i class="fa fa-check"></i>
+                                                </div>
+                                                <h5 class="font-medium text-gray-800">UI设计</h5>
+                                                <p class="text-xs text-gray-500 mt-1">完成于 2025-10-05</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Step 4 -->
+                                        <div class="process-step current w-1/5 mb-8 mx-1">
+                                            <div class="text-center">
+                                                <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white mx-auto mb-2">
+                                                    <i class="fa fa-spinner fa-spin"></i>
+                                                </div>
+                                                <h5 class="font-medium text-gray-800">前端开发</h5>
+                                                <p class="text-xs text-gray-500 mt-1">预计 2025-11-15</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Step 5 -->
+                                        <div class="process-step pending w-1/5 mb-8 mx-1">
+                                            <div class="text-center">
+                                                <div class="w-10 h-10 rounded-full bg-yellow-500 flex items-center justify-center text-white mx-auto mb-2">
+                                                    <i class="fa fa-clock-o"></i>
+                                                </div>
+                                                <h5 class="font-medium text-gray-800">测试</h5>
+                                                <p class="text-xs text-gray-500 mt-1">预计 2025-11-30</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Step 6 -->
+                                        <div class="process-step pending w-1/5 mb-8 mx-1">
+                                            <div class="text-center">
+                                                <div class="w-10 h-10 rounded-full bg-yellow-500 flex items-center justify-center text-white mx-auto mb-2">
+                                                    <i class="fa fa-clock-o"></i>
+                                                </div>
+                                                <h5 class="font-medium text-gray-800">发布</h5>
+                                                <p class="text-xs text-gray-500 mt-1">预计 2025-12-15</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Step 7 -->
+                                        <div class="process-step pending w-1/5 mb-8 mx-1">
+                                            <div class="text-center">
+                                                <div class="w-10 h-10 rounded-full bg-yellow-500 flex items-center justify-center text-white mx-auto mb-2">
+                                                    <i class="fa fa-clock-o"></i>
+                                                </div>
+                                                <h5 class="font-medium text-gray-800">运营</h5>
+                                                <p class="text-xs text-gray-500 mt-1">预计 2025-12-20</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Step 8 -->
+                                        <div class="process-step pending w-1/5 mb-8 mx-1">
+                                            <div class="text-center">
+                                                <div class="w-10 h-10 rounded-full bg-yellow-500 flex items-center justify-center text-white mx-auto mb-2">
+                                                    <i class="fa fa-clock-o"></i>
+                                                </div>
+                                                <h5 class="font-medium text-gray-800">数据分析</h5>
+                                                <p class="text-xs text-gray-500 mt-1">持续进行</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Step 9 -->
+                                        <div class="process-step pending w-1/5 mb-8 mx-1">
+                                            <div class="text-center">
+                                                <div class="w-10 h-10 rounded-full bg-yellow-500 flex items-center justify-center text-white mx-auto mb-2">
+                                                    <i class="fa fa-clock-o"></i>
+                                                </div>
+                                                <h5 class="font-medium text-gray-800">迭代优化</h5>
+                                                <p class="text-xs text-gray-500 mt-1">持续进行</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Process Steps Details -->
+                            <div>
+                                <h4 class="text-md font-medium text-gray-800 mb-4">流程步骤详情</h4>
+                                <div class="space-y-4">
+                                    <!-- Step 1 -->
+                                    <div class="border rounded-lg p-4">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center">
+                                                <div class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white">
+                                                    <i class="fa fa-check text-xs"></i>
+                                                </div>
+                                                <div class="ml-3">
+                                                    <h5 class="font-medium text-gray-800">需求收集</h5>
+                                                    <p class="text-xs text-gray-500">完成于 2025-09-05</p>
+                                                </div>
+                                            </div>
+                                            <span class="status-badge status-completed">已完成</span>
+                                        </div>
+                                        <div class="mt-3">
+                                            <p class="text-sm text-gray-600">收集用户反馈、市场调研和竞品分析，确定产品需求和功能优先级。</p>
+                                        </div>
+                                        <div class="mt-3 flex justify-end">
+                                            <button class="text-primary hover:text-secondary text-sm font-medium">
+                                                查看详情 <i class="fa fa-arrow-right ml-1"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Step 2 -->
+                                    <div class="border rounded-lg p-4">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center">
+                                                <div class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white">
+                                                    <i class="fa fa-check text-xs"></i>
+                                                </div>
+                                                <div class="ml-3">
+                                                    <h5 class="font-medium text-gray-800">需求分析</h5>
+                                                    <p class="text-xs text-gray-500">完成于 2025-09-15</p>
+                                                </div>
+                                            </div>
+                                            <span class="status-badge status-completed">已完成</span>
+                                        </div>
+                                        <div class="mt-3">
+                                            <p class="text-sm text-gray-600">深入分析需求，制定产品规格说明书，明确功能细节和验收标准。</p>
+                                        </div>
+                                        <div class="mt-3 flex justify-end">
+                                            <button class="text-primary hover:text-secondary text-sm font-medium">
+                                                查看详情 <i class="fa fa-arrow-right ml-1"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Step 3 -->
+                                    <div class="border rounded-lg p-4">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center">
+                                                <div class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white">
+                                                    <i class="fa fa-check text-xs"></i>
+                                                </div>
+                                                <div class="ml-3">
+                                                    <h5 class="font-medium text-gray-800">UI设计</h5>
+                                                    <p class="text-xs text-gray-500">完成于 2025-10-05</p>
+                                                </div>
+                                            </div>
+                                            <span class="status-badge status-completed">已完成</span>
+                                        </div>
+                                        <div class="mt-3">
+                                            <p class="text-sm text-gray-600">创建用户界面设计，包括线框图、视觉设计和交互原型，确保用户体验最佳。</p>
+                                        </div>
+                                        <div class="mt-3 flex justify-end">
+                                            <button class="text-primary hover:text-secondary text-sm font-medium">
+                                                查看详情 <i class="fa fa-arrow-right ml-1"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Step 4 -->
+                                    <div class="border rounded-lg p-4">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center">
+                                                <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white">
+                                                    <i class="fa fa-spinner fa-spin text-xs"></i>
+                                                </div>
+                                                <div class="ml-3">
+                                                    <h5 class="font-medium text-gray-800">前端开发</h5>
+                                                    <p class="text-xs text-gray-500">预计完成 2025-11-15</p>
+                                                </div>
+                                            </div>
+                                            <span class="status-badge status-in-progress">进行中</span>
+                                        </div>
+                                        <div class="mt-3">
+                                            <p class="text-sm text-gray-600">根据设计稿实现前端界面，确保响应式设计和良好的用户体验。</p>
+                                        </div>
+                                        <div class="mt-3 flex justify-end">
+                                            <button class="text-primary hover:text-secondary text-sm font-medium">
+                                                查看详情 <i class="fa fa-arrow-right ml-1"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Document Management Tab -->
+                    <div class="tab-pane hidden" id="documents-content">
+                        <div class="bg-white rounded-lg shadow-md p-6">
+                            <div class="flex items-center justify-between mb-6">
+                                <h3 class="text-lg font-bold text-gray-800">文档管理</h3>
+                                <div class="flex items-center space-x-3">
+                                    <button class="px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-secondary transition-all-300 flex items-center">
+                                        <i class="fa fa-upload mr-2"></i> 上传文档
+                                    </button>
+                                    <button class="px-4 py-2 text-sm font-medium text-white bg-secondary rounded-md hover:bg-primary transition-all-300 flex items-center">
+                                        <i class="fa fa-plus mr-2"></i> 新建文档
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                <!-- Document 1 -->
+                                <div class="border rounded-lg overflow-hidden">
+                                    <div class="h-2 bg-blue-500"></div>
+                                    <div class="p-4">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center">
+                                                <i class="fa fa-file-pdf-o text-red-500 text-2xl"></i>
+                                                <div class="ml-3">
+                                                    <h4 class="font-medium text-gray-800">项目需求文档</h4>
+                                                    <p class="text-xs text-gray-500">PDF • 2.5 MB</p>
+                                                </div>
+                                            </div>
+                                            <div class="text-gray-400 hover:text-gray-600">
+                                                <i class="fa fa-ellipsis-v"></i>
+                                            </div>
+                                        </div>
+                                        <div class="mt-4 flex items-center justify-between text-xs text-gray-500">
+                                            <span>上传于: 2025-09-10</span>
+                                            <span>张三</span>
+                                        </div>
+                                        <div class="mt-4 pt-4 border-t border-gray-100 flex justify-between">
+                                            <button class="text-primary hover:text-secondary text-sm font-medium flex items-center">
+                                                <i class="fa fa-download mr-1"></i> 下载
+                                            </button>
+                                            <button class="text-primary hover:text-secondary text-sm font-medium flex items-center">
+                                                <i class="fa fa-eye mr-1"></i> 查看
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Document 2 -->
+                                <div class="border rounded-lg overflow-hidden">
+                                    <div class="h-2 bg-green-500"></div>
+                                    <div class="p-4">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center">
+                                                <i class="fa fa-file-image-o text-green-500 text-2xl"></i>
+                                                <div class="ml-3">
+                                                    <h4 class="font-medium text-gray-800">UI设计稿</h4>
+                                                    <p class="text-xs text-gray-500">PNG • 5.8 MB</p>
+                                                </div>
+                                            </div>
+                                            <div class="text-gray-400 hover:text-gray-600">
+                                                <i class="fa fa-ellipsis-v"></i>
+                                            </div>
+                                        </div>
+                                        <div class="mt-4 flex items-center justify-between text-xs text-gray-500">
+                                            <span>上传于: 2025-10-05</span>
+                                            <span>李四</span>
+                                        </div>
+                                        <div class="mt-4 pt-4 border-t border-gray-100 flex justify-between">
+                                            <button class="text-primary hover:text-secondary text-sm font-medium flex items-center">
+                                                <i class="fa fa-download mr-1"></i> 下载
+                                            </button>
+                                            <button class="text-primary hover:text-secondary text-sm font-medium flex items-center">
+                                                <i class="fa fa-eye mr-1"></i> 查看
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Document 3 -->
+                                <div class="border rounded-lg overflow-hidden">
+                                    <div class="h-2 bg-purple-500"></div>
+                                    <div class="p-4">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center">
+                                                <i class="fa fa-file-word-o text-blue-500 text-2xl"></i>
+                                                <div class="ml-3">
+                                                    <h4 class="font-medium text-gray-800">项目计划书</h4>
+                                                    <p class="text-xs text-gray-500">DOCX • 1.2 MB</p>
+                                                </div>
+                                            </div>
+                                            <div class="text-gray-400 hover:text-gray-600">
+                                                <i class="fa fa-ellipsis-v"></i>
+                                            </div>
+                                        </div>
+                                        <div class="mt-4 flex items-center justify-between text-xs text-gray-500">
+                                            <span>上传于: 2025-09-05</span>
+                                            <span>张三</span>
+                                        </div>
+                                        <div class="mt-4 pt-4 border-t border-gray-100 flex justify-between">
+                                            <button class="text-primary hover:text-secondary text-sm font-medium flex items-center">
+                                                <i class="fa fa-download mr-1"></i> 下载
+                                            </button>
+                                            <button class="text-primary hover:text-secondary text-sm font-medium flex items-center">
+                                                <i class="fa fa-eye mr-1"></i> 查看
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Document 4 -->
+                                <div class="border rounded-lg overflow-hidden">
+                                    <div class="h-2 bg-yellow-500"></div>
+                                    <div class="p-4">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center">
+                                                <i class="fa fa-file-excel-o text-green-600 text-2xl"></i>
+                                                <div class="ml-3">
+                                                    <h4 class="font-medium text-gray-800">项目进度表</h4>
+                                                    <p class="text-xs text-gray-500">XLSX • 0.8 MB</p>
+                                                </div>
+                                            </div>
+                                            <div class="text-gray-400 hover:text-gray-600">
+                                                <i class="fa fa-ellipsis-v"></i>
+                                            </div>
+                                        </div>
+                                        <div class="mt-4 flex items-center justify-between text-xs text-gray-500">
+                                            <span>上传于: 2025-09-20</span>
+                                            <span>张三</span>
+                                        </div>
+                                        <div class="mt-4 pt-4 border-t border-gray-100 flex justify-between">
+                                            <button class="text-primary hover:text-secondary text-sm font-medium flex items-center">
+                                                <i class="fa fa-download mr-1"></i> 下载
+                                            </button>
+                                            <button class="text-primary hover:text-secondary text-sm font-medium flex items-center">
+                                                <i class="fa fa-eye mr-1"></i> 查看
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Document 5 -->
+                                <div class="border rounded-lg overflow-hidden">
+                                    <div class="h-2 bg-blue-500"></div>
+                                    <div class="p-4">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center">
+                                                <i class="fa fa-file-code-o text-blue-500 text-2xl"></i>
+                                                <div class="ml-3">
+                                                    <h4 class="font-medium text-gray-800">API文档</h4>
+                                                    <p class="text-xs text-gray-500">MD • 0.5 MB</p>
+                                                </div>
+                                            </div>
+                                            <div class="text-gray-400 hover:text-gray-600">
+                                                <i class="fa fa-ellipsis-v"></i>
+                                            </div>
+                                        </div>
+                                        <div class="mt-4 flex items-center justify-between text-xs text-gray-500">
+                                            <span>上传于: 2025-10-01</span>
+                                            <span>王五</span>
+                                        </div>
+                                        <div class="mt-4 pt-4 border-t border-gray-100 flex justify-between">
+                                            <button class="text-primary hover:text-secondary text-sm font-medium flex items-center">
+                                                <i class="fa fa-download mr-1"></i> 下载
+                                            </button>
+                                            <button class="text-primary hover:text-secondary text-sm font-medium flex items-center">
+                                                <i class="fa fa-eye mr-1"></i> 查看
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Add Document Card -->
+                                <div class="border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center h-40 cursor-pointer hover:border-primary transition-all-300">
+                                    <div class="text-center">
+                                        <div class="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-primary mx-auto mb-2">
+                                            <i class="fa fa-plus text-xl"></i>
+                                        </div>
+                                        <h4 class="text-sm font-medium text-gray-700">添加文档</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Requirement Clarification Tab -->
+                    <div class="tab-pane hidden" id="requirements-content">
+                        <div class="bg-white rounded-lg shadow-md p-6">
+                            <div class="flex items-center justify-between mb-6">
+                                <h3 class="text-lg font-bold text-gray-800">需求澄清</h3>
+                                <button class="px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-secondary transition-all-300 flex items-center">
+                                    <i class="fa fa-plus mr-2"></i> 新建需求澄清
+                                </button>
+                            </div>
+
+                            <!-- Requirement List -->
+                            <div class="space-y-4">
+                                <!-- Requirement 1 -->
+                                <div class="border rounded-lg p-4">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <h4 class="font-medium text-gray-800">用户认证流程优化</h4>
+                                            <p class="text-sm text-gray-500 mt-1">优化现有登录和注册流程，提高用户体验</p>
+                                        </div>
+                                        <span class="status-badge status-completed">已完成</span>
+                                    </div>
+                                    <div class="mt-4 flex items-center justify-between">
+                                        <div class="flex items-center">
+                                            <span class="text-xs text-gray-500 mr-3"><i class="fa fa-user mr-1"></i> 张三</span>
+                                            <span class="text-xs text-gray-500"><i class="fa fa-calendar-o mr-1"></i> 2025-09-10</span>
+                                        </div>
+                                        <button class="text-primary hover:text-secondary text-sm font-medium">
+                                            查看详情 <i class="fa fa-arrow-right ml-1"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Requirement 2 -->
+                                <div class="border rounded-lg p-4">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <h4 class="font-medium text-gray-800">支付流程简化</h4>
+                                            <p class="text-sm text-gray-500 mt-1">减少支付步骤，提高转化率</p>
+                                        </div>
+                                        <span class="status-badge status-in-progress">进行中</span>
+                                    </div>
+                                    <div class="mt-4 flex items-center justify-between">
+                                        <div class="flex items-center">
+                                            <span class="text-xs text-gray-500 mr-3"><i class="fa fa-user mr-1"></i> 李四</span>
+                                            <span class="text-xs text-gray-500"><i class="fa fa-calendar-o mr-1"></i> 2025-10-05</span>
+                                        </div>
+                                        <button class="text-primary hover:text-secondary text-sm font-medium">
+                                            查看详情 <i class="fa fa-arrow-right ml-1"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Requirement 3 -->
+                                <div class="border rounded-lg p-4">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <h4 class="font-medium text-gray-800">个人中心设计</h4>
+                                            <p class="text-sm text-gray-500 mt-1">重新设计个人中心，提供更好的用户体验</p>
+                                        </div>
+                                        <span class="status-badge status-pending">待处理</span>
+                                    </div>
+                                    <div class="mt-4 flex items-center justify-between">
+                                        <div class="flex items-center">
+                                            <span class="text-xs text-gray-500 mr-3"><i class="fa fa-user mr-1"></i> 王五</span>
+                                            <span class="text-xs text-gray-500"><i class="fa fa-calendar-o mr-1"></i> 2025-10-20</span>
+                                        </div>
+                                        <button class="text-primary hover:text-secondary text-sm font-medium">
+                                            查看详情 <i class="fa fa-arrow-right ml-1"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Requirement 4 -->
+                                <div class="border rounded-lg p-4">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <h4 class="font-medium text-gray-800">搜索功能改进</h4>
+                                            <p class="text-sm text-gray-500 mt-1">增强搜索算法，提高搜索结果相关性</p>
+                                        </div>
+                                        <span class="status-badge status-pending">待处理</span>
+                                    </div>
+                                    <div class="mt-4 flex items-center justify-between">
+                                        <div class="flex items-center">
+                                            <span class="text-xs text-gray-500 mr-3"><i class="fa fa-user mr-1"></i> 张三</span>
+                                            <span class="text-xs text-gray-500"><i class="fa fa-calendar-o mr-1"></i> 2025-10-25</span>
+                                        </div>
+                                        <button class="text-primary hover:text-secondary text-sm font-medium">
+                                            查看详情 <i class="fa fa-arrow-right ml-1"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Challenge Arbitration Tab -->
+                    <div class="tab-pane hidden" id="challenges-content">
+                        <div class="bg-white rounded-lg shadow-md p-6">
+                            <div class="flex items-center justify-between mb-6">
+                                <h3 class="text-lg font-bold text-gray-800">挑战与裁决</h3>
+                                <button class="px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-secondary transition-all-300 flex items-center">
+                                    <i class="fa fa-plus mr-2"></i> 发起挑战
+                                </button>
+                            </div>
+
+                            <!-- Challenge List -->
+                            <div class="space-y-4">
+                                <!-- Challenge 1 -->
+                                <div class="border rounded-lg p-4">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <h4 class="font-medium text-gray-800">UI设计风格统一</h4>
+                                            <p class="text-sm text-gray-500 mt-1">不同页面的设计风格不统一，需要统一视觉语言</p>
+                                        </div>
+                                        <span class="status-badge status-completed">已裁决</span>
+                                    </div>
+                                    <div class="mt-3">
+                                        <div class="flex items-center text-sm text-gray-500">
+                                            <span class="font-medium mr-2">发起人:</span>
+                                            <span>李四 (UI设计师)</span>
+                                        </div>
+                                        <div class="flex items-center text-sm text-gray-500 mt-1">
+                                            <span class="font-medium mr-2">发起时间:</span>
+                                            <span>2025-09-25</span>
+                                        </div>
+                                    </div>
+                                    <div class="mt-3 pt-3 border-t border-gray-100">
+                                        <div class="flex items-center text-sm">
+                                            <span class="font-medium mr-2 text-gray-700">裁决结果:</span>
+                                            <span class="text-gray-600">同意统一UI设计风格，采用设计系统方案</span>
+                                        </div>
+                                    </div>
+                                    <div class="mt-3 flex justify-end">
+                                        <button class="text-primary hover:text-secondary text-sm font-medium">
+                                            查看详情 <i class="fa fa-arrow-right ml-1"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Challenge 2 -->
+                                <div class="border rounded-lg p-4">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <h4 class="font-medium text-gray-800">技术架构选择</h4>
+                                            <p class="text-sm text-gray-500 mt-1">关于前端框架选择存在分歧，需要决策</p>
+                                        </div>
+                                        <span class="status-badge status-completed">已裁决</span>
+                                    </div>
+                                    <div class="mt-3">
+                                        <div class="flex items-center text-sm text-gray-500">
+                                            <span class="font-medium mr-2">发起人:</span>
+                                            <span>王五 (前端开发)</span>
+                                        </div>
+                                        <div class="flex items-center text-sm text-gray-500 mt-1">
+                                            <span class="font-medium mr-2">发起时间:</span>
+                                            <span>2025-10-05</span>
+                                        </div>
+                                    </div>
+                                    <div class="mt-3 pt-3 border-t border-gray-100">
+                                        <div class="flex items-center text-sm">
+                                            <span class="font-medium mr-2 text-gray-700">裁决结果:</span>
+                                            <span class="text-gray-600">采用React作为前端框架，提高开发效率</span>
+                                        </div>
+                                    </div>
+                                    <div class="mt-3 flex justify-end">
+                                        <button class="text-primary hover:text-secondary text-sm font-medium">
+                                            查看详情 <i class="fa fa-arrow-right ml-1"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Challenge 3 -->
+                                <div class="border rounded-lg p-4">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <h4 class="font-medium text-gray-800">项目进度调整</h4>
+                                            <p class="text-sm text-gray-500 mt-1">部分功能开发进度滞后，需要调整项目计划</p>
+                                        </div>
+                                        <span class="status-badge status-in-progress">裁决中</span>
+                                    </div>
+                                    <div class="mt-3">
+                                        <div class="flex items-center text-sm text-gray-500">
+                                            <span class="font-medium mr-2">发起人:</span>
+                                            <span>张三 (产品经理)</span>
+                                        </div>
+                                        <div class="flex items-center text-sm text-gray-500 mt-1">
+                                            <span class="font-medium mr-2">发起时间:</span>
+                                            <span>2025-10-20</span>
+                                        </div>
+                                    </div>
+                                    <div class="mt-3 flex justify-end">
+                                        <button class="text-primary hover:text-secondary text-sm font-medium">
+                                            查看详情 <i class="fa fa-arrow-right ml-1"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Versions Tab -->
+                    <div class="tab-pane hidden" id="versions-content">
+                        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                            <!-- Versions List -->
+                            <div class="lg:col-span-1">
+                                <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                                    <div class="p-4 border-b">
+                                        <h3 class="font-bold text-gray-800">版本列表</h3>
+                                    </div>
+                                    <div class="divide-y">
+                                        <div class="version-card p-4 active" data-version-id="8" data-version-name="v8.0">
+                                            <div class="flex items-center justify-between">
+                                                <div>
+                                                    <h4 class="font-medium text-gray-800">v8.0</h4>
+                                                    <p class="text-xs text-gray-500">当前版本</p>
+                                                </div>
+                                                <span class="status-badge status-in-progress">进行中</span>
+                                            </div>
+                                        </div>
+                                        <div class="version-card p-4" data-version-id="7" data-version-name="v7.0">
+                                            <div class="flex items-center justify-between">
+                                                <div>
+                                                    <h4 class="font-medium text-gray-800">v7.0</h4>
+                                                    <p class="text-xs text-gray-500">上一版本</p>
+                                                </div>
+                                                <span class="status-badge status-completed">已完成</span>
+                                            </div>
+                                        </div>
+                                        <div class="version-card p-4" data-version-id="6" data-version-name="v6.0">
+                                            <div class="flex items-center justify-between">
+                                                <div>
+                                                    <h4 class="font-medium text-gray-800">v6.0</h4>
+                                                    <p class="text-xs text-gray-500">历史版本</p>
+                                                </div>
+                                                <span class="status-badge status-completed">已完成</span>
+                                            </div>
+                                        </div>
+                                        <div class="version-card p-4" data-version-id="5" data-version-name="v5.0">
+                                            <div class="flex items-center justify-between">
+                                                <div>
+                                                    <h4 class="font-medium text-gray-800">v5.0</h4>
+                                                    <p class="text-xs text-gray-500">历史版本</p>
+                                                </div>
+                                                <span class="status-badge status-completed">已完成</span>
+                                            </div>
+                                        </div>
+                                        <div class="version-card p-4" data-version-id="4" data-version-name="v4.0">
+                                            <div class="flex items-center justify-between">
+                                                <div>
+                                                    <h4 class="font-medium text-gray-800">v4.0</h4>
+                                                    <p class="text-xs text-gray-500">历史版本</p>
+                                                </div>
+                                                <span class="status-badge status-completed">已完成</span>
+                                            </div>
+                                        </div>
+                                        <div class="version-card p-4" data-version-id="3" data-version-name="v3.0">
+                                            <div class="flex items-center justify-between">
+                                                <div>
+                                                    <h4 class="font-medium text-gray-800">v3.0</h4>
+                                                    <p class="text-xs text-gray-500">历史版本</p>
+                                                </div>
+                                                <span class="status-badge status-completed">已完成</span>
+                                            </div>
+                                        </div>
+                                        <div class="version-card p-4" data-version-id="2" data-version-name="v2.0">
+                                            <div class="flex items-center justify-between">
+                                                <div>
+                                                    <h4 class="font-medium text-gray-800">v2.0</h4>
+                                                    <p class="text-xs text-gray-500">历史版本</p>
+                                                </div>
+                                                <span class="status-badge status-completed">已完成</span>
+                                            </div>
+                                        </div>
+                                        <div class="version-card p-4" data-version-id="1" data-version-name="v1.0">
+                                            <div class="flex items-center justify-between">
+                                                <div>
+                                                    <h4 class="font-medium text-gray-800">v1.0</h4>
+                                                    <p class="text-xs text-gray-500">初始版本</p>
+                                                </div>
+                                                <span class="status-badge status-completed">已完成</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="p-4 border-t">
+                                        <button id="addVersionBtn" class="w-full px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-secondary transition-all-300 flex items-center justify-center">
+                                            <i class="fa fa-plus mr-2"></i> 新建版本
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Version Details -->
+                            <div class="lg:col-span-3">
+                                <div class="bg-white rounded-lg shadow-md p-6">
+                                    <div class="flex items-center justify-between mb-6">
+                                        <div>
+                                            <h3 class="text-lg font-bold text-gray-800">版本 v2.0</h3>
+                                            <p class="text-sm text-gray-500 mt-1">创建于: 2025-10-01 | 更新于: 2025-10-25</p>
+                                        </div>
+                                        <div class="flex items-center space-x-3">
+                                            <button class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-all-300 flex items-center">
+                                                <i class="fa fa-pencil mr-2"></i> 编辑
+                                            </button>
+                                            <button class="px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-secondary transition-all-300 flex items-center">
+                                                <i class="fa fa-check mr-2"></i> 完成版本
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-6">
+                                        <h4 class="text-md font-medium text-gray-800 mb-2">版本描述</h4>
+                                        <p class="text-gray-600">
+                                            版本2.0是移动应用的重大更新，包含全新的用户界面设计、优化的交互流程和新增的功能模块。本版本将重点关注用户体验提升和性能优化，解决现有版本中的关键问题。
+                                        </p>
+                                    </div>
+
+                                    <div class="mb-6">
+                                        <h4 class="text-md font-medium text-gray-800 mb-2">主要功能</h4>
+                                        <ul class="list-disc pl-5 text-gray-600 space-y-1">
+                                            <li>全新的用户界面设计</li>
+                                            <li>优化的导航结构</li>
+                                            <li>新增个人中心模块</li>
+                                            <li>改进的搜索功能</li>
+                                            <li>性能优化和bug修复</li>
+                                        </ul>
+                                    </div>
+
+                                    <!-- Version Process Flow -->
+                                    <div class="mb-6">
+                                        <h4 class="text-md font-medium text-gray-800 mb-4">版本开发流程</h4>
+                                        
+                                        <!-- Process Flow Visualization -->
+                                        <div class="relative py-8">
+                                            <!-- Process Steps -->
+                                            <div class="flex justify-between relative">
+                                                <!-- Step 1 -->
+                                                <div class="process-step completed w-1/5 mx-1">
+                                                    <div class="text-center">
+                                                        <div class="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-white mx-auto mb-2">
+                                                            <i class="fa fa-check"></i>
+                                                        </div>
+                                                        <h5 class="font-medium text-gray-800">需求分析</h5>
+                                                        <p class="text-xs text-gray-500 mt-1">完成于 2025-10-05</p>
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- Step 2 -->
+                                                <div class="process-step completed w-1/5 mx-1">
+                                                    <div class="text-center">
+                                                        <div class="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-white mx-auto mb-2">
+                                                            <i class="fa fa-check"></i>
+                                                        </div>
+                                                        <h5 class="font-medium text-gray-800">UI设计</h5>
+                                                        <p class="text-xs text-gray-500 mt-1">完成于 2025-10-15</p>
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- Step 3 -->
+                                                <div class="process-step current w-1/5 mx-1">
+                                                    <div class="text-center">
+                                                        <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white mx-auto mb-2">
+                                                            <i class="fa fa-spinner fa-spin"></i>
+                                                        </div>
+                                                        <h5 class="font-medium text-gray-800">前端开发</h5>
+                                                        <p class="text-xs text-gray-500 mt-1">预计 2025-11-15</p>
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- Step 4 -->
+                                                <div class="process-step pending w-1/5 mx-1">
+                                                    <div class="text-center">
+                                                        <div class="w-10 h-10 rounded-full bg-yellow-500 flex items-center justify-center text-white mx-auto mb-2">
+                                                            <i class="fa fa-clock-o"></i>
+                                                        </div>
+                                                        <h5 class="font-medium text-gray-800">测试</h5>
+                                                        <p class="text-xs text-gray-500 mt-1">预计 2025-11-30</p>
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- Step 5 -->
+                                                <div class="process-step pending w-1/5 mx-1">
+                                                    <div class="text-center">
+                                                        <div class="w-10 h-10 rounded-full bg-yellow-500 flex items-center justify-center text-white mx-auto mb-2">
+                                                            <i class="fa fa-clock-o"></i>
+                                                        </div>
+                                                        <h5 class="font-medium text-gray-800">发布</h5>
+                                                        <p class="text-xs text-gray-500 mt-1">预计 2025-12-15</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Connectors -->
+                                            <div class="process-connector completed absolute left-1/5 right-3/5 top-1/2 transform -translate-y-1/2"></div>
+                                            <div class="process-connector completed absolute left-2/5 right-2/5 top-1/2 transform -translate-y-1/2"></div>
+                                            <div class="process-connector absolute left-3/5 right-1/5 top-1/2 transform -translate-y-1/2"></div>
+                                            <div class="process-connector absolute left-4/5 right-0 top-1/2 transform -translate-y-1/2"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Version Tasks -->
+                                    <div>
+                                        <div class="flex items-center justify-between mb-4">
+                                            <h4 class="text-md font-medium text-gray-800">版本任务</h4>
+                                            <button class="px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-secondary transition-all-300 flex items-center">
+                                                <i class="fa fa-plus mr-2"></i> 添加任务
+                                            </button>
+                                        </div>
+                                        
+                                        <div class="overflow-x-auto">
+                                            <table class="min-w-full divide-y divide-gray-200">
+                                                <thead class="bg-gray-50">
+                                                    <tr>
+                                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">任务名称</th>
+                                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">负责人</th>
+                                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
+                                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">截止日期</th>
+                                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="bg-white divide-y divide-gray-200">
+                                                    <tr>
+                                                        <td class="px-6 py-4 whitespace-nowrap">
+                                                            <div class="text-sm font-medium text-gray-900">首页重新设计</div>
+                                                        </td>
+                                                        <td class="px-6 py-4 whitespace-nowrap">
+                                                            <div class="flex items-center">
+                                                                <div class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white">
+                                                                    <span class="text-xs font-medium">AL</span>
+                                                                </div>
+                                                                <span class="ml-2 text-sm text-gray-700">李四</span>
+                                                            </div>
+                                                        </td>
+                                                        <td class="px-6 py-4 whitespace-nowrap">
+                                                            <span class="status-badge status-completed">已完成</span>
+                                                        </td>
+                                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                            2025-10-10
+                                                        </td>
+                                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                            <button class="text-primary hover:text-secondary">查看</button>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="px-6 py-4 whitespace-nowrap">
+                                                            <div class="text-sm font-medium text-gray-900">用户认证流程优化</div>
+                                                        </td>
+                                                        <td class="px-6 py-4 whitespace-nowrap">
+                                                            <div class="flex items-center">
+                                                                <div class="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center text-white">
+                                                                    <span class="text-xs font-medium">SW</span>
+                                                                </div>
+                                                                <span class="ml-2 text-sm text-gray-700">王五</span>
+                                                            </div>
+                                                        </td>
+                                                        <td class="px-6 py-4 whitespace-nowrap">
+                                                            <span class="status-badge status-completed">已完成</span>
+                                                        </td>
+                                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                            2025-10-15
+                                                        </td>
+                                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                            <button class="text-primary hover:text-secondary">查看</button>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="px-6 py-4 whitespace-nowrap">
+                                                            <div class="text-sm font-medium text-gray-900">个人中心模块开发</div>
+                                                        </td>
+                                                        <td class="px-6 py-4 whitespace-nowrap">
+                                                            <div class="flex items-center">
+                                                                <div class="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center text-white">
+                                                                    <span class="text-xs font-medium">SW</span>
+                                                                </div>
+                                                                <span class="ml-2 text-sm text-gray-700">王五</span>
+                                                            </div>
+                                                        </td>
+                                                        <td class="px-6 py-4 whitespace-nowrap">
+                                                            <span class="status-badge status-in-progress">进行中</span>
+                                                        </td>
+                                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                            2025-10-30
+                                                        </td>
+                                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                            <button class="text-primary hover:text-secondary">查看</button>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="px-6 py-4 whitespace-nowrap">
+                                                            <div class="text-sm font-medium text-gray-900">搜索功能改进</div>
+                                                        </td>
+                                                        <td class="px-6 py-4 whitespace-nowrap">
+                                                            <div class="flex items-center">
+                                                                <div class="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center text-white">
+                                                                    <span class="text-xs font-medium">SW</span>
+                                                                </div>
+                                                                <span class="ml-2 text-sm text-gray-700">王五</span>
+                                                            </div>
+                                                        </td>
+                                                        <td class="px-6 py-4 whitespace-nowrap">
+                                                            <span class="status-badge status-pending">待处理</span>
+                                                        </td>
+                                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                            2025-11-10
+                                                        </td>
+                                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                            <button class="text-primary hover:text-secondary">查看</button>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="px-6 py-4 whitespace-nowrap">
+                                                            <div class="text-sm font-medium text-gray-900">性能优化</div>
+                                                        </td>
+                                                        <td class="px-6 py-4 whitespace-nowrap">
+                                                            <div class="flex items-center">
+                                                                <div class="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center text-white">
+                                                                    <span class="text-xs font-medium">SW</span>
+                                                                </div>
+                                                                <span class="ml-2 text-sm text-gray-700">王五</span>
+                                                            </div>
+                                                        </td>
+                                                        <td class="px-6 py-4 whitespace-nowrap">
+                                                            <span class="status-badge status-pending">待处理</span>
+                                                        </td>
+                                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                            2025-11-20
+                                                        </td>
+                                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                            <button class="text-primary hover:text-secondary">查看</button>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Team Tab -->
+                    <div class="tab-pane hidden" id="team-content">
+                        <div class="bg-white rounded-lg shadow-md p-6">
+                            <div class="flex items-center justify-between mb-6">
+                                <h3 class="text-lg font-bold text-gray-800">项目团队</h3>
+                                <button class="px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-secondary transition-all-300 flex items-center">
+                                    <i class="fa fa-plus mr-2"></i> 添加成员
+                                </button>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                <!-- Team Member 1 -->
+                                <div class="border rounded-lg p-4">
+                                    <div class="flex items-center">
+                                        <div class="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-white">
+                                            <span class="font-medium">JD</span>
+                                        </div>
+                                        <div class="ml-4">
+                                            <h4 class="font-medium text-gray-800">张三</h4>
+                                            <p class="text-sm text-gray-500">产品经理</p>
+                                            <div class="flex items-center mt-1">
+                                                <span class="px-2 py-0.5 text-xs font-medium text-white bg-blue-500 rounded-full">负责人</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4">
+                                        <div class="flex items-center text-sm text-gray-500">
+                                            <i class="fa fa-envelope mr-2"></i>
+                                            <span>zhangsan@example.com</span>
+                                        </div>
+                                        <div class="flex items-center text-sm text-gray-500 mt-1">
+                                            <i class="fa fa-phone mr-2"></i>
+                                            <span>+86 138 0000 0000</span>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4 pt-4 border-t border-gray-100 flex justify-end">
+                                        <button class="text-gray-500 hover:text-primary mr-3">
+                                            <i class="fa fa-pencil"></i>
+                                        </button>
+                                        <button class="text-gray-500 hover:text-danger">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Team Member 2 -->
+                                <div class="border rounded-lg p-4">
+                                    <div class="flex items-center">
+                                        <div class="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center text-white">
+                                            <span class="font-medium">AL</span>
+                                        </div>
+                                        <div class="ml-4">
+                                            <h4 class="font-medium text-gray-800">李四</h4>
+                                            <p class="text-sm text-gray-500">UI设计师</p>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4">
+                                        <div class="flex items-center text-sm text-gray-500">
+                                            <i class="fa fa-envelope mr-2"></i>
+                                            <span>lisi@example.com</span>
+                                        </div>
+                                        <div class="flex items-center text-sm text-gray-500 mt-1">
+                                            <i class="fa fa-phone mr-2"></i>
+                                            <span>+86 139 0000 0000</span>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4 pt-4 border-t border-gray-100 flex justify-end">
+                                        <button class="text-gray-500 hover:text-primary mr-3">
+                                            <i class="fa fa-pencil"></i>
+                                        </button>
+                                        <button class="text-gray-500 hover:text-danger">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Team Member 3 -->
+                                <div class="border rounded-lg p-4">
+                                    <div class="flex items-center">
+                                        <div class="w-12 h-12 rounded-full bg-purple-500 flex items-center justify-center text-white">
+                                            <span class="font-medium">SW</span>
+                                        </div>
+                                        <div class="ml-4">
+                                            <h4 class="font-medium text-gray-800">王五</h4>
+                                            <p class="text-sm text-gray-500">前端开发</p>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4">
+                                        <div class="flex items-center text-sm text-gray-500">
+                                            <i class="fa fa-envelope mr-2"></i>
+                                            <span>wangwu@example.com</span>
+                                        </div>
+                                        <div class="flex items-center text-sm text-gray-500 mt-1">
+                                            <i class="fa fa-phone mr-2"></i>
+                                            <span>+86 137 0000 0000</span>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4 pt-4 border-t border-gray-100 flex justify-end">
+                                        <button class="text-gray-500 hover:text-primary mr-3">
+                                            <i class="fa fa-pencil"></i>
+                                        </button>
+                                        <button class="text-gray-500 hover:text-danger">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Documents Tab -->
+                    <div class="tab-pane hidden" id="documents-content">
+                        <div class="bg-white rounded-lg shadow-md p-6">
+                            <div class="flex items-center justify-between mb-6">
+                                <h3 class="text-lg font-bold text-gray-800">项目文档</h3>
+                                <div class="flex items-center space-x-3">
+                                    <button class="px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-secondary transition-all-300 flex items-center">
+                                        <i class="fa fa-upload mr-2"></i> 上传文档
+                                    </button>
+                                    <button class="px-4 py-2 text-sm font-medium text-white bg-secondary rounded-md hover:bg-primary transition-all-300 flex items-center">
+                                        <i class="fa fa-plus mr-2"></i> 新建文档
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                <!-- Document 1 -->
+                                <div class="border rounded-lg overflow-hidden">
+                                    <div class="h-2 bg-blue-500"></div>
+                                    <div class="p-4">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center">
+                                                <i class="fa fa-file-pdf-o text-red-500 text-2xl"></i>
+                                                <div class="ml-3">
+                                                    <h4 class="font-medium text-gray-800">项目需求文档</h4>
+                                                    <p class="text-xs text-gray-500">PDF • 2.5 MB</p>
+                                                </div>
+                                            </div>
+                                            <div class="text-gray-400 hover:text-gray-600">
+                                                <i class="fa fa-ellipsis-v"></i>
+                                            </div>
+                                        </div>
+                                        <div class="mt-4 flex items-center justify-between text-xs text-gray-500">
+                                            <span>上传于: 2025-09-10</span>
+                                            <span>张三</span>
+                                        </div>
+                                        <div class="mt-4 pt-4 border-t border-gray-100 flex justify-between">
+                                            <button class="text-primary hover:text-secondary text-sm font-medium flex items-center">
+                                                <i class="fa fa-download mr-1"></i> 下载
+                                            </button>
+                                            <button class="text-primary hover:text-secondary text-sm font-medium flex items-center">
+                                                <i class="fa fa-eye mr-1"></i> 查看
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Document 2 -->
+                                <div class="border rounded-lg overflow-hidden">
+                                    <div class="h-2 bg-green-500"></div>
+                                    <div class="p-4">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center">
+                                                <i class="fa fa-file-image-o text-green-500 text-2xl"></i>
+                                                <div class="ml-3">
+                                                    <h4 class="font-medium text-gray-800">UI设计稿</h4>
+                                                    <p class="text-xs text-gray-500">PNG • 5.8 MB</p>
+                                                </div>
+                                            </div>
+                                            <div class="text-gray-400 hover:text-gray-600">
+                                                <i class="fa fa-ellipsis-v"></i>
+                                            </div>
+                                        </div>
+                                        <div class="mt-4 flex items-center justify-between text-xs text-gray-500">
+                                            <span>上传于: 2025-10-05</span>
+                                            <span>李四</span>
+                                        </div>
+                                        <div class="mt-4 pt-4 border-t border-gray-100 flex justify-between">
+                                            <button class="text-primary hover:text-secondary text-sm font-medium flex items-center">
+                                                <i class="fa fa-download mr-1"></i> 下载
+                                            </button>
+                                            <button class="text-primary hover:text-secondary text-sm font-medium flex items-center">
+                                                <i class="fa fa-eye mr-1"></i> 查看
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Document 3 -->
+                                <div class="border rounded-lg overflow-hidden">
+                                    <div class="h-2 bg-purple-500"></div>
+                                    <div class="p-4">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center">
+                                                <i class="fa fa-file-word-o text-blue-500 text-2xl"></i>
+                                                <div class="ml-3">
+                                                    <h4 class="font-medium text-gray-800">项目计划书</h4>
+                                                    <p class="text-xs text-gray-500">DOCX • 1.2 MB</p>
+                                                </div>
+                                            </div>
+                                            <div class="text-gray-400 hover:text-gray-600">
+                                                <i class="fa fa-ellipsis-v"></i>
+                                            </div>
+                                        </div>
+                                        <div class="mt-4 flex items-center justify-between text-xs text-gray-500">
+                                            <span>上传于: 2025-09-05</span>
+                                            <span>张三</span>
+                                        </div>
+                                        <div class="mt-4 pt-4 border-t border-gray-100 flex justify-between">
+                                            <button class="text-primary hover:text-secondary text-sm font-medium flex items-center">
+                                                <i class="fa fa-download mr-1"></i> 下载
+                                            </button>
+                                            <button class="text-primary hover:text-secondary text-sm font-medium flex items-center">
+                                                <i class="fa fa-eye mr-1"></i> 查看
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Document 4 -->
+                                <div class="border rounded-lg overflow-hidden">
+                                    <div class="h-2 bg-yellow-500"></div>
+                                    <div class="p-4">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center">
+                                                <i class="fa fa-file-excel-o text-green-600 text-2xl"></i>
+                                                <div class="ml-3">
+                                                    <h4 class="font-medium text-gray-800">项目进度表</h4>
+                                                    <p class="text-xs text-gray-500">XLSX • 0.8 MB</p>
+                                                </div>
+                                            </div>
+                                            <div class="text-gray-400 hover:text-gray-600">
+                                                <i class="fa fa-ellipsis-v"></i>
+                                            </div>
+                                        </div>
+                                        <div class="mt-4 flex items-center justify-between text-xs text-gray-500">
+                                            <span>上传于: 2025-09-20</span>
+                                            <span>张三</span>
+                                        </div>
+                                        <div class="mt-4 pt-4 border-t border-gray-100 flex justify-between">
+                                            <button class="text-primary hover:text-secondary text-sm font-medium flex items-center">
+                                                <i class="fa fa-download mr-1"></i> 下载
+                                            </button>
+                                            <button class="text-primary hover:text-secondary text-sm font-medium flex items-center">
+                                                <i class="fa fa-eye mr-1"></i> 查看
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Add Document Card -->
+                                <div class="border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center h-40 cursor-pointer hover:border-primary transition-all-300">
+                                    <div class="text-center">
+                                        <div class="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-primary mx-auto mb-2">
+                                            <i class="fa fa-plus text-xl"></i>
+                                        </div>
+                                        <h4 class="text-sm font-medium text-gray-700">添加文档</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- New Project Modal (Hidden by default) -->
+    <div id="newProjectModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md animate-fade-in">
+            <div class="p-6 border-b">
+                <h3 class="text-lg font-bold text-gray-800">创建新项目</h3>
+            </div>
+            <div class="p-6">
+                <form id="newProjectForm">
+                    <div class="mb-4">
+                        <label for="projectName" class="block text-sm font-medium text-gray-700 mb-1">项目名称</label>
+                        <input type="text" id="projectName" name="projectName" required 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                               placeholder="输入项目名称">
+                    </div>
+                    <div class="mb-4">
+                        <label for="projectDescription" class="block text-sm font-medium text-gray-700 mb-1">项目描述</label>
+                        <textarea id="projectDescription" name="projectDescription" rows="3" 
+                                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                                  placeholder="输入项目描述"></textarea>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label for="projectStartDate" class="block text-sm font-medium text-gray-700 mb-1">开始日期</label>
+                            <input type="date" id="projectStartDate" name="projectStartDate" required 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
+                        </div>
+                        <div>
+                            <label for="projectEndDate" class="block text-sm font-medium text-gray-700 mb-1">结束日期</label>
+                            <input type="date" id="projectEndDate" name="projectEndDate" required 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label for="projectStatus" class="block text-sm font-medium text-gray-700 mb-1">项目状态</label>
+                        <select id="projectStatus" name="projectStatus" required 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
+                            <option value="planning">规划中</option>
+                            <option value="in-progress" selected>进行中</option>
+                            <option value="on-hold">暂停</option>
+                            <option value="completed">已完成</option>
+                        </select>
+                    </div>
+                    <div class="mb-6">
+                        <label for="projectTags" class="block text-sm font-medium text-gray-700 mb-1">项目标签</label>
+                        <input type="text" id="projectTags" name="projectTags" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                               placeholder="输入标签，用逗号分隔">
+                    </div>
+                    <div class="flex justify-end space-x-3">
+                        <button type="button" id="cancelNewProject" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-all-300">
+                            取消
+                        </button>
+                        <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-secondary transition-all-300">
+                            创建项目
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Version Modal (Hidden by default) -->
+    <div id="newVersionModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md animate-fade-in">
+            <div class="p-6 border-b">
+                <h3 class="text-lg font-bold text-gray-800">创建新版本</h3>
+            </div>
+            <div class="p-6">
+                <form id="newVersionForm">
+                    <div class="mb-4">
+                        <label for="versionName" class="block text-sm font-medium text-gray-700 mb-1">版本名称</label>
+                        <input type="text" id="versionName" name="versionName" required 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                               placeholder="例如: v1.0, v2.0">
+                    </div>
+                    <div class="mb-4">
+                        <label for="versionDescription" class="block text-sm font-medium text-gray-700 mb-1">版本描述</label>
+                        <textarea id="versionDescription" name="versionDescription" rows="3" 
+                                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                                  placeholder="输入版本描述"></textarea>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label for="versionStartDate" class="block text-sm font-medium text-gray-700 mb-1">开始日期</label>
+                            <input type="date" id="versionStartDate" name="versionStartDate" required 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
+                        </div>
+                        <div>
+                            <label for="versionEndDate" class="block text-sm font-medium text-gray-700 mb-1">结束日期</label>
+                            <input type="date" id="versionEndDate" name="versionEndDate" required 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
+                        </div>
+                    </div>
+                    <div class="mb-6">
+                        <label for="versionFeatures" class="block text-sm font-medium text-gray-700 mb-1">主要功能</label>
+                        <textarea id="versionFeatures" name="versionFeatures" rows="3" 
+                                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                                  placeholder="列出主要功能，每行一个"></textarea>
+                    </div>
+                    <div class="flex justify-end space-x-3">
+                        <button type="button" id="cancelNewVersion" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-all-300">
+                            取消
+                        </button>
+                        <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-secondary transition-all-300">
+                            创建版本
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const sidebar = document.getElementById('sidebar');
+        const toggleSidebar = document.getElementById('toggleSidebar');
+        const mainContent = document.getElementById('mainContent');
+        const searchToggle = document.getElementById('searchToggle');
+        const searchBar = document.getElementById('searchBar');
+        const projectsView = document.getElementById('projectsView');
+        const projectDetailsView = document.getElementById('projectDetailsView');
+        const backToProjects = document.getElementById('backToProjects');
+        const projectCards = document.querySelectorAll('.project-card');
+        const newProjectBtn = document.getElementById('newProjectBtn');
+        const addProjectCard = document.getElementById('addProjectCard');
+        const newProjectModal = document.getElementById('newProjectModal');
+        const cancelNewProject = document.getElementById('cancelNewProject');
+        const newProjectForm = document.getElementById('newProjectForm');
+        const newVersionBtn = document.getElementById('newVersionBtn');
+        const addVersionBtn = document.getElementById('addVersionBtn');
+        const newVersionModal = document.getElementById('newVersionModal');
+        const cancelNewVersion = document.getElementById('cancelNewVersion');
+        const newVersionForm = document.getElementById('newVersionForm');
+        const projectTabs = document.querySelectorAll('#projectTabs button');
+        const tabPanes = document.querySelectorAll('.tab-pane');
+        const versionCards = document.querySelectorAll('.version-card');
+
+        // Sidebar Toggle
+        toggleSidebar.addEventListener('click', function() {
+            sidebar.classList.toggle('sidebar-collapsed');
+            const sidebarTexts = document.querySelectorAll('.sidebar-text');
+            
+            if (sidebar.classList.contains('sidebar-collapsed')) {
+                sidebarTexts.forEach(text => text.classList.add('hidden'));
+                mainContent.classList.remove('ml-64');
+                mainContent.classList.add('ml-20');
+            } else {
+                sidebarTexts.forEach(text => text.classList.remove('hidden'));
+                mainContent.classList.remove('ml-20');
+                mainContent.classList.add('ml-64');
+            }
+        });
+
+        // Search Toggle
+        searchToggle.addEventListener('click', function() {
+            searchBar.classList.toggle('hidden');
+        });
+
+        // Project Card Click
+        projectCards.forEach(card => {
+            if (!card.id) { // Skip the "Add Project" card
+                card.addEventListener('click', function() {
+                    const projectId = this.dataset.projectId;
+                    const projectName = this.dataset.projectName;
+                    
+                    // Update project details
+                    document.getElementById('projectDetailTitle').textContent = projectName;
+                    
+                    // Show project details view
+                    projectsView.classList.add('hidden');
+                    projectDetailsView.classList.remove('hidden');
+                });
+            }
+        });
+
+        // Back to Projects
+        backToProjects.addEventListener('click', function() {
+            projectDetailsView.classList.add('hidden');
+            projectsView.classList.remove('hidden');
+        });
+
+        // New Project Modal
+        newProjectBtn.addEventListener('click', function() {
+            newProjectModal.classList.remove('hidden');
+        });
+
+        addProjectCard.addEventListener('click', function() {
+            newProjectModal.classList.remove('hidden');
+        });
+
+        cancelNewProject.addEventListener('click', function() {
+            newProjectModal.classList.add('hidden');
+        });
+
+        newProjectForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form values
+            const projectName = document.getElementById('projectName').value;
+            const projectDescription = document.getElementById('projectDescription').value;
+            const projectStatus = document.getElementById('projectStatus').value;
+            
+            // Simulate project creation
+            alert(`项目 "${projectName}" 创建成功！`);
+            
+            // Close modal
+            newProjectModal.classList.add('hidden');
+            
+            // Reset form
+            newProjectForm.reset();
+        });
+
+        // New Version Modal
+        newVersionBtn.addEventListener('click', function() {
+            newVersionModal.classList.remove('hidden');
+        });
+
+        addVersionBtn.addEventListener('click', function() {
+            newVersionModal.classList.remove('hidden');
+        });
+
+        cancelNewVersion.addEventListener('click', function() {
+            newVersionModal.classList.add('hidden');
+        });
+
+        newVersionForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form values
+            const versionName = document.getElementById('versionName').value;
+            const versionDescription = document.getElementById('versionDescription').value;
+            
+            // Simulate version creation
+            alert(`版本 "${versionName}" 创建成功！`);
+            
+            // Close modal
+            newVersionModal.classList.add('hidden');
+            
+            // Reset form
+            newVersionForm.reset();
+        });
+
+        // Project Tabs
+        projectTabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Check if the tab is disabled
+                if (this.disabled) {
+                    // Show version selection notice
+                    document.getElementById('versionSelectionNotice').classList.remove('hidden');
+                    return;
+                }
+                
+                const tabId = this.dataset.tab;
+                
+                // Remove active class from all tabs and panes
+                projectTabs.forEach(t => t.classList.remove('tab-active'));
+                tabPanes.forEach(p => p.classList.add('hidden'));
+                
+                // Add active class to clicked tab and corresponding pane
+                this.classList.add('tab-active');
+                document.getElementById(`${tabId}-content`).classList.remove('hidden');
+                
+                // Hide version selection notice if it's visible
+                document.getElementById('versionSelectionNotice').classList.add('hidden');
+            });
+        });
+
+        // Version Cards
+        versionCards.forEach(card => {
+            card.addEventListener('click', function() {
+                // Remove active class from all version cards
+                versionCards.forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked version card
+                this.classList.add('active');
+                
+                // Load version details based on version name
+                const versionId = this.dataset.versionId;
+                const versionName = this.dataset.versionName;
+                
+                // Enable version-dependent tabs
+                enableVersionDependentTabs(true);
+                
+                // Hide version selection notice
+                document.getElementById('versionSelectionNotice').classList.add('hidden');
+                
+                // Update version details
+                document.querySelector('#versions-content .text-lg.font-bold').textContent = `版本 ${versionName}`;
+                
+                // Update version description and features based on version
+                let description = '';
+                let features = [];
+                let startDate = '';
+                let updateDate = '';
+                
+                // Set version specific data
+                if (versionName === 'v8.0') {
+                    description = '版本8.0是应用的最新重大更新，专注于AI功能增强和用户体验优化。本版本引入了智能推荐系统，大幅提升了应用的智能化水平。';
+                    features = [
+                        'AI智能推荐系统',
+                        '用户界面全面升级',
+                        '性能优化和bug修复',
+                        '新增数据分析功能',
+                        '增强的安全性能'
+                    ];
+                    startDate = '2025-10-01';
+                    updateDate = '2025-10-25';
+                } else if (versionName === 'v7.0') {
+                    description = '版本7.0主要关注应用性能优化和用户体验提升。本版本解决了多个关键问题，并引入了新的交互模式。';
+                    features = [
+                        '应用性能优化',
+                        '新的用户交互模式',
+                        '增强的数据分析功能',
+                        'UI细节优化',
+                        '修复已知问题'
+                    ];
+                    startDate = '2025-08-01';
+                    updateDate = '2025-09-30';
+                } else if (versionName === 'v6.0') {
+                    description = '版本6.0引入了全新的用户界面设计和功能模块，大幅提升了用户体验。';
+                    features = [
+                        '全新的用户界面设计',
+                        '新增个人中心模块',
+                        '优化的搜索功能',
+                        '性能提升',
+                        'bug修复'
+                    ];
+                    startDate = '2025-06-01';
+                    updateDate = '2025-07-31';
+                } else if (versionName === 'v5.0') {
+                    description = '版本5.0主要关注应用的稳定性和性能提升，解决了多个关键问题。';
+                    features = [
+                        '性能优化',
+                        'bug修复',
+                        '安全性能增强',
+                        '用户体验改进',
+                        '兼容性提升'
+                    ];
+                    startDate = '2025-04-01';
+                    updateDate = '2025-05-31';
+                } else if (versionName === 'v4.0') {
+                    description = '版本4.0引入了新的功能模块和交互方式，提升了应用的整体体验。';
+                    features = [
+                        '新增社交分享功能',
+                        '优化的用户界面',
+                        '性能提升',
+                        'bug修复',
+                        '新的主题系统'
+                    ];
+                    startDate = '2025-02-01';
+                    updateDate = '2025-03-31';
+                } else if (versionName === 'v3.0') {
+                    description = '版本3.0是应用的重大更新，引入了全新的用户界面和功能。';
+                    features = [
+                        '全新的用户界面',
+                        '新增数据分析功能',
+                        '优化的用户体验',
+                        '性能提升',
+                        'bug修复'
+                    ];
+                    startDate = '2025-01-01';
+                    updateDate = '2025-01-31';
+                } else if (versionName === 'v2.0') {
+                    description = '版本2.0是移动应用的重大更新，包含全新的用户界面设计、优化的交互流程和新增的功能模块。本版本将重点关注用户体验提升和性能优化，解决现有版本中的关键问题。';
+                    features = [
+                        '全新的用户界面设计',
+                        '优化的导航结构',
+                        '新增个人中心模块',
+                        '改进的搜索功能',
+                        '性能优化和bug修复'
+                    ];
+                    startDate = '2025-10-01';
+                    updateDate = '2025-10-25';
+                } else { // v1.0
+                    description = '初始版本，包含应用的核心功能和基本用户界面。';
+                    features = [
+                        '核心功能实现',
+                        '基本用户界面',
+                        '用户认证系统',
+                        '数据存储功能',
+                        '基本的搜索功能'
+                    ];
+                    startDate = '2025-09-01';
+                    updateDate = '2025-09-30';
+                }
+                
+                // Update the DOM with version specific data
+                document.querySelector('#versions-content .text-gray-600').textContent = description;
+                document.querySelector('#versions-content .text-sm.text-gray-500.mt-1').textContent = `创建于: ${startDate} | 更新于: ${updateDate}`;
+                
+                // Update features list
+                const featuresList = document.querySelector('#versions-content .list-disc');
+                featuresList.innerHTML = '';
+                features.forEach(feature => {
+                    const li = document.createElement('li');
+                    li.textContent = feature;
+                    featuresList.appendChild(li);
+                });
+                
+                // Update version-dependent content (process, documents, requirements, challenges)
+                updateVersionDependentContent(versionId, versionName);
+            });
+        });
+        
+        // Function to enable/disable version-dependent tabs
+        function enableVersionDependentTabs(enabled) {
+            const tabs = ['process-tab', 'documents-tab', 'requirements-tab', 'challenges-tab'];
+            
+            tabs.forEach(tabId => {
+                const tab = document.getElementById(tabId);
+                if (tab) {
+                    tab.disabled = !enabled;
+                    if (enabled) {
+                        tab.classList.remove('opacity-50', 'cursor-not-allowed');
+                    } else {
+                        tab.classList.add('opacity-50', 'cursor-not-allowed');
+                    }
+                }
+            });
+        }
+        
+        // Function to update version-dependent content
+        function updateVersionDependentContent(versionId, versionName) {
+            // Update process management content based on version
+            updateProcessContent(versionId, versionName);
+            
+            // Update document management content based on version
+            updateDocumentContent(versionId, versionName);
+            
+            // Update requirements clarification content based on version
+            updateRequirementsContent(versionId, versionName);
+            
+            // Update challenges and arbitration content based on version
+            updateChallengesContent(versionId, versionName);
+        }
+        
+        // Function to update process management content
+        function updateProcessContent(versionId, versionName) {
+            // This function would typically fetch data from an API
+            // For demo purposes, we'll use hardcoded data
+            
+            // Update process title to include version
+            const processTitle = document.querySelector('#process-content h3');
+            if (processTitle) {
+                processTitle.textContent = `流程管理 - 版本 ${versionName}`;
+            }
+            
+            // Example: Update process steps based on version
+            // In a real application, this would be dynamic
+            let processSteps = [];
+            
+            if (versionName === 'v8.0') {
+                processSteps = [
+                    { name: 'AI需求分析', status: 'completed', date: '2025-10-05' },
+                    { name: 'UI/UX设计', status: 'completed', date: '2025-10-10' },
+                    { name: '前端开发', status: 'in-progress', date: '2025-10-25' },
+                    { name: '后端开发', status: 'pending', date: '2025-11-05' },
+                    { name: '测试', status: 'pending', date: '2025-11-15' },
+                    { name: '发布', status: 'pending', date: '2025-11-25' }
+                ];
+            } else if (versionName === 'v7.0') {
+                processSteps = [
+                    { name: '需求分析', status: 'completed', date: '2025-08-05' },
+                    { name: 'UI设计', status: 'completed', date: '2025-08-15' },
+                    { name: '前端开发', status: 'completed', date: '2025-09-05' },
+                    { name: '后端开发', status: 'completed', date: '2025-09-15' },
+                    { name: '测试', status: 'completed', date: '2025-09-25' },
+                    { name: '发布', status: 'completed', date: '2025-09-30' }
+                ];
+            } else {
+                processSteps = [
+                    { name: '需求分析', status: 'completed', date: `${startDate.split('-')[0]}-${startDate.split('-')[1]}-05` },
+                    { name: '设计', status: 'completed', date: `${startDate.split('-')[0]}-${startDate.split('-')[1]}-15` },
+                    { name: '开发', status: 'completed', date: `${startDate.split('-')[0]}-${(parseInt(startDate.split('-')[1]) + 1).toString().padStart(2, '0')}-05` },
+                    { name: '测试', status: 'completed', date: `${startDate.split('-')[0]}-${(parseInt(startDate.split('-')[1]) + 1).toString().padStart(2, '0')}-15` },
+                    { name: '发布', status: 'completed', date: updateDate }
+                ];
+            }
+            
+            // Update process steps visualization
+            updateProcessStepsVisualization(processSteps);
+            
+            // Update process steps details
+            updateProcessStepsDetails(processSteps);
+        }
+        
+        // Function to update process steps visualization
+        function updateProcessStepsVisualization(steps) {
+            const processStepsContainer = document.querySelector('#process-content .flex.flex-wrap.mb-8');
+            if (!processStepsContainer) return;
+            
+            // Clear existing steps
+            processStepsContainer.innerHTML = '';
+            
+            // Add new steps
+            steps.forEach((step, index) => {
+                const stepElement = document.createElement('div');
+                stepElement.className = `process-step ${step.status} w-1/5 mb-8 mx-1`;
+                
+                let iconClass = 'fa-clock-o';
+                let bgColorClass = 'bg-yellow-500';
+                
+                if (step.status === 'completed') {
+                    iconClass = 'fa-check';
+                    bgColorClass = 'bg-green-500';
+                } else if (step.status === 'in-progress') {
+                    iconClass = 'fa-spinner fa-spin';
+                    bgColorClass = 'bg-blue-500';
+                }
+                
+                stepElement.innerHTML = `
+                    <div class="text-center">
+                        <div class="w-10 h-10 rounded-full ${bgColorClass} flex items-center justify-center text-white mx-auto mb-2">
+                            <i class="fa ${iconClass}"></i>
+                        </div>
+                        <h5 class="font-medium text-gray-800">${step.name}</h5>
+                        <p class="text-xs text-gray-500 mt-1">${step.status === 'completed' ? '完成于' : '预计'} ${step.date}</p>
+                    </div>
+                `;
+                
+                processStepsContainer.appendChild(stepElement);
+            });
+        }
+        
+        // Function to update process steps details
+        function updateProcessStepsDetails(steps) {
+            const processStepsDetailsContainer = document.querySelector('#process-content .space-y-4');
+            if (!processStepsDetailsContainer) return;
+            
+            // Clear existing details
+            processStepsDetailsContainer.innerHTML = '';
+            
+            // Add new details
+            steps.forEach((step, index) => {
+                const stepDetailsElement = document.createElement('div');
+                stepDetailsElement.className = 'border rounded-lg p-4';
+                
+                let iconClass = 'fa-clock-o';
+                let bgColorClass = 'bg-yellow-500';
+                let statusClass = 'status-pending';
+                let statusText = '待开始';
+                
+                if (step.status === 'completed') {
+                    iconClass = 'fa-check text-xs';
+                    bgColorClass = 'bg-green-500';
+                    statusClass = 'status-completed';
+                    statusText = '已完成';
+                } else if (step.status === 'in-progress') {
+                    iconClass = 'fa-spinner fa-spin text-xs';
+                    bgColorClass = 'bg-blue-500';
+                    statusClass = 'status-in-progress';
+                    statusText = '进行中';
+                }
+                
+                let description = '';
+                switch (step.name) {
+                    case 'AI需求分析':
+                    case '需求分析':
+                        description = '收集用户反馈、市场调研和竞品分析，确定产品需求和功能优先级。';
+                        break;
+                    case 'UI/UX设计':
+                    case 'UI设计':
+                    case '设计':
+                        description = '创建用户界面设计，包括线框图、视觉设计和交互原型，确保用户体验最佳。';
+                        break;
+                    case '前端开发':
+                        description = '根据设计稿实现前端界面，确保响应式设计和良好的用户体验。';
+                        break;
+                    case '后端开发':
+                        description = '实现后端API和数据处理逻辑，确保系统稳定和安全。';
+                        break;
+                    case '测试':
+                        description = '进行功能测试、性能测试和用户体验测试，确保产品质量。';
+                        break;
+                    case '发布':
+                        description = '准备发布版本，进行生产环境部署和监控。';
+                        break;
+                    default:
+                        description = '正在进行中...';
+                }
+                
+                stepDetailsElement.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 rounded-full ${bgColorClass} flex items-center justify-center text-white">
+                                <i class="fa ${iconClass}"></i>
+                            </div>
+                            <div class="ml-3">
+                                <h5 class="font-medium text-gray-800">${step.name}</h5>
+                                <p class="text-xs text-gray-500">${step.status === 'completed' ? '完成于' : '预计'} ${step.date}</p>
+                            </div>
+                        </div>
+                        <span class="status-badge ${statusClass}">${statusText}</span>
+                    </div>
+                    <div class="mt-3">
+                        <p class="text-sm text-gray-600">${description}</p>
+                    </div>
+                    <div class="mt-3 flex justify-end">
+                        <button class="text-primary hover:text-secondary text-sm font-medium">
+                            查看详情 <i class="fa fa-arrow-right ml-1"></i>
+                        </button>
+                    </div>
+                `;
+                
+                processStepsDetailsContainer.appendChild(stepDetailsElement);
+            });
+        }
+        
+        // Function to update document management content
+        function updateDocumentContent(versionId, versionName) {
+            // This function would typically fetch data from an API
+            // For demo purposes, we'll use hardcoded data
+            
+            // Update document title to include version
+            const documentTitle = document.querySelector('#documents-content h3');
+            if (documentTitle) {
+                documentTitle.textContent = `文档管理 - 版本 ${versionName}`;
+            }
+            
+            // Example: Update documents based on version
+            // In a real application, this would be dynamic
+            let documents = [];
+            
+            if (versionName === 'v8.0') {
+                documents = [
+                    { name: 'AI功能需求文档', type: '需求文档', size: '2.5MB', date: '2025-10-03', status: '最新' },
+                    { name: 'UI设计规范', type: '设计文档', size: '1.8MB', date: '2025-10-08', status: '最新' },
+                    { name: '前端开发指南', type: '开发文档', size: '3.2MB', date: '2025-10-12', status: '最新' },
+                    { name: 'API接口文档', type: '技术文档', size: '1.5MB', date: '2025-10-15', status: '最新' },
+                    { name: '测试计划', type: '测试文档', size: '0.9MB', date: '2025-10-18', status: '草稿' }
+                ];
+            } else if (versionName === 'v7.0') {
+                documents = [
+                    { name: '性能优化需求文档', type: '需求文档', size: '1.9MB', date: '2025-08-03', status: '已归档' },
+                    { name: 'UI优化设计稿', type: '设计文档', size: '2.2MB', date: '2025-08-10', status: '已归档' },
+                    { name: '性能测试报告', type: '测试文档', size: '1.1MB', date: '2025-09-20', status: '已归档' },
+                    { name: '发布说明', type: '发布文档', size: '0.5MB', date: '2025-09-30', status: '已归档' }
+                ];
+            } else {
+                documents = [
+                    { name: '版本需求文档', type: '需求文档', size: '1.5MB', date: `${startDate.split('-')[0]}-${startDate.split('-')[1]}-05`, status: '已归档' },
+                    { name: '设计文档', type: '设计文档', size: '2.0MB', date: `${startDate.split('-')[0]}-${startDate.split('-')[1]}-15`, status: '已归档' },
+                    { name: '开发文档', type: '开发文档', size: '2.5MB', date: `${startDate.split('-')[0]}-${(parseInt(startDate.split('-')[1]) + 1).toString().padStart(2, '0')}-05`, status: '已归档' },
+                    { name: '测试报告', type: '测试文档', size: '1.0MB', date: `${startDate.split('-')[0]}-${(parseInt(startDate.split('-')[1]) + 1).toString().padStart(2, '0')}-15`, status: '已归档' },
+                    { name: '发布说明', type: '发布文档', size: '0.5MB', date: updateDate, status: '已归档' }
+                ];
+            }
+            
+            // Update documents list
+            updateDocumentsList(documents);
+        }
+        
+        // Function to update documents list
+        function updateDocumentsList(documents) {
+            const documentsContainer = document.querySelector('#documents-content .grid.grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-3.gap-6');
+            if (!documentsContainer) return;
+            
+            // Clear existing documents
+            documentsContainer.innerHTML = '';
+            
+            // Add new documents
+            documents.forEach((doc, index) => {
+                const docElement = document.createElement('div');
+                docElement.className = 'border rounded-lg overflow-hidden';
+                
+                let statusClass = 'bg-gray-500';
+                if (doc.status === '最新') {
+                    statusClass = 'bg-green-500';
+                } else if (doc.status === '草稿') {
+                    statusClass = 'bg-yellow-500';
+                } else if (doc.status === '已归档') {
+                    statusClass = 'bg-gray-500';
+                }
+                
+                docElement.innerHTML = `
+                    <div class="h-2 ${statusClass}"></div>
+                    <div class="p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 rounded bg-blue-50 flex items-center justify-center text-primary">
+                                    <i class="fa fa-file-text-o"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <h4 class="font-medium text-gray-800">${doc.name}</h4>
+                                    <p class="text-xs text-gray-500">${doc.type}</p>
+                                </div>
+                            </div>
+                            <span class="text-xs px-2 py-1 rounded-full ${statusClass} text-white">${doc.status}</span>
+                        </div>
+                        <div class="flex items-center justify-between text-xs text-gray-500">
+                            <span><i class="fa fa-calendar-o mr-1"></i> ${doc.date}</span>
+                            <span><i class="fa fa-download mr-1"></i> ${doc.size}</span>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 p-3 flex justify-between">
+                        <button class="text-primary hover:text-secondary text-sm">
+                            <i class="fa fa-eye mr-1"></i> 预览
+                        </button>
+                        <button class="text-primary hover:text-secondary text-sm">
+                            <i class="fa fa-download mr-1"></i> 下载
+                        </button>
+                    </div>
+                `;
+                
+                documentsContainer.appendChild(docElement);
+            });
+        }
+        
+        // Function to update requirements clarification content
+        function updateRequirementsContent(versionId, versionName) {
+            // This function would typically fetch data from an API
+            // For demo purposes, we'll use hardcoded data
+            
+            // Update requirements title to include version
+            const requirementsTitle = document.querySelector('#requirements-content h3');
+            if (requirementsTitle) {
+                requirementsTitle.textContent = `需求澄清 - 版本 ${versionName}`;
+            }
+            
+            // Example: Update requirements based on version
+            // In a real application, this would be dynamic
+            let requirements = [];
+            
+            if (versionName === 'v8.0') {
+                requirements = [
+                    { id: 'REQ-001', title: 'AI智能推荐系统功能需求', status: '已澄清', description: '需要明确AI推荐系统的数据源、算法类型和用户交互方式。', createdAt: '2025-10-02', completedAt: '2025-10-04' },
+                    { id: 'REQ-002', title: '用户界面升级细节', status: '已澄清', description: '需要详细说明UI升级的具体页面和交互元素变更。', createdAt: '2025-10-05', completedAt: '2025-10-08' },
+                    { id: 'REQ-003', title: '数据分析功能需求', status: '澄清中', description: '需要明确数据分析的维度、可视化方式和导出功能。', createdAt: '2025-10-10', completedAt: '' }
+                ];
+            } else if (versionName === 'v7.0') {
+                requirements = [
+                    { id: 'REQ-001', title: '性能优化指标', status: '已澄清', description: '需要明确性能优化的具体指标和测试方法。', createdAt: '2025-08-02', completedAt: '2025-08-04' },
+                    { id: 'REQ-002', title: '用户交互模式变更', status: '已澄清', description: '需要详细说明新的用户交互模式和操作流程。', createdAt: '2025-08-06', completedAt: '2025-08-09' }
+                ];
+            } else {
+                requirements = [
+                    { id: 'REQ-001', title: '核心功能需求', status: '已澄清', description: '需要明确版本的核心功能和优先级。', createdAt: `${startDate.split('-')[0]}-${startDate.split('-')[1]}-02`, completedAt: `${startDate.split('-')[0]}-${startDate.split('-')[1]}-04` },
+                    { id: 'REQ-002', title: '用户界面需求', status: '已澄清', description: '需要明确用户界面的设计风格和布局要求。', createdAt: `${startDate.split('-')[0]}-${startDate.split('-')[1]}-06`, completedAt: `${startDate.split('-')[0]}-${startDate.split('-')[1]}-08` }
+                ];
+            }
+            
+            // Update requirements list
+            updateRequirementsList(requirements);
+        }
+        
+        // Function to update requirements list
+        function updateRequirementsList(requirements) {
+            const requirementsContainer = document.querySelector('#requirements-content .space-y-4');
+            if (!requirementsContainer) return;
+            
+            // Clear existing requirements
+            requirementsContainer.innerHTML = '';
+            
+            // Add new requirements
+            requirements.forEach(req => {
+                const reqElement = document.createElement('div');
+                reqElement.className = 'bg-white rounded-lg shadow-md overflow-hidden';
+                
+                let statusClass = 'status-pending';
+                let statusText = '待澄清';
+                
+                if (req.status === '已澄清') {
+                    statusClass = 'status-completed';
+                    statusText = '已澄清';
+                } else if (req.status === '澄清中') {
+                    statusClass = 'status-in-progress';
+                    statusText = '澄清中';
+                }
+                
+                reqElement.innerHTML = `
+                    <div class="p-6">
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <div class="flex items-center">
+                                    <h3 class="text-lg font-bold text-gray-800">${req.id}: ${req.title}</h3>
+                                    <span class="status-badge ${statusClass} ml-3">${statusText}</span>
+                                </div>
+                                <p class="text-gray-600 mt-2">${req.description}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 flex items-center justify-between text-sm text-gray-500">
+                            <div class="flex items-center">
+                                <span class="mr-4"><i class="fa fa-user-o mr-1"></i> 产品经理</span>
+                                <span><i class="fa fa-calendar-o mr-1"></i> 创建于: ${req.createdAt}</span>
+                            </div>
+                            ${req.completedAt ? `<span><i class="fa fa-check-circle-o mr-1"></i> 完成于: ${req.completedAt}</span>` : ''}
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-50 px-6 py-3 flex justify-between">
+                        <button class="text-primary hover:text-secondary text-sm font-medium">
+                            <i class="fa fa-comments-o mr-1"></i> 查看讨论
+                        </button>
+                        <button class="text-primary hover:text-secondary text-sm font-medium">
+                            <i class="fa fa-eye mr-1"></i> 查看详情
+                        </button>
+                    </div>
+                `;
+                
+                requirementsContainer.appendChild(reqElement);
+            });
+        }
+        
+        // Function to update challenges and arbitration content
+        function updateChallengesContent(versionId, versionName) {
+            // This function would typically fetch data from an API
+            // For demo purposes, we'll use hardcoded data
+            
+            // Update challenges title to include version
+            const challengesTitle = document.querySelector('#challenges-content h3');
+            if (challengesTitle) {
+                challengesTitle.textContent = `挑战与裁决 - 版本 ${versionName}`;
+            }
+            
+            // Example: Update challenges based on version
+            // In a real application, this would be dynamic
+            let challenges = [];
+            
+            if (versionName === 'v8.0') {
+                challenges = [
+                    { id: 'CHA-001', title: 'AI推荐算法选择', status: '已裁决', description: '团队对使用协同过滤还是深度学习算法存在分歧，需要裁决。', createdAt: '2025-10-03', completedAt: '2025-10-05', decision: '采用混合算法方案，结合协同过滤和深度学习的优势。' },
+                    { id: 'CHA-002', title: 'UI设计风格争议', status: '已裁决', description: '设计团队对新版UI的风格存在不同意见，需要裁决。', createdAt: '2025-10-07', completedAt: '2025-10-09', decision: '采用A方案设计风格，但融入B方案的部分交互元素。' },
+                    { id: 'CHA-003', title: '性能优化方案', status: '裁决中', description: '开发团队对性能优化的方案存在分歧，需要裁决。', createdAt: '2025-10-12', completedAt: '', decision: '' }
+                ];
+            } else if (versionName === 'v7.0') {
+                challenges = [
+                    { id: 'CHA-001', title: '性能优化优先级', status: '已裁决', description: '团队对性能优化的优先级存在分歧，需要裁决。', createdAt: '2025-08-05', completedAt: '2025-08-07', decision: '优先优化启动速度和页面加载时间，再解决内存占用问题。' },
+                    { id: 'CHA-002', title: '交互模式变更影响', status: '已裁决', description: '团队对交互模式变更的用户影响存在担忧，需要评估。', createdAt: '2025-08-10', completedAt: '2025-08-12', decision: '进行小规模用户测试，收集反馈后再决定是否全面推广。' }
+                ];
+            } else {
+                challenges = [
+                    { id: 'CHA-001', title: '功能优先级排序', status: '已裁决', description: '团队对功能优先级排序存在分歧，需要裁决。', createdAt: `${startDate.split('-')[0]}-${startDate.split('-')[1]}-05`, completedAt: `${startDate.split('-')[0]}-${startDate.split('-')[1]}-07`, decision: '按照用户价值和开发难度综合评估，确定优先级排序。' },
+                    { id: 'CHA-002', title: '技术方案选择', status: '已裁决', description: '团队对技术方案选择存在分歧，需要裁决。', createdAt: `${startDate.split('-')[0]}-${startDate.split('-')[1]}-10`, completedAt: `${startDate.split('-')[0]}-${startDate.split('-')[1]}-12`, decision: '采用方案B，基于长期维护和扩展性考虑。' }
+                ];
+            }
+            
+            // Update challenges list
+            updateChallengesList(challenges);
+        }
+        
+        // Function to update challenges list
+        function updateChallengesList(challenges) {
+            const challengesContainer = document.querySelector('#challenges-content .space-y-6');
+            if (!challengesContainer) return;
+            
+            // Clear existing challenges
+            challengesContainer.innerHTML = '';
+            
+            // Add new challenges
+            challenges.forEach(challenge => {
+                const challengeElement = document.createElement('div');
+                challengeElement.className = 'bg-white rounded-lg shadow-md overflow-hidden';
+                
+                let statusClass = 'status-pending';
+                let statusText = '待裁决';
+                
+                if (challenge.status === '已裁决') {
+                    statusClass = 'status-completed';
+                    statusText = '已裁决';
+                } else if (challenge.status === '裁决中') {
+                    statusClass = 'status-in-progress';
+                    statusText = '裁决中';
+                }
+                
+                challengeElement.innerHTML = `
+                    <div class="p-6">
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <div class="flex items-center">
+                                    <h3 class="text-lg font-bold text-gray-800">${challenge.id}: ${challenge.title}</h3>
+                                    <span class="status-badge ${statusClass} ml-3">${statusText}</span>
+                                </div>
+                                <p class="text-gray-600 mt-2">${challenge.description}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 flex items-center justify-between text-sm text-gray-500">
+                            <div class="flex items-center">
+                                <span class="mr-4"><i class="fa fa-user-o mr-1"></i> 技术负责人</span>
+                                <span><i class="fa fa-calendar-o mr-1"></i> 创建于: ${challenge.createdAt}</span>
+                            </div>
+                            ${challenge.completedAt ? `<span><i class="fa fa-check-circle-o mr-1"></i> 完成于: ${challenge.completedAt}</span>` : ''}
+                        </div>
+                        
+                        ${challenge.decision ? `
+                        <div class="mt-4 pt-4 border-t border-gray-100">
+                            <h4 class="text-md font-medium text-gray-800 mb-2">裁决结果</h4>
+                            <p class="text-gray-600">${challenge.decision}</p>
+                        </div>
+                        ` : ''}
+                    </div>
+                    
+                    <div class="bg-gray-50 px-6 py-3 flex justify-between">
+                        <button class="text-primary hover:text-secondary text-sm font-medium">
+                            <i class="fa fa-comments-o mr-1"></i> 查看讨论
+                        </button>
+                        <button class="text-primary hover:text-secondary text-sm font-medium">
+                            <i class="fa fa-eye mr-1"></i> 查看详情
+                        </button>
+                    </div>
+                `;
+                
+                challengesContainer.appendChild(challengeElement);
+            });
+        }
+
+        // Initialize date inputs with current date
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date().toISOString().split('T')[0];
+            
+            // Initialize version-dependent tabs as disabled
+            enableVersionDependentTabs(false);
+            
+            // New Project Modal
+            const projectStartDate = document.getElementById('projectStartDate');
+            const projectEndDate = document.getElementById('projectEndDate');
+            
+            if (projectStartDate) projectStartDate.value = today;
+            
+            if (projectEndDate) {
+                const nextMonth = new Date();
+                nextMonth.setMonth(nextMonth.getMonth() + 3);
+                projectEndDate.value = nextMonth.toISOString().split('T')[0];
+            }
+            
+            // New Version Modal
+            const versionStartDate = document.getElementById('versionStartDate');
+            const versionEndDate = document.getElementById('versionEndDate');
+            
+            if (versionStartDate) versionStartDate.value = today;
+            
+            if (versionEndDate) {
+                const nextMonth = new Date();
+                nextMonth.setMonth(nextMonth.getMonth() + 1);
+                versionEndDate.value = nextMonth.toISOString().split('T')[0];
+            }
+        });
+    </script>
+</body>
+</html>

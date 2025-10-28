@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProductCoCreate AI - 项目管理</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#4f46e5',
+                        success: '#10b981',
+                        warning: '#f59e0b',
+                        danger: '#ef4444'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background-color: #f8fafc;
+        }
+        .sidebar {
+            width: 250px;
+        }
+        .project-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px -3px rgba(0, 0, 0, 0.15);
+        }
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .status-active {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        .status-planning {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+        .status-completed {
+            background-color: #f3f4f6;
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex">
+    <!-- Sidebar -->
+    <aside class="sidebar bg-white shadow-md h-screen fixed left-0 top-0 z-10">
+        <div class="p-4 flex items-center justify-between border-b">
+            <div class="flex items-center">
+                <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/e10cd3e372b34c81bd38e133e4bd5b6f~tplv-a9rns2rl98-image.image?rcl=202510281322428F39A82D876F62A3D046&rk3s=8e244e95&rrcfp=f06b921b&x-expires=1764221004&x-signature=F1qcXPuf02II05L0PsQjVA3rO4o%3D" alt="Logo" class="h-8">
+                <h1 class="ml-2 text-lg font-bold text-gray-800">ProductCoCreate</h1>
+            </div>
+        </div>
+        <nav class="mt-4">
+            <ul>
+                <li>
+                    <a href="dashboard.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 transition-all">
+                        <i class="fa fa-dashboard w-6 text-center"></i>
+                        <span class="ml-3">仪表盘</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="project-management.html" class="bg-blue-50 text-primary border-l-4 border-primary flex items-center px-4 py-3 hover:bg-blue-50 transition-all">
+                        <i class="fa fa-folder-open w-6 text-center"></i>
+                        <span class="ml-3">项目管理</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 transition-all">
+                        <i class="fa fa-cog w-6 text-center"></i>
+                        <span class="ml-3">系统设置</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        <div class="absolute bottom-0 w-full p-4 border-t">
+            <div class="flex items-center">
+                <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white">
+                    <span class="font-medium">ZS</span>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm font-medium text-gray-800">张三</p>
+                    <p class="text-xs text-gray-500">产品经理</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="ml-64 flex-1 min-h-screen p-6">
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-800">项目管理</h1>
+                <p class="text-sm text-gray-600 mt-1">管理您的产品项目和版本</p>
+            </div>
+            <button id="createProjectBtn" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-secondary transition-all">
+                <i class="fa fa-plus mr-2"></i>新建项目
+            </button>
+        </div>
+
+        <!-- Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+                        <i class="fa fa-folder-open text-2xl text-primary"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-2xl font-bold text-gray-800">5</p>
+                        <p class="text-sm text-gray-600">总项目数</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
+                        <i class="fa fa-check-circle text-2xl text-success"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-2xl font-bold text-gray-800">3</p>
+                        <p class="text-sm text-gray-600">进行中</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center">
+                        <i class="fa fa-code-fork text-2xl text-warning"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-2xl font-bold text-gray-800">12</p>
+                        <p class="text-sm text-gray-600">总版本数</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center">
+                        <i class="fa fa-users text-2xl text-secondary"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-2xl font-bold text-gray-800">24</p>
+                        <p class="text-sm text-gray-600">团队成员</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter -->
+        <div class="mb-6 flex items-center space-x-2">
+            <button class="filter-btn px-4 py-2 bg-primary text-white rounded-md text-sm" data-filter="all">
+                全部项目 (5)
+            </button>
+            <button class="filter-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-md text-sm hover:bg-gray-200" data-filter="active">
+                进行中 (3)
+            </button>
+            <button class="filter-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-md text-sm hover:bg-gray-200" data-filter="planning">
+                规划中 (1)
+            </button>
+            <button class="filter-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-md text-sm hover:bg-gray-200" data-filter="completed">
+                已完成 (1)
+            </button>
+        </div>
+
+        <!-- Project List -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="projectList">
+            <!-- Project Card 1 -->
+            <div class="project-card bg-white rounded-lg shadow-md p-6" data-project-id="1" data-status="active">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">移动应用重新设计</h3>
+                        <span class="status-badge status-active">进行中</span>
+                    </div>
+                    <i class="fa fa-chevron-right text-gray-400"></i>
+                </div>
+                <p class="text-sm text-gray-600 mb-4">重新设计移动应用的用户界面和用户体验</p>
+                <div class="mb-4 flex items-center space-x-4 text-xs text-gray-500">
+                    <span><i class="fa fa-code-fork mr-1"></i>3个版本</span>
+                    <span><i class="fa fa-file mr-1"></i>38个文档</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <div class="flex -space-x-2">
+                        <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs border-2 border-white">ZS</div>
+                        <div class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white text-xs border-2 border-white">LS</div>
+                        <div class="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center text-white text-xs border-2 border-white">WW</div>
+                        <div class="w-8 h-8 rounded-full bg-gray-400 flex items-center justify-center text-white text-xs border-2 border-white">+5</div>
+                    </div>
+                    <span class="text-xs text-gray-500">更新于 2天前</span>
+                </div>
+            </div>
+
+            <!-- Project Card 2 -->
+            <div class="project-card bg-white rounded-lg shadow-md p-6" data-project-id="2" data-status="active">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">电商平台升级</h3>
+                        <span class="status-badge status-active">进行中</span>
+                    </div>
+                    <i class="fa fa-chevron-right text-gray-400"></i>
+                </div>
+                <p class="text-sm text-gray-600 mb-4">升级电商平台的核心功能，提升性能和用户体验</p>
+                <div class="mb-4 flex items-center space-x-4 text-xs text-gray-500">
+                    <span><i class="fa fa-code-fork mr-1"></i>2个版本</span>
+                    <span><i class="fa fa-file mr-1"></i>25个文档</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <div class="flex -space-x-2">
+                        <div class="w-8 h-8 rounded-full bg-red-500 flex items-center justify-center text-white text-xs border-2 border-white">ZL</div>
+                        <div class="w-8 h-8 rounded-full bg-yellow-500 flex items-center justify-center text-white text-xs border-2 border-white">SQ</div>
+                        <div class="w-8 h-8 rounded-full bg-gray-400 flex items-center justify-center text-white text-xs border-2 border-white">+3</div>
+                    </div>
+                    <span class="text-xs text-gray-500">更新于 1天前</span>
+                </div>
+            </div>
+
+            <!-- Project Card 3 -->
+            <div class="project-card bg-white rounded-lg shadow-md p-6" data-project-id="3" data-status="active">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">企业管理系统</h3>
+                        <span class="status-badge status-active">进行中</span>
+                    </div>
+                    <i class="fa fa-chevron-right text-gray-400"></i>
+                </div>
+                <p class="text-sm text-gray-600 mb-4">为企业客户打造的综合管理系统</p>
+                <div class="mb-4 flex items-center space-x-4 text-xs text-gray-500">
+                    <span><i class="fa fa-code-fork mr-1"></i>4个版本</span>
+                    <span><i class="fa fa-file mr-1"></i>52个文档</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <div class="flex -space-x-2">
+                        <div class="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-white text-xs border-2 border-white">QB</div>
+                        <div class="w-8 h-8 rounded-full bg-pink-500 flex items-center justify-center text-white text-xs border-2 border-white">JJ</div>
+                        <div class="w-8 h-8 rounded-full bg-gray-400 flex items-center justify-center text-white text-xs border-2 border-white">+6</div>
+                    </div>
+                    <span class="text-xs text-gray-500">更新于 3小时前</span>
+                </div>
+            </div>
+
+            <!-- Project Card 4 -->
+            <div class="project-card bg-white rounded-lg shadow-md p-6" data-project-id="4" data-status="planning">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">智能数据分析平台</h3>
+                        <span class="status-badge status-planning">规划中</span>
+                    </div>
+                    <i class="fa fa-chevron-right text-gray-400"></i>
+                </div>
+                <p class="text-sm text-gray-600 mb-4">基于AI的智能数据分析和可视化平台</p>
+                <div class="mb-4 flex items-center space-x-4 text-xs text-gray-500">
+                    <span><i class="fa fa-code-fork mr-1"></i>1个版本</span>
+                    <span><i class="fa fa-file mr-1"></i>8个文档</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <div class="flex -space-x-2">
+                        <div class="w-8 h-8 rounded-full bg-teal-500 flex items-center justify-center text-white text-xs border-2 border-white">LC</div>
+                        <div class="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center text-white text-xs border-2 border-white">MD</div>
+                    </div>
+                    <span class="text-xs text-gray-500">创建于 1周前</span>
+                </div>
+            </div>
+
+            <!-- Project Card 5 -->
+            <div class="project-card bg-white rounded-lg shadow-md p-6" data-project-id="5" data-status="completed">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">遗留系统迁移</h3>
+                        <span class="status-badge status-completed">已完成</span>
+                    </div>
+                    <i class="fa fa-chevron-right text-gray-400"></i>
+                </div>
+                <p class="text-sm text-gray-600 mb-4">将遗留系统迁移到新架构和技术栈</p>
+                <div class="mb-4 flex items-center space-x-4 text-xs text-gray-500">
+                    <span><i class="fa fa-code-fork mr-1"></i>2个版本</span>
+                    <span><i class="fa fa-file mr-1"></i>31个文档</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <div class="flex -space-x-2">
+                        <div class="w-8 h-8 rounded-full bg-cyan-500 flex items-center justify-center text-white text-xs border-2 border-white">NE</div>
+                        <div class="w-8 h-8 rounded-full bg-lime-500 flex items-center justify-center text-white text-xs border-2 border-white">OF</div>
+                        <div class="w-8 h-8 rounded-full bg-gray-400 flex items-center justify-center text-white text-xs border-2 border-white">+2</div>
+                    </div>
+                    <span class="text-xs text-gray-500">完成于 1月前</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // 项目卡片点击事件
+        document.querySelectorAll('.project-card').forEach(card => {
+            card.addEventListener('click', function() {
+                const projectId = this.dataset.projectId;
+                window.location.href = `project-detail.html?id=${projectId}`;
+            });
+        });
+
+        // 筛选功能
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const filter = this.dataset.filter;
+
+                // 更新按钮样式
+                document.querySelectorAll('.filter-btn').forEach(b => {
+                    b.classList.remove('bg-primary', 'text-white');
+                    b.classList.add('bg-gray-100', 'text-gray-700');
+                });
+                this.classList.remove('bg-gray-100', 'text-gray-700');
+                this.classList.add('bg-primary', 'text-white');
+
+                // 筛选项目
+                document.querySelectorAll('.project-card').forEach(card => {
+                    if (filter === 'all') {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = card.dataset.status === filter ? 'block' : 'none';
+                    }
+                });
+            });
+        });
+
+        // 创建新项目
+        document.getElementById('createProjectBtn').addEventListener('click', function() {
+            alert('创建新项目功能');
+        });
+    </script>
+</body>
+</html>

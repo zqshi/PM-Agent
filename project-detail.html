@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProductCoCreate AI - 项目详情</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#4f46e5',
+                        success: '#10b981',
+                        warning: '#f59e0b',
+                        danger: '#ef4444',
+                        info: '#3b82f6',
+                        light: '#f3f4f6',
+                        dark: '#111827'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background-color: #f8fafc;
+        }
+        .sidebar {
+            width: 250px;
+            transition: all 0.3s ease;
+        }
+        .sidebar-collapsed {
+            width: 80px;
+        }
+        .version-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .version-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        .badge {
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .badge-active {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        .badge-development {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+        .badge-archived {
+            background-color: #f3f4f6;
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex">
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar bg-white shadow-md h-screen fixed left-0 top-0 z-10">
+        <div class="p-4 flex items-center justify-between border-b">
+            <div class="flex items-center">
+                <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/e10cd3e372b34c81bd38e133e4bd5b6f~tplv-a9rns2rl98-image.image?rcl=202510281322428F39A82D876F62A3D046&rk3s=8e244e95&rrcfp=f06b921b&x-expires=1764221004&x-signature=F1qcXPuf02II05L0PsQjVA3rO4o%3D" alt="Logo" class="h-8">
+                <h1 class="ml-2 text-lg font-bold text-gray-800 sidebar-text">ProductCoCreate</h1>
+            </div>
+        </div>
+        <nav class="mt-4">
+            <ul>
+                <li>
+                    <a href="dashboard.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 transition-all">
+                        <i class="fa fa-dashboard w-6 text-center"></i>
+                        <span class="ml-3 sidebar-text">仪表盘</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="project-management.html" class="bg-blue-50 text-primary border-l-4 border-primary flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 transition-all">
+                        <i class="fa fa-folder-open w-6 text-center"></i>
+                        <span class="ml-3 sidebar-text">项目管理</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 transition-all">
+                        <i class="fa fa-cog w-6 text-center"></i>
+                        <span class="ml-3 sidebar-text">系统设置</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="ml-64 flex-1 min-h-screen p-6">
+        <!-- Breadcrumb -->
+        <nav class="flex mb-6 text-sm">
+            <a href="project-management.html" class="text-primary hover:text-secondary">项目管理</a>
+            <span class="mx-2 text-gray-400">/</span>
+            <span class="text-gray-600" id="projectName">移动应用重新设计</span>
+        </nav>
+
+        <!-- Project Header -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div class="flex items-start justify-between">
+                <div class="flex-1">
+                    <h1 class="text-3xl font-bold text-gray-800 mb-2" id="projectTitle">移动应用重新设计</h1>
+                    <p class="text-gray-600 mb-4" id="projectDescription">重新设计移动应用的用户界面和用户体验，提升用户满意度和转化率</p>
+                    <div class="flex items-center space-x-4">
+                        <div class="flex items-center">
+                            <i class="fa fa-calendar text-gray-400 mr-2"></i>
+                            <span class="text-sm text-gray-600">创建于: 2025-09-01</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fa fa-user text-gray-400 mr-2"></i>
+                            <span class="text-sm text-gray-600">负责人: 张三</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fa fa-users text-gray-400 mr-2"></i>
+                            <span class="text-sm text-gray-600">团队成员: 8人</span>
+                        </div>
+                    </div>
+                </div>
+                <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-secondary transition-all">
+                    <i class="fa fa-cog mr-2"></i>项目设置
+                </button>
+            </div>
+        </div>
+
+        <!-- Version Management -->
+        <div class="mb-4 flex items-center justify-between">
+            <h2 class="text-2xl font-bold text-gray-800">版本管理</h2>
+            <button id="createVersionBtn" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-secondary transition-all">
+                <i class="fa fa-plus mr-2"></i>创建新版本
+            </button>
+        </div>
+
+        <!-- Version List -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="versionList">
+            <!-- Version Card 1 -->
+            <div class="version-card bg-white rounded-lg shadow-md p-6" onclick="goToVersion(1)">
+                <div class="flex items-start justify-between mb-4">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800">v1.0 - 初始版本</h3>
+                        <span class="badge badge-active mt-2 inline-block">生产环境</span>
+                    </div>
+                    <i class="fa fa-chevron-right text-gray-400"></i>
+                </div>
+                <p class="text-sm text-gray-600 mb-4">首次发布的移动应用设计，包含核心功能和基础UI界面</p>
+                <div class="space-y-2 mb-4">
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-gray-500">流程数量</span>
+                        <span class="font-medium text-gray-800">3个</span>
+                    </div>
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-gray-500">文档数量</span>
+                        <span class="font-medium text-gray-800">12个</span>
+                    </div>
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-gray-500">完成度</span>
+                        <span class="font-medium text-green-600">100%</span>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between text-xs text-gray-500 pt-4 border-t">
+                    <span>创建于: 2025-09-01</span>
+                    <span>发布于: 2025-09-30</span>
+                </div>
+            </div>
+
+            <!-- Version Card 2 -->
+            <div class="version-card bg-white rounded-lg shadow-md p-6" onclick="goToVersion(2)">
+                <div class="flex items-start justify-between mb-4">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800">v2.0 - 功能增强</h3>
+                        <span class="badge badge-development mt-2 inline-block">开发中</span>
+                    </div>
+                    <i class="fa fa-chevron-right text-gray-400"></i>
+                </div>
+                <p class="text-sm text-gray-600 mb-4">增强版本，添加高级功能、优化性能和改进用户体验</p>
+                <div class="space-y-2 mb-4">
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-gray-500">流程数量</span>
+                        <span class="font-medium text-gray-800">5个</span>
+                    </div>
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-gray-500">文档数量</span>
+                        <span class="font-medium text-gray-800">18个</span>
+                    </div>
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-gray-500">完成度</span>
+                        <span class="font-medium text-blue-600">65%</span>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between text-xs text-gray-500 pt-4 border-t">
+                    <span>创建于: 2025-10-01</span>
+                    <span>预计: 2025-12-31</span>
+                </div>
+            </div>
+
+            <!-- Version Card 3 -->
+            <div class="version-card bg-white rounded-lg shadow-md p-6" onclick="goToVersion(3)">
+                <div class="flex items-start justify-between mb-4">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800">v0.9 - Beta版本</h3>
+                        <span class="badge badge-archived mt-2 inline-block">已归档</span>
+                    </div>
+                    <i class="fa fa-chevron-right text-gray-400"></i>
+                </div>
+                <p class="text-sm text-gray-600 mb-4">测试版本，用于内部测试和验证核心功能</p>
+                <div class="space-y-2 mb-4">
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-gray-500">流程数量</span>
+                        <span class="font-medium text-gray-800">2个</span>
+                    </div>
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-gray-500">文档数量</span>
+                        <span class="font-medium text-gray-800">8个</span>
+                    </div>
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-gray-500">完成度</span>
+                        <span class="font-medium text-gray-600">100%</span>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between text-xs text-gray-500 pt-4 border-t">
+                    <span>创建于: 2025-08-01</span>
+                    <span>归档于: 2025-08-31</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Project Statistics -->
+        <div class="mt-8 bg-white rounded-lg shadow-md p-6">
+            <h3 class="text-xl font-bold text-gray-800 mb-6">项目统计</h3>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-primary mb-2">3</div>
+                    <div class="text-sm text-gray-600">总版本数</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-success mb-2">38</div>
+                    <div class="text-sm text-gray-600">总文档数</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-warning mb-2">10</div>
+                    <div class="text-sm text-gray-600">总流程数</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-info mb-2">8</div>
+                    <div class="text-sm text-gray-600">团队成员</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function goToVersion(versionId) {
+            // 获取URL参数中的项目ID
+            const urlParams = new URLSearchParams(window.location.search);
+            const projectId = urlParams.get('id') || '1';
+
+            // 跳转到版本详情页
+            window.location.href = `version-detail.html?projectId=${projectId}&versionId=${versionId}`;
+        }
+
+        // 创建新版本
+        document.getElementById('createVersionBtn').addEventListener('click', function() {
+            // 这里可以打开创建版本的对话框
+            alert('创建新版本功能');
+        });
+
+        // 根据URL参数加载项目数据
+        window.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const projectId = urlParams.get('id');
+
+            // 这里可以根据projectId加载实际数据
+            console.log('加载项目ID:', projectId);
+        });
+    </script>
+</body>
+</html>
