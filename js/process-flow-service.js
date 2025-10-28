@@ -461,6 +461,107 @@ class ProcessFlowService {
                     "input": "优化用户登录流程，支持多种登录方式（用户名/邮箱/手机号登录）",
                     "output": null,
                     "agentName": "product-demand-manager-agent",
+                    "clarificationRounds": [
+                        {
+                            "roundNumber": 1,
+                            "status": "completed",
+                            "agentMessage": "我已经分析了您的需求，有几个关键问题需要澄清，以便我能更好地理解登录功能的具体要求。",
+                            "questions": [
+                                {
+                                    "id": "r1_q1",
+                                    "question": "目标用户群体是哪些？是面向C端个人用户、B端企业用户，还是两者都有？",
+                                    "status": "answered",
+                                    "answer": "主要面向C端个人用户，未来可能扩展到B端。",
+                                    "answeredBy": "张三（产品经理）",
+                                    "answeredAt": "2025-10-29T06:30:00.000Z"
+                                },
+                                {
+                                    "id": "r1_q2",
+                                    "question": "用户主要在什么设备和场景下使用登录功能？（PC端、移动端、平板等）",
+                                    "status": "answered",
+                                    "answer": "主要是移动端（iOS和Android），PC端为辅。用户通常在首次安装APP或更换设备时需要登录。",
+                                    "answeredBy": "张三（产品经理）",
+                                    "answeredAt": "2025-10-29T06:32:00.000Z"
+                                },
+                                {
+                                    "id": "r1_q3",
+                                    "question": "是否需要支持第三方登录（如微信、QQ、Apple ID等）？",
+                                    "status": "answered",
+                                    "answer": "是的，需要支持微信和Apple ID登录，优先级最高。",
+                                    "answeredBy": "张三（产品经理）",
+                                    "answeredAt": "2025-10-29T06:35:00.000Z"
+                                }
+                            ],
+                            "userSummary": "用户确认了产品主要面向C端移动端用户，需要支持微信和Apple ID第三方登录。",
+                            "completedAt": "2025-10-29T06:40:00.000Z"
+                        },
+                        {
+                            "roundNumber": 2,
+                            "status": "completed",
+                            "agentMessage": "根据您第一轮的回答，我需要进一步确认关于第三方登录和安全性的具体要求。",
+                            "questions": [
+                                {
+                                    "id": "r2_q1",
+                                    "question": "第三方登录后，是否需要用户补充手机号或邮箱进行账号绑定？",
+                                    "status": "answered",
+                                    "answer": "是的，首次第三方登录后需要引导用户绑定手机号，用于后续找回密码和安全验证。",
+                                    "answeredBy": "张三（产品经理）",
+                                    "answeredAt": "2025-10-29T07:00:00.000Z"
+                                },
+                                {
+                                    "id": "r2_q2",
+                                    "question": "手机号登录是通过验证码还是密码？是否支持免密登录？",
+                                    "status": "answered",
+                                    "answer": "支持验证码和密码两种方式。老用户优先使用密码，新用户可以通过验证码快速注册登录。",
+                                    "answeredBy": "张三（产品经理）",
+                                    "answeredAt": "2025-10-29T07:05:00.000Z"
+                                },
+                                {
+                                    "id": "r2_q3",
+                                    "question": "是否需要支持生物识别（指纹、Face ID）进行快速登录？",
+                                    "status": "answered",
+                                    "answer": "需要支持，这是移动端用户的强需求，可以大幅提升登录体验。",
+                                    "answeredBy": "张三（产品经理）",
+                                    "answeredAt": "2025-10-29T07:10:00.000Z"
+                                }
+                            ],
+                            "userSummary": "明确了账号绑定策略、登录方式选择和生物识别支持需求。",
+                            "completedAt": "2025-10-29T07:15:00.000Z"
+                        },
+                        {
+                            "roundNumber": 3,
+                            "status": "in_progress",
+                            "agentMessage": "最后，我需要了解一些技术实现和数据相关的细节。",
+                            "questions": [
+                                {
+                                    "id": "r3_q1",
+                                    "question": "现有系统是否已经支持邮箱和手机号作为账号标识？数据库需要做哪些调整？",
+                                    "status": "pending",
+                                    "answer": null,
+                                    "answeredBy": null,
+                                    "answeredAt": null
+                                },
+                                {
+                                    "id": "r3_q2",
+                                    "question": "登录失败次数是否有限制？超过限制后如何处理（锁定账号、图形验证码等）？",
+                                    "status": "pending",
+                                    "answer": null,
+                                    "answeredBy": null,
+                                    "answeredAt": null
+                                },
+                                {
+                                    "id": "r3_q3",
+                                    "question": "是否需要记录用户的登录日志（设备、IP、时间等）供用户查看？",
+                                    "status": "pending",
+                                    "answer": null,
+                                    "answeredBy": null,
+                                    "answeredAt": null
+                                }
+                            ],
+                            "userSummary": null,
+                            "completedAt": null
+                        }
+                    ],
                     "clarificationQuestions": [
                         {
                             "id": "q1",

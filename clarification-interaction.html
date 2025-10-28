@@ -83,6 +83,81 @@
         .progress-ring-circle {
             transition: stroke-dashoffset 0.5s ease;
         }
+        /* 多轮澄清样式 */
+        .round-container {
+            position: relative;
+            margin-bottom: 24px;
+        }
+        .round-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .round-header:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
+        }
+        .round-header.current {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            box-shadow: 0 4px 12px rgba(245, 87, 108, 0.4);
+        }
+        .round-header.completed {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        .round-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 18px;
+            margin-right: 12px;
+        }
+        .round-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease;
+        }
+        .round-content.expanded {
+            max-height: 10000px;
+        }
+        .timeline-connector {
+            position: absolute;
+            left: 19px;
+            top: 60px;
+            bottom: -24px;
+            width: 2px;
+            background: linear-gradient(to bottom, #667eea, #e0e0e0);
+        }
+        .agent-message {
+            background: linear-gradient(135deg, #e0f2fe 0%, #e0e7ff 100%);
+            border-left: 4px solid #3b82f6;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+        .user-response {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border-left: 4px solid #10b981;
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 12px;
+        }
+        .round-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.3);
+        }
     </style>
 </head>
 <body class="min-h-screen flex">
@@ -147,11 +222,13 @@
                         <i class="fa fa-comments text-3xl text-blue-500 mr-3"></i>
                         <h1 class="text-3xl font-bold text-gray-800">需求澄清</h1>
                         <span class="ml-4 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">步骤 1.1</span>
+                        <span class="ml-2 px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium" id="roundIndicator">第 1 轮</span>
                     </div>
                     <p class="text-gray-600 mb-4">为了更好地理解您的需求，Product Manager Agent 准备了以下澄清问题。请详细回答这些问题，以帮助我们生成更准确的产品设计文档。</p>
                     <div class="flex items-center space-x-6 text-sm text-gray-600">
                         <span><i class="fa fa-lightbulb-o mr-2"></i>提示：所有回答会自动保存</span>
-                        <span><i class="fa fa-info-circle mr-2"></i>可以随时返回修改答案</span>
+                        <span><i class="fa fa-info-circle mr-2"></i>支持多轮深入澄清</span>
+                        <span><i class="fa fa-history mr-2"></i>可查看历史轮次</span>
                     </div>
                 </div>
                 <button class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-all" onclick="window.location.href=document.getElementById('processLink').href">
@@ -242,13 +319,22 @@
                 return;
             }
 
-            // 获取澄清问题 - 优先从步骤1.1的clarificationQuestions字段读取
+            // 获取澄清问题 - 优先从步骤1.1的clarificationRounds字段读取多轮数据
             const step11 = currentProcessFlow.steps['1.1'];
-            if (step11 && step11.clarificationQuestions) {
-                // 从步骤数据中构造clarificationDoc格式
+            if (step11 && step11.clarificationRounds) {
+                // 多轮澄清模式
                 clarificationDoc = {
                     type: 'clarification_questions',
                     version: 1,
+                    multiRound: true,
+                    rounds: step11.clarificationRounds
+                };
+            } else if (step11 && step11.clarificationQuestions) {
+                // 单轮澄清模式（兼容旧版本）
+                clarificationDoc = {
+                    type: 'clarification_questions',
+                    version: 1,
+                    multiRound: false,
                     content: {
                         questions: groupQuestionsByCategory(step11.clarificationQuestions)
                     }
@@ -258,6 +344,9 @@
                 clarificationDoc = currentProcessFlow.documents.find(doc =>
                     doc.type === 'clarification_questions' && doc.version === 1
                 );
+                if (clarificationDoc) {
+                    clarificationDoc.multiRound = false;
+                }
             }
 
             if (!clarificationDoc) {
@@ -268,8 +357,15 @@
 
             // 渲染页面
             renderOriginalRequirement();
-            renderQuestions();
-            renderCategoryNav();
+
+            // 根据模式选择渲染方式
+            if (clarificationDoc.multiRound) {
+                renderMultiRoundQuestions();
+            } else {
+                renderQuestions();
+                renderCategoryNav();
+            }
+
             updateProgress();
             updateBreadcrumb();
         });
@@ -329,6 +425,172 @@
 
                 container.innerHTML += cardHTML;
             });
+        }
+
+        // 渲染多轮澄清问题
+        function renderMultiRoundQuestions() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = '';
+
+            const rounds = clarificationDoc.rounds || [];
+            const currentRoundIndex = rounds.length - 1;
+
+            rounds.forEach((round, roundIndex) => {
+                const isCurrentRound = roundIndex === currentRoundIndex;
+                const isCompleted = round.status === 'completed';
+                const statusText = isCompleted ? '已完成' : (isCurrentRound ? '进行中' : '待开始');
+                const statusClass = isCompleted ? 'completed' : (isCurrentRound ? 'current' : '');
+
+                const roundHTML = `
+                    <div class="round-container">
+                        ${roundIndex < rounds.length - 1 ? '<div class="timeline-connector"></div>' : ''}
+                        <div class="round-header ${statusClass}" onclick="toggleRound(${roundIndex})">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <span class="round-badge">${roundIndex + 1}</span>
+                                    <div>
+                                        <h3 class="text-xl font-bold">第 ${roundIndex + 1} 轮澄清</h3>
+                                        <p class="text-sm opacity-90 mt-1">${round.agentMessage || 'Agent正在生成问题...'}</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-3">
+                                    <span class="round-status">${statusText}</span>
+                                    <i class="fa fa-chevron-down transition-transform" id="round-${roundIndex}-chevron"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="round-content ${isCurrentRound ? 'expanded' : ''}" id="round-${roundIndex}-content">
+                            ${renderRoundContent(round, roundIndex, isCurrentRound)}
+                        </div>
+                    </div>
+                `;
+
+                container.innerHTML += roundHTML;
+            });
+
+            // 更新轮次指示器
+            document.getElementById('roundIndicator').textContent = `第 ${currentRoundIndex + 1} 轮`;
+        }
+
+        // 渲染单轮内容
+        function renderRoundContent(round, roundIndex, isCurrentRound) {
+            if (!round.questions || round.questions.length === 0) {
+                return '<div class="text-center py-8 text-gray-500">等待Agent生成问题...</div>';
+            }
+
+            let html = '';
+
+            // Agent消息
+            if (round.agentMessage) {
+                html += `
+                    <div class="agent-message mb-4">
+                        <div class="flex items-start">
+                            <i class="fa fa-robot text-blue-500 text-xl mr-3 mt-1"></i>
+                            <div class="flex-1">
+                                <p class="font-medium text-gray-800 mb-1">Product Manager Agent</p>
+                                <p class="text-gray-700">${round.agentMessage}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // 问题列表
+            round.questions.forEach((q, qIndex) => {
+                const isAnswered = q.status === 'answered';
+                html += `
+                    <div class="bg-white rounded-lg border p-4 mb-3">
+                        <div class="flex items-start">
+                            <span class="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center text-sm font-bold mr-3">${qIndex + 1}</span>
+                            <div class="flex-1">
+                                <p class="text-gray-800 font-medium mb-2">${q.question}</p>
+                                ${isCurrentRound && !isAnswered ? `
+                                    <textarea
+                                        class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary focus:border-transparent"
+                                        placeholder="请输入您的回答..."
+                                        data-round="${roundIndex}"
+                                        data-question="${qIndex}"
+                                        oninput="handleMultiRoundAnswer(this)"
+                                        rows="3"
+                                    ></textarea>
+                                ` : isAnswered ? `
+                                    <div class="user-response">
+                                        <div class="flex items-start">
+                                            <i class="fa fa-user text-green-500 mr-2 mt-1"></i>
+                                            <div class="flex-1">
+                                                <p class="text-sm text-gray-600 mb-1">${q.answeredBy || '您'} • ${formatDate(q.answeredAt)}</p>
+                                                <p class="text-gray-800">${q.answer}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // 用户回答汇总（如果已完成该轮）
+            if (round.status === 'completed' && round.userSummary) {
+                html += `
+                    <div class="user-response mt-4">
+                        <div class="flex items-start">
+                            <i class="fa fa-check-circle text-green-500 text-xl mr-3 mt-1"></i>
+                            <div class="flex-1">
+                                <p class="font-medium text-gray-800 mb-2">本轮回答总结</p>
+                                <p class="text-gray-700 whitespace-pre-wrap">${round.userSummary}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            return html;
+        }
+
+        // 切换轮次展开/折叠
+        function toggleRound(roundIndex) {
+            const content = document.getElementById(`round-${roundIndex}-content`);
+            const chevron = document.getElementById(`round-${roundIndex}-chevron`);
+
+            if (content.classList.contains('expanded')) {
+                content.classList.remove('expanded');
+                chevron.style.transform = 'rotate(0deg)';
+            } else {
+                content.classList.add('expanded');
+                chevron.style.transform = 'rotate(180deg)';
+            }
+        }
+
+        // 处理多轮回答输入
+        function handleMultiRoundAnswer(textarea) {
+            const roundIndex = parseInt(textarea.dataset.round);
+            const questionIndex = parseInt(textarea.dataset.question);
+            const answer = textarea.value.trim();
+
+            // 自动保存逻辑
+            if (autoSaveTimeout) clearTimeout(autoSaveTimeout);
+            autoSaveTimeout = setTimeout(() => {
+                // 这里可以添加保存到localStorage或发送到后端的逻辑
+                console.log(`保存轮次 ${roundIndex + 1} 问题 ${questionIndex + 1} 的回答:`, answer);
+            }, 1000);
+        }
+
+        // 格式化日期
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            const now = new Date();
+            const diff = now - date;
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(diff / 3600000);
+            const days = Math.floor(diff / 86400000);
+
+            if (minutes < 1) return '刚刚';
+            if (minutes < 60) return `${minutes}分钟前`;
+            if (hours < 24) return `${hours}小时前`;
+            if (days < 7) return `${days}天前`;
+            return date.toLocaleDateString('zh-CN');
         }
 
         // 渲染分类导航
