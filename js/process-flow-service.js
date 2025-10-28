@@ -655,11 +655,10 @@ class ProcessFlowService {
         const flows = this.getAllProcessFlows();
 
         // 添加新的mock流程 - 用于版本详情页展示
-        if (!flows['mock_process_1']) {
-            const mockProcess1 = this.createMockProcess1();
-            this.saveProcessFlow(mockProcess1);
-            console.log('✅ Mock流程 mock_process_1 初始化成功');
-        }
+        // 强制更新以确保使用最新的数据结构（包含多轮澄清）
+        const mockProcess1 = this.createMockProcess1();
+        this.saveProcessFlow(mockProcess1);
+        console.log('✅ Mock流程 mock_process_1 已更新（包含多轮澄清数据）');
 
         // 检查是否已存在mock数据
         if (flows['process_1730076000000']) {

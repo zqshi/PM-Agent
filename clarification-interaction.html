@@ -321,8 +321,13 @@
 
             // 获取澄清问题 - 优先从步骤1.1的clarificationRounds字段读取多轮数据
             const step11 = currentProcessFlow.steps['1.1'];
+            console.log('步骤1.1数据:', step11);
+            console.log('是否有clarificationRounds:', !!step11.clarificationRounds);
+            console.log('是否有clarificationQuestions:', !!step11.clarificationQuestions);
+
             if (step11 && step11.clarificationRounds) {
                 // 多轮澄清模式
+                console.log('✅ 使用多轮澄清模式, 轮次数量:', step11.clarificationRounds.length);
                 clarificationDoc = {
                     type: 'clarification_questions',
                     version: 1,
